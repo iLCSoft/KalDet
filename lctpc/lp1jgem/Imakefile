@@ -1,4 +1,4 @@
-#include "conf/makejsf.tmpl"
+#include "../../conf/makejsf.tmpl"
 
 INSTALLDIR    = ../..
 PACKAGENAME   = KalDetLP1JGEM
