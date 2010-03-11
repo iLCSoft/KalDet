@@ -30,17 +30,6 @@ all:: $(SONAME)
 
 SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
 
-#if defined(DarwinArchitecture)
-$(SONAME): $(OBJS)
-	$(LD) $(SOFLAGS) -o $(SONAME) $(OBJS) $(LDFLAGS)
-
-install:: $(SONAME)
-	$(MKDIRHIER) $(DESTDIR)$(LIBINSTALLDIR)
-	$(INSTALL) $(INSTALLFLAGS) $(SONAME) $(LIBINSTALLDIR)
-	$(RM) $(LIBINSTALLDIR)/lib$(LIBNAME).$(DllSuf)
-	$(LN) $(SONAME) $(LIBINSTALLDIR)/lib$(LIBNAME).$(DllSuf)
-#endif
-
 InstallSharedLibrary($(LIBNAME),$(SOREV),$(LIBINSTALLDIR))
 
 InstallMultipleFlags($(HDRS),$(INCINSTALLDIR),-m 644 -C)

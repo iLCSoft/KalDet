@@ -1,0 +1,308 @@
+XCOMM #---------------------------------------------------
+XCOMM # Machine dependant configuration to build application.
+XCOMM #---------------------------------------------------
+XCOMM # 
+XCOMM #  Required environment variable.
+XCOMM #     ROOTSYS : ROOT top directory.
+XCOMM # 
+XCOMM #(History) 
+XCOMM #  29-May-1999 Add EXTRACXXOPT in CXXFLAGS
+XCOMM #              Define .cxx compile rule here.    
+XCOMM #  4-Feb-2000 soname option in SOFLAGS for Linux is removed.
+XCOMM # 
+XCOMM # $Id: makejsf.tmpl,v 1.1 2010-03-11 15:07:01 fujiik Exp $
+XCOMM # 
+
+#include "include/LCBASEConfig.h"
+
+ROOT_VERSION = __ROOT_VERSION__
+ROOT_MINORVERSION = __ROOT_MINORVERSION__
+ROOT_PATCHLEVEL= __ROOT_PATCHLEVEL__
+ROOT_FULLVERSION= __ROOT_FULLVERSION__
+G77EGCS_VERSION = __G77EGCS_VERSION__
+G77EGCS_MINORVERSION = __G77EGCS_MINORVERSION__
+G77EGCS_PATCHLEVEL = __G77EGCS_PATCHLEVEL__
+UNAME_MACHINE = __UNAME_MACHINE__
+UNAME_SYSNAME = __UNAME_SYSNAME__
+G77EGCS_LIBNAME = __G77EGCS_LIBNAME__
+
+DllSuf        = $(SOEXT)
+DylibSuf      = $(SOEXT)
+SrcSuf        = cxx
+ObjSuf        = o
+HdrSuf        = h
+
+LD            = $(CXX)
+DYLDFLAGS     = $(SOFLAGS)
+DYLIBFLAGS    = $(SOFLAGS)
+DYLDEXTRALIBS = 
+RCINTDEFINES  = 
+PDFLIB        =
+
+ROOTLIBS      = $(shell root-config --libs) -lMinuit
+ROOTGLIBS     = $(shell root-config --glibs)
+
+DEPENDFILES   = $(filter -I% -D%,$(CXXFLAGS)) $(INCPATH)
+
+JSFTMPDIR     = 
+JSFBINDIR     = 
+JSFLIBDIR     = 
+JSFINCDIR     = 
+
+AIXLIBS       =
+
+#ifndef __CERNLIB_PDFLIB__
+CERNLIBLIBS   += pdflib804
+#endif
+#ifdef __LCLIBRAN_USE_RANMAR__
+CERNLIBLIBS   += mathlib
+#endif
+CERNLIBLIBS   += packlib
+CERNLIBS      = $(shell cernlib $(CERNLIBLIBS))
+
+
+XCOMM #---------------------------------------------------
+
+.SUFFIXES: .$(SrcSuf)
+
+.$(SrcSuf).$(ObjSuf):
+	$(CXX) $(CXXFLAGS) -c $<
+
+
+XCOMM # -----------------------------------------------------
+XCOMM # Linux with egcs
+XCOMM # -----------------------------------------------------
+#if defined(LinuxArchitecture)
+SOEXT         = so
+LIBF2C	      = -l$(G77EGCS_LIBNAME)
+FC	      = g77
+CXX           = g++ -O2 -g
+CC            = $(CXX)
+CXXFLAGS      = -Wall -fPIC \
+		$(EXTRACXXOPT) \
+		$(shell root-config --cflags)
+SOFLAGS       = -shared -rdynamic
+LDFLAGS       = $(ANALLIB) $(GLIBS) -rdynamic
+LIBS          = $(ROOTLIBS) -lm -ldl
+GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
+		-lXpm -lX11 $(LIBF2C) -lm -ldl
+BLOCKDATA     = 
+DEPENDFILES  += $(shell cxxdepends)
+#endif
+
+XCOMM # -----------------------------------------------------
+XCOMM # MkLinux with egcs
+XCOMM # -----------------------------------------------------
+#if defined(PowerPCArchitecture)
+#ifndef PPCArchitecture
+#define PPCArchitecture
+#endif
+#endif
+#if defined(PPCArchitecture)
+SOEXT         = so
+LIBF2C	      = -l$(G77EGCS_LIBNAME)
+CXX           = g++ -O2
+CC            = $(CXX)
+CXXFLAGS      = -Wall -fsigned-char -fPIC \
+		$(EXTRACXXOPT) \
+		$(shell root-config --cflags)
+SOFLAGS       = -shared -rdynamic
+LDFLAGS       = $(ANALLIB) $(GLIBS) -rdynamic
+LIBS          = $(ROOTLIBS) -lm -ldl
+GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
+                -lXpm -lX11 $(LIBF2C) -lm -ldl
+BLOCKDATA     = 
+DEPENDFILES  += $(shell cxxdepends)
+#endif
+
+XCOMM # -----------------------------------------------------
+XCOMM # MacOS X
+XCOMM # -----------------------------------------------------
+#if defined(MacOSXArchitecture) || defined(DarwinArchitecture)
+#ifndef PPCArchitecture
+#define PPCArchitecture
+#endif
+#ifndef PowerPCArchitecture
+#define PowerPCArchitecture
+#endif
+
+SOEXT         = so
+DylibSuf      = dylib	
+LIBF2C	      = -l$(G77EGCS_LIBNAME)
+CXX           = c++ -O
+CC            = $(CXX)
+RCINTDEFINES  = -D__DARWIN__
+CXXFLAGS      = -m32 -pipe -Wall -fsigned-char -D__BIG_ENDIAN__ \
+		$(EXTRACXXOPT) $(RCINTDEFINES) \
+		$(shell root-config --cflags)
+/* DYLIBFLAGS    = -dylib -r -nostartfiles -nodefaultlibs */
+/* DYLIBFLAGS    = -dylib -r -nostdlib */
+DYLIBFLAGS    = -m32 -dynamiclib -flat_namespace -undefined suppress -single_module
+/* DYLDFLAGS     = -dynamiclib -undefined suppress -nostdlib -bind_at_load */
+DYLDFLAGS     = $(DYLIBFLAGS)
+/* SOFLAGS       = -m32 -bundle -flat_namespace -undefined suppress */
+SOFLAGS       = $(DYLIBFLAGS)
+SHLIBLDFLAGS  = $(DYLDFLAGS)
+LDFLAGS       = $(ANALLIB) $(GLIBS) -Xlinker -bind_at_load
+LIBS          = $(ROOTLIBS) -L/usr/local/lib -lm -ldl
+GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
+                -lXpm -lX11 $(LIBF2C) -L/usr/local/lib -lm -ldl
+/* DYLDEXTRALIBS = -lcc_dynamic */
+PDFLIB	      = -lpdflib
+BLOCKDATA     = 
+DEPENDFILES  += $(shell cxxdepends)
+INSTALLFLAGS  = -c
+INSTALLFLAGS = -c
+/*
+ * SharedLibraryTarget - generate rules to create a shared library;
+ * build it into a different name so that we do not hose people by having
+ * the library gone for long periods.
+ */
+#  ifdef SharedLibraryTarget
+#  undef SharedLibraryTarget
+#  endif
+#  define SharedLibraryTarget(libname,rev,solist,down,up)               @@\
+AllTarget(Concat(lib,libname.rev.dylib))                                @@\
+                                                                        @@\
+Concat(lib,libname.rev.dylib):  solist $(EXTRALIBRARYDEPS)              @@\
+	$(RM) $@~                                                       @@\
+	@MAJREV=`echo rev | sed 's/\.[^\.]*$$//'`; \                    @@\
+	  INSTALLNAME=$(KALDETROOT)/lib/Concat(lib,libname.$$MAJREV.dylib); \             @@\
+	  set -x; (cd down; $(CC) -o up/$@~ $(SHLIBLDFLAGS) -install_name $$INSTALLNAME -current_version rev -compatibility_version rev solist $(REQUIREDLIBS)); \ @@\
+	  $(RM) $$INSTALLNAME; $(LN) $@ $$INSTALLNAME; \                @@\
+	  LinkBuildSonameLibrary($$INSTALLNAME)                         @@\
+	$(RM) $@                                                        @@\
+	$(MV) $@~ $@                                                    @@\
+	@if $(SOSYMLINK); then (set -x; \                               @@\
+	  $(RM) Concat(lib,libname.dylib); \                            @@\
+	  $(LN) $@ Concat(lib,libname.dylib); \                         @@\
+	  $(RM) Concat(lib,libname.so); \                               @@\
+	  $(LN) $@ Concat(lib,libname.so)); fi                          @@\
+	LinkBuildLibrary($@)                                            @@\
+	LinkBuildLibraryMaybe(Concat(lib,libname.dylib),$(SOSYMLINK))   @@\
+	LinkBuildLibraryMaybe(Concat(lib,libname.so),$(SOSYMLINK))      @@\
+									@@\
+clean::                                                                 @@\
+	@MAJREV=`echo rev | sed 's/\.[^\.]*$$//'`; \                    @@\
+	set -x; $(RM) Concat(lib,libname.$$MAJREV.dylib)                @@\
+	$(RM) Concat(lib,libname.rev.dylib) Concat(lib,libname.dylib) Concat(lib,libname.so)
+
+/*
+ * InstallSharedLibrary - generate rules to install the shared library.
+ */
+#  ifdef InstallSharedLibrary
+#  undef InstallSharedLibrary
+#  endif
+#  define InstallSharedLibrary(libname,rev,dest)			@@\
+install:: Concat(lib,libname.rev.dylib)					@@\
+	MakeDir($(DESTDIR)dest)						@@\
+	$(INSTALL) $(INSTALLFLAGS) $(INSTLIBFLAGS) Concat(lib,libname.rev.dylib) $(DESTDIR)dest @@\
+	@MAJREV=`echo rev | sed 's/\([0-9]*\)\(\.[0-9]*\)\{1,2\}/\1/'`; \	@@\
+	  set -x; $(RM) Concat($(DESTDIR)dest/lib,libname.$$MAJREV.dylib) && \ @@\
+	  $(LN) Concat(lib,libname.rev.dylib) Concat($(DESTDIR)dest/lib,libname.$$MAJREV.dylib) @@\
+	@if $(SOSYMLINK); then (set -x; \				@@\
+	  $(RM) Concat($(DESTDIR)dest/lib,libname.so); \		@@\
+	  $(RM) Concat($(DESTDIR)dest/lib,libname.dylib); \		@@\
+	  $(LN) Concat(lib,libname.rev.dylib) Concat($(DESTDIR)dest/lib,libname.so); \		@@\
+	  $(LN) Concat(lib,libname.rev.dylib) Concat($(DESTDIR)dest/lib,libname.dylib)); fi
+
+#endif
+
+XCOMM # -----------------------------------------------------
+XCOMM # For Machten gcc (This is not tested yet.)
+XCOMM # -----------------------------------------------------
+#if defined(MachTenPPCArchitecture)
+SOEXT         = so
+LIBF2C        = -lf2c           
+CXX           = g++ -O2
+CC            = $(CXX)
+CXXFLAGS      = -Wall  -fno-rtti -fno-exceptions -fPIC \
+		$(EXTRACXXOPT) \
+		$(shell root-config --cflags)
+SOFLAGS       = -shared -rdynamic
+LDFLAGS       = $(ANALLIB) $(GLIBS) -rdynamic
+LIBS          = $(ROOTLIBS) -lm -ldl
+GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -L/usr/X11R6/lib \
+		-lXpm -lX11 $(LIBF2C) -lm -ldl
+BLOCKDATA     = 
+DEPENDFILES  += $(shell cxxdepends)
+#endif
+
+XCOMM # -----------------------------------------------------
+XCOMM # HI-UX
+XCOMM # -----------------------------------------------------
+#if defined(hitachiArchitecture)
+SOEXT         = sl
+CXX           = g++ -O2
+CC            = $(CXX)
+CXXFLAGS      = -Wall  -fno-rtti -fno-exceptions -fPIC \
+		$(EXTRACXXOPT) \
+		$(shell root-config --cflags) \
+		$(USEFORTRAN)
+SOFLAGS       = -nostdlib  -nostartfiles -Wl,-b,-E 
+LDFLAGS       = $(ANALLIB) -Wl,+s $(GLIBS) $(F90LIB)
+MYLDOPT       = -lmsl2 -L/lib/pa1.1 -lm
+F90LIB        =  $(MYLDOPT) -Wl,-a,archive -lhf90math -lf90 \
+		-Wl,-a,default -lc
+LIBS          = $(ROOTLIBS) -lm -ldld
+GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) -lXpm -lX11 -lm -ldld
+FC            = f90
+USEFORTRAN    = -D_HIUX_FORTRAN
+BLOCKDATA     = $(LCLIBROOT)/util/lcfull/src/prblk1.o \
+		$(LCLIBROOT)/util/fortlib/src/uconst.o \
+		$(LCLIBROOT)/simjlc/src/smrblk.o \
+		$(LCLIBROOT)/util/ltkcl/cmbblk.o 
+DEPENDFILES  += $(shell cxxdepends)
+#endif
+
+
+XCOMM # -----------------------------------------------------
+XCOMM # HP-UX
+XCOMM # -----------------------------------------------------
+#if defined(HPArchitecture)
+SOEXT         = sl
+LIBF2C        = -L/opt/fortran/lib -lU77
+CXX	      = aCC -O
+CC            = $(CXX)
+CXXFLAGS      = +W70,495,740,749,829,823 -DR__ACC -z +Z \
+		$(EXTRACXXOPT) \
+		$(shell root-config --cflags)
+SOFLAGS       = -b -z -Wl,+vnocompatwarnings -Wl,-E
+LDFLAGS       = -z -Wl,+s -Wl,-E $(ANALLIB) $(GLIBS)
+LIBS          = $(ROOTLIBS) -L/usr/lib -lm -ldld
+GLIBS         = $(ROOTLIBS) $(ROOTGLIBS) \
+		$(LIBF2C) -L/usr/lib -lm -ldld
+BLOCKDATA     = 
+DEPENDFILES   += -I/opt/aCC/include -I/opt/aCC/include/iostream \
+                -I/usr -I/usr/include
+#endif
+
+XCOMM # -----------------------------------------------------
+XCOMM # AIX
+XCOMM # -----------------------------------------------------
+#if defined(AIXArchitecture)
+SOEXT         = so
+LIBF2C        =
+CXX           = xlC
+CC            = $(CXX)
+CXXFLAGS      = $(EXTRACXXOPT) -DAIX \
+                $(shell root-config --cflags) \
+		-I/usr/vacpp/include -brtl -bshared
+SOFLAGS       = -p 0
+LDFLAGS       = -brtl -bshared $(ANALLIB) $(GLIBS) -lxlf90
+ROOTLIBS     := $(shell root-config --nonew --libs)
+ROOTGLIBS    := $(shell root-config --nonew --glibs)
+LIBS          = $(ROOTLIBS) -lxlf90
+GLIBS         = $(ROOTLIBS) $(ROOTGLIBS)
+BLOCKDATA     =
+LD            = /usr/vacpp/bin/makeC++SharedLib -brtl -bshared
+DEPENDFILES  += $(shell cxxdepends)
+AIXLIBS       = $(ROOTLIBS)
+#endif
+
+
+GCCVER = $(shell $(CXX) -dumpversion 2>/dev/null | sed -e 's;\..*;;')
+ifeq ($(GCCVER),3)
+   CXXFLAGS += -D__USEISOCXX__
+endif
+

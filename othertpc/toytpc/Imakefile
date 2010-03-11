@@ -1,11 +1,11 @@
 #include "conf/makejsf.tmpl"
 
-INSTALLDIR    = ..
-PACKAGENAME   = KalDetKern
+INSTALLDIR    = ../..
+PACKAGENAME   = KalDetToyTpc
 SOREV         = 2009.01
-SRCS          = EXVKalDetector.$(SrcSuf) \
-                EXVMeasLayer.$(SrcSuf) \
-                EXHYBTrack.$(SrcSuf)
+SRCS          = EXTPCKalDetector.$(SrcSuf) \
+                EXTPCMeasLayer.$(SrcSuf) \
+                EXTPCHit.$(SrcSuf)
 
 OBJS          =	$(subst .$(SrcSuf),.$(ObjSuf),$(SRCS)) \
                 $(PACKAGENAME)Dict.$(ObjSuf)
@@ -21,12 +21,25 @@ SONAME        = lib$(LIBNAME).$(DllSuf).$(SOREV)
 LIBINSTALLDIR = $(INSTALLDIR)/lib
 INCINSTALLDIR = $(INSTALLDIR)/include
 INCPATH       = -I. -I$(KALTESTROOT)/include -I$(INCINSTALLDIR)
+INCPATH      += -I$(MARLIN)/include -I$(GEAR)/include
 CXXFLAGS     += $(INCPATH) -O -g
+CXXFLAGS     += -DUSE_GEAR
 SHLIBLDFLAGS  = $(DYLIBFLAGS)
 
 all:: $(SONAME)
 
 SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
+
+#if defined(DarwinArchitecture)
+$(SONAME): $(OBJS)
+	$(LD) $(SOFLAGS) -o $(SONAME) $(OBJS) $(LDFLAGS)
+
+install:: $(SONAME)
+	$(MKDIRHIER) $(DESTDIR)$(LIBINSTALLDIR)
+	$(INSTALL) $(INSTALLFLAGS) $(SONAME) $(LIBINSTALLDIR)
+	$(RM) $(LIBINSTALLDIR)/lib$(LIBNAME).$(DllSuf)
+	$(LN) $(SONAME) $(LIBINSTALLDIR)/lib$(LIBNAME).$(DllSuf)
+#endif
 
 InstallSharedLibrary($(LIBNAME),$(SOREV),$(LIBINSTALLDIR))
 

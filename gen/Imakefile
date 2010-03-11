@@ -1,43 +1,41 @@
 #include "conf/makejsf.tmpl"
 
 INSTALLDIR    = ..
-PACKAGENAME   = KalDetKern
-SOREV         = 2009.01
-SRCS          = EXVKalDetector.$(SrcSuf) \
-                EXVMeasLayer.$(SrcSuf) \
-                EXHYBTrack.$(SrcSuf)
+PACKAGENAME   = EXGen
+SOREV         = 2005.01
+SRCS          = EXEventGen.$(SrcSuf)
 
-OBJS          =	$(subst .$(SrcSuf),.$(ObjSuf),$(SRCS)) \
-                $(PACKAGENAME)Dict.$(ObjSuf)
+OBJS	      =	$(subst .$(SrcSuf),.$(ObjSuf),$(SRCS)) \
+		$(PACKAGENAME)Dict.$(ObjSuf)
 
-HDRS          = $(subst .$(SrcSuf),.h,$(SRCS))
+HDRS	      = $(subst .$(SrcSuf),.h,$(SRCS)) 
 
 DICTNAME      = $(PACKAGENAME)Dict
 
 LIBNAME       = $(PACKAGENAME)
 
-SONAME        = lib$(LIBNAME).$(DllSuf).$(SOREV)
-
 LIBINSTALLDIR = $(INSTALLDIR)/lib
 INCINSTALLDIR = $(INSTALLDIR)/include
-INCPATH       = -I. -I$(KALTESTROOT)/include -I$(INCINSTALLDIR)
+INCPATH	      = -I. -I../../KalTest/include -I$(INCINSTALLDIR)
 CXXFLAGS     += $(INCPATH) -O -g
 SHLIBLDFLAGS  = $(DYLIBFLAGS)
 
-all:: $(SONAME)
+
+all::
 
 SharedLibraryTarget($(LIBNAME),$(SOREV),$(OBJS),.,.)
-
+	
 InstallSharedLibrary($(LIBNAME),$(SOREV),$(LIBINSTALLDIR))
 
-InstallMultipleFlags($(HDRS),$(INCINSTALLDIR),-m 644 -C)
+InstallMultipleFlags($(HDRS),$(INCINSTALLDIR),-m 644)
 
-clean::
+clean:: 
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h
 
 depend:: $(SRCS) $(HDRS)
 	for i in $(SRCS); do \
 	rmkdepend -a -- $(DEPENDFILES) -- $$i; done
+
 
 distclean:: clean
 	@rm -f $(OBJS) core *.$(DllSuf) $(DICTNAME).$(SrcSuf) $(DICTNAME).h *~
@@ -46,4 +44,5 @@ distclean:: clean
 $(DICTNAME).$(SrcSuf): $(HDRS) LinkDef.h
 	@echo "Generating dictionary ..."
 	rootcint -f $(DICTNAME).$(SrcSuf) \
-		-c $(INCPATH) $(HDRS) LinkDef.h
+ 		-c $(INCPATH) $(HDRS) LinkDef.h
+

@@ -18,15 +18,15 @@
 ##   clean         : deletes *.o ...
 ##   distclean     : deletes even libraries
 ##
-## $Id: Makefile,v 1.1.1.1 2009-11-24 00:13:59 ikematsu Exp $
+## $Id: Makefile,v 1.2 2010-03-11 15:09:07 fujiik Exp $
 ########################################################################
 
-SHELL   = `which bash`
 MFLAGS  =
 CURRDIR = .
 
-#SUBDIRS = kern lctpc/lp1jgem ild/tpc othertpc/mp-tpc
-SUBDIRS = kern lctpc/lp1jgem
+#SUBDIRS = kern gen lctpc/lp1jgem ild/tpc othertpc/mp-tpc
+SUBDIRS = kern gen othertpc/toytpc
+#SUBDIRS = kern gen lctpc/lp1jgem
 
 all:
 	@case '${MFLAGS}' in *[ik]*) set +e;; esac; \
