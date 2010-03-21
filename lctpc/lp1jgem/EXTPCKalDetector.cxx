@@ -13,7 +13,7 @@
 //*   2009/11/23  K.Ikematsu   Derived from KalTest/examples/kaltest/
 //*                                         hybrid/tpc/EXTPCKalDetector.cxx
 //*
-//* $Id: EXTPCKalDetector.cxx,v 1.1.1.1 2009-11-24 00:13:59 ikematsu Exp $
+//* $Id: EXTPCKalDetector.cxx,v 1.2 2010-03-21 21:23:48 fujiik Exp $
 //*************************************************************************
 //
 // STL
@@ -32,6 +32,7 @@
 #include "EXTPCKalDetector.h"
 #include "EXTPCMeasLayer.h"
 #include "EXTPCHit.h"
+#include "TKalDetCradle.h"
 #include "TRandom.h"
 #include "TMath.h"
 
@@ -39,7 +40,9 @@
 #include "TNode.h"
 #include "TVirtualPad.h"
 
+EXTPCKalDetector * EXTPCKalDetector::fgInstance = 0;
 Double_t EXTPCKalDetector::fgVdrift = 7.6e-3;
+
 ClassImp(EXTPCKalDetector)
 
 EXTPCKalDetector::EXTPCKalDetector(Int_t m)
@@ -141,6 +144,18 @@ EXTPCKalDetector::EXTPCKalDetector(Int_t m)
 
 EXTPCKalDetector::~EXTPCKalDetector()
 {
+}
+
+EXTPCKalDetector * EXTPCKalDetector::GetInstance()
+{
+  if (!fgInstance) {
+     fgInstance = new EXTPCKalDetector;
+     TKalDetCradle & lp1tpc = * new TKalDetCradle;
+     lp1tpc.Install(*fgInstance);
+     lp1tpc.Close();
+     lp1tpc.Sort();
+  }
+  return fgInstance;
 }
 
 //_________________________________________________________________________
