@@ -13,7 +13,7 @@
 //*   2009/11/23  K.Ikematsu   Derived from KalTest/examples/kaltest/
 //*                                         hybrid/tpc/EXTPCKalDetector.cxx
 //*
-//* $Id: EXTPCKalDetector.cxx,v 1.2 2010-03-21 21:23:48 fujiik Exp $
+//* $Id: EXTPCKalDetector.cxx,v 1.3 2010-05-31 04:30:30 fujiik Exp $
 //*************************************************************************
 //
 // STL
@@ -93,10 +93,17 @@ EXTPCKalDetector::EXTPCKalDetector(Int_t m)
   static const Int_t    nlayers = nrows * 3;  // # of layers
   //////////////////////////////////////////////////////////
   static const Double_t neff    = 22.7;
+#if 1
   static const Double_t sigmax0 = 38.3e-4;
   static const Double_t sigmax1 = 101.5e-4 / TMath::Sqrt(10.) / TMath::Sqrt(neff);
   static const Double_t sigmaz0 = 500.e-4;
   static const Double_t sigmaz1 = 154.e-4  / TMath::Sqrt(10.) / TMath::Sqrt(neff);
+#else
+  static const Double_t sigmax0 = 100.e-4;
+  static const Double_t sigmax1 = 0.;
+  static const Double_t sigmaz0 = 500.e-4;
+  static const Double_t sigmaz1 = 0.;
+#endif
 
   Bool_t active = EXTPCMeasLayer::kActive;
   Bool_t dummy  = EXTPCMeasLayer::kDummy;

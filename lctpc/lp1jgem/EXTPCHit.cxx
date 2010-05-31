@@ -17,7 +17,7 @@
 //*   2009/11/23  K.Ikematsu   Added data member *fHitPtr
 //*                            as a pointer to raw Hit object
 //*
-//* $Id: EXTPCHit.cxx,v 1.1.1.1 2009-11-24 00:13:59 ikematsu Exp $
+//* $Id: EXTPCHit.cxx,v 1.2 2010-05-31 04:30:30 fujiik Exp $
 //*************************************************************************
 //
 #include "EXTPCHit.h"
@@ -39,7 +39,8 @@ ClassImp(EXTPCHit)
 EXTPCHit::EXTPCHit(Int_t m)
         : TVTrackHit(m),
           fSide(0),
-          fVdrift(0)
+          fVdrift(0),
+          fHitPtr(0)
 {
 }
 
@@ -54,7 +55,8 @@ EXTPCHit::EXTPCHit(const EXTPCMeasLayer &ms,
         : TVTrackHit(ms, x, dx, b, m),
           fSide(side),
           fVdrift(v),
-          fXXPtr(&xx)
+          fXXPtr(&xx),
+          fHitPtr(0)
 {
 }
 
