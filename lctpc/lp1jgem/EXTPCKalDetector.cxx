@@ -13,9 +13,11 @@
 //*   2009/11/23  K.Ikematsu   Derived from KalTest/examples/kaltest/
 //*                                         hybrid/tpc/EXTPCKalDetector.cxx
 //*
-//* $Id: EXTPCKalDetector.cxx,v 1.3 2010-05-31 04:30:30 fujiik Exp $
+//* $Id: EXTPCKalDetector.cxx,v 1.4 2010-09-22 05:49:59 fujiik Exp $
 //*************************************************************************
 //
+//#define APR_2009
+#define SEP_2010
 // STL
 #include <vector>
 
@@ -115,7 +117,13 @@ EXTPCKalDetector::EXTPCKalDetector(Int_t m)
     Int_t    rownum     = layer % nrows;
 
     ///// FIXME: temporary treatment //////////////////////////////////////
+#ifdef APR_2009
     Int_t    module     = superlayer < 1 ? 1 : (superlayer < 2 ? 3 : 6);
+#else
+#ifdef SEP_2010
+    Int_t    module     = superlayer < 1 ? 0 : (superlayer < 2 ? 3 : 5);
+#endif
+#endif
     ///////////////////////////////////////////////////////////////////////
 
     TVector3 xc(modules[module]->getOffset()[0] * kmm2cm,
