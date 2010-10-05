@@ -81,6 +81,10 @@ INCLUDE( cmake/MacroRootDict.cmake )
 
 ###################################################################################
 
+IF( KalTest_HOME AND NOT KalTest_DIR )
+    SET( KalTest_DIR ${KalTest_HOME} )
+ENDIF()
+
 FIND_PACKAGE( KalTest REQUIRED )
 
 INCLUDE_DIRECTORIES( ${KalTest_INCLUDE_DIRS} )
