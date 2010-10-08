@@ -1,3 +1,80 @@
 $Id: README,v 1.1.1.1 2009-11-24 00:13:59 ikematsu Exp $
 
-To be filled...
+Description: To be filled...
+
+
+-------------------------------------------------------------------------------
+  KalDet Package now part of iLCSoft
+
+  ( F.Gaede, J.Engels, 2010/10/08)
+-------------------------------------------------------------------------------
+
+
+Dependencies: KalDet depends on KalTest, ROOT, GEAR and Marlin
+
+
+---- Building KalDet with cmake:
+
+The KalTest package has been included in the iLCSoft framework and can be
+installed with ilcinstall and built with cmake. Since all KalDet dependencies
+are included in the iLCSoft framework the easiest way to build KalDet is to
+make use of an existing iLCSoft installation, i.e.:
+
+# init ilcsoft
+. /path/to/ilcsoft/vXX-YY-ZZ/init_ilcsoft.sh
+
+# configure
+cmake -C $ILCSOFT/ILCSoft.cmake ..
+
+# build
+make install
+
+
+---- Building against the KalTest Library with cmake:
+
+ a) in an iLCSoft package, simply add KalTest to your project dependencies in the CMakeLists.txt, e.g:
+
+
+      SET( ${PROJECT_NAME}_DEPENDS "Marlin LCIO GEAR KalDet")
+
+
+ b) use the usual cmake mechanism in your CMakeLists.txt :
+
+      FIND_PACKAGE( KalDet )
+
+      # -- and then use the following variables, as needed:
+      #
+      #  KalDet_INCLUDE_DIRS KalDet_LIBRARY_DIRS KalDet_LIBRARIES
+      #
+      # e.g:
+
+      INCLUDE_DIRECTORIES( ${KalDet_INCLUDE_DIRS} )
+
+      TARGET_LINK_LIBRARIES( ${LIBNAME} ${KalDet_LIBRARIES})
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+  Note: with a cmake install the KalDet header files will be installed in
+        ./include/kaldet  so make sure you use this in your C++ files, eg:
+
+      #include "kaldet/EXTPCKalDetector.h"
+      #include "kaldet/EXEventGen.h"
+      #include "kaldet/EXTPCHit.h"
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+=====================================================================================
+
+  Release Notes:
+
+=====================================================================================
+
+ --------
+| v01-00 |  - first release as part of iLCSoft - no code changes.
+ --------     (except header in subdirectory 'include/kaldet', when installed with cmake)
+
+
