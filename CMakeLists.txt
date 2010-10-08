@@ -20,8 +20,8 @@ PROJECT( KalDet )
 OPTION( BUILD_SHARED_LIBS "Set to OFF to build static libraries" ON )
 
 # project version
-SET( KALDET_MAJOR_VERSION 0 )
-SET( KALDET_MINOR_VERSION 6 )
+SET( KALDET_MAJOR_VERSION 1 )
+SET( KALDET_MINOR_VERSION 0 )
 SET( KALDET_PATCH_LEVEL 0 )
 
 # set default install prefix to project root directory
