@@ -86,6 +86,7 @@ ENDFOREACH()
 
 SET( ROOT_DICT_OUTPUT_SOURCES )
 FOREACH( dict_src_filename ${ROOT_DICT_INPUT_SOURCES} )
+    STRING( REPLACE "/" "_" dict_src_filename ${dict_src_filename} )
     SET( dict_src_file ${ROOT_DICT_OUTPUT_DIR}/${dict_src_filename} )
     ADD_CUSTOM_COMMAND(
         OUTPUT  ${dict_src_file}

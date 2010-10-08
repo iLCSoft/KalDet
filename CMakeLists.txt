@@ -81,19 +81,32 @@ INCLUDE( cmake/MacroRootDict.cmake )
 
 ###################################################################################
 
-IF( KalTest_HOME AND NOT KalTest_DIR )
-    SET( KalTest_DIR ${KalTest_HOME} )
-ENDIF()
 
-FIND_PACKAGE( KalTest REQUIRED )
+SET( kaldet_req_pkgs KalTest Marlin GEAR )
 
-INCLUDE_DIRECTORIES( ${KalTest_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${KalTest_INCLUDE_DIRS}/kaltest )
-LINK_LIBRARIES( ${KalTest_LIBRARIES} )
+FOREACH( pkg ${kaldet_req_pkgs} )
+
+    IF( ${pkg}_HOME AND NOT ${pkg}_DIR )
+        SET( ${pkg}_DIR ${${pkg}_HOME} )
+    ENDIF()
+
+    FIND_PACKAGE( ${pkg} REQUIRED )
+
+    IF( ${pkg}_FOUND )
+
+        INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
+        INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS}/kaltest )
+        ADD_DEFINITIONS( ${${pkg}_DEFINITIONS} )
+        LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
+    ELSE()
+        MESSAGE( FATAL_ERROR "required package ${pkg} not found" )
+    ENDIF()
+
+ENDFOREACH()
 
 # build KalDet library
 
-SET( lib_input_dirs gen kern )
+SET( lib_input_dirs gen kern lctpc/lp1jgem )
 
 FOREACH( lib_input_dir ${lib_input_dirs} )
     LIST( APPEND ROOT_DICT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${lib_input_dir} )
