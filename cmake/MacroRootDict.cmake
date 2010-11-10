@@ -1,65 +1,65 @@
-# ROOT package required
-#INCLUDE( ${PROJECT_SOURCE_DIR}/FindROOT.cmake )
-LIST( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
-FIND_PACKAGE( ROOT REQUIRED )
-SET( ENV{ROOTSYS} "${ROOT_HOME}" )
-SET( ENV{PATH} $ENV{ROOTSYS}/bin:$ENV{PATH} )
-SET( ENV{LD_LIBRARY_PATH} $ENV{ROOTSYS}/lib:$ENV{LD_LIBRARY_PATH} )
 IF(APPLE)
-    SET( ENV{DYLD_LIBRARY_PATH} $ENV{LD_LIBRARY_PATH} )
-ENDIF(APPLE)
-#-----------------------------
-
-# ============================================================================
-# prepares input headers for GEN_ROOT_DICT_SOURCES
-# expects:
-#   INPUT_DIR - directory to search for headers
-#
-# returns:
-#   ROOT_DICT_INPUT_HEADERS - header files found in INPUT_DIR
-#       LinkDef.h should be the last header (if found) (required by rootcint)
-#
-MACRO( PREPARE_ROOT_DICT_HEADERS INPUT_DIR )
-
-    FILE( GLOB ROOT_DICT_INPUT_HEADERS "${INPUT_DIR}/*.h" )
-
-    # rootcint needs LinkDef.h as the last header !!
-
-    #LIST( FIND ROOT_DICT_INPUT_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h LINKDEF_FOUND )
-    #IF( LINKDEF_FOUND )
-    #    LIST( REMOVE_ITEM ROOT_DICT_INPUT_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/LinkDef.h )
-    #    LIST( APPEND ROOT_DICT_INPUT_HEADERS LinkDef.h )
-    #ENDIF( LINKDEF_FOUND )
-
-    FILE( GLOB exclude_headers "${INPUT_DIR}/LinkDef.h" )
-    IF( exclude_headers )
-        LIST( REMOVE_ITEM ROOT_DICT_INPUT_HEADERS "${exclude_headers}" )
-        LIST( APPEND ROOT_DICT_INPUT_HEADERS "${exclude_headers}")
-    ENDIF( exclude_headers )
-
-    #MESSAGE( STATUS "  headers : ${ROOT_DICT_INPUT_HEADERS}  ********************  exclude headers : ${exclude_headers} " )
-
-ENDMACRO( PREPARE_ROOT_DICT_HEADERS )
+    SET( LD_LIBRARY_PATH_VAR DYLD_LIBRARY_PATH )
+ELSE()
+    SET( LD_LIBRARY_PATH_VAR LD_LIBRARY_PATH )
+ENDIF()
 
 IF( NOT DEFINED ROOT_DICT_OUTPUT_DIR )
-    MESSAGE( STATUS "ROOT_DICT_OUTPUT_DIR set to default: ${PROJECT_BINARY_DIR}/rootdict" )
     SET( ROOT_DICT_OUTPUT_DIR "${PROJECT_BINARY_DIR}/rootdict" )
-ENDIF( NOT DEFINED ROOT_DICT_OUTPUT_DIR )
+ENDIF()
 
 # clean generated header files with 'make clean'
 SET_DIRECTORY_PROPERTIES( PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ROOT_DICT_OUTPUT_DIR}" )
 
+IF( NOT ROOT_FIND_QUIETLY )
+    MESSAGE( STATUS "Check for ROOT_DICT_OUTPUT_DIR: ${PROJECT_BINARY_DIR}/rootdict" )
+    MESSAGE( STATUS "Check for ROOT_DICT_CINT_DEFINITIONS: ${ROOT_DICT_CINT_DEFINITIONS}" )
+ENDIF()
 
-IF( DEFINED ROOT_DICT_CINT_DEFINITIONS )
-    MESSAGE( STATUS "ROOT_DICT_CINT_DEFINITIONS set to: ${ROOT_DICT_CINT_DEFINITIONS}" )
-ENDIF( DEFINED ROOT_DICT_CINT_DEFINITIONS )
+
+# ============================================================================
+# helper macro to prepare input headers for GEN_ROOT_DICT_SOURCES
+#   sorts LinkDef.h to be the last header (required by rootcint)
+#
+# arguments:
+#   INPUT_DIR - directory to search for headers matching *.h
+#
+# returns:
+#   ROOT_DICT_INPUT_HEADERS - all header files found in INPUT_DIR with
+#       LinkDef.h as the last header (if found)
+#
+# ----------------------------------------------------------------------------
+MACRO( PREPARE_ROOT_DICT_HEADERS INPUT_DIR )
+
+    FILE( GLOB ROOT_DICT_INPUT_HEADERS "${INPUT_DIR}/*.h" )
+    FILE( GLOB _linkdef_hdr "${INPUT_DIR}/LinkDef.h" )
+
+    #LIST( FIND ROOT_DICT_INPUT_HEADERS ${_linkdef_hdr} _aux )
+    #IF( ${_aux} EQUAL 0 OR ${_aux} GREATER 0 )
+    #    LIST( REMOVE_ITEM ROOT_DICT_INPUT_HEADERS "${_linkdef_hdr}" )
+    #    LIST( APPEND ROOT_DICT_INPUT_HEADERS "${_linkdef_hdr}" )
+    #ENDIF()
+
+    IF( _linkdef_hdr )
+        LIST( REMOVE_ITEM ROOT_DICT_INPUT_HEADERS "${_linkdef_hdr}" )
+        LIST( APPEND ROOT_DICT_INPUT_HEADERS "${_linkdef_hdr}")
+    ENDIF()
+
+    #MESSAGE( STATUS "ROOT_DICT_INPUT_HEADERS: ${ROOT_DICT_INPUT_HEADERS}" )
+
+ENDMACRO( PREPARE_ROOT_DICT_HEADERS )
+
+
+
+
 
 # ============================================================================
 # macro for generating root dict sources with rootcint
 #
-# expects:
+# requires following variables:
 #       ROOT_DICT_INPUT_SOURCES - list of sources to generate
 #       ROOT_DICT_INPUT_HEADERS - list of headers needed to generate dict sources
+#           * if LinkDef.h is in the list it must be at the end !!
 #       ROOT_DICT_INCLUDE_DIRS - list of include dirs to pass to rootcint -I..
 #       ROOT_DICT_CINT_DEFINITIONS - extra definitions to pass to rootcint
 #       ROOT_DICT_OUTPUT_DIR - where sources should be generated
@@ -69,37 +69,31 @@ ENDIF( DEFINED ROOT_DICT_CINT_DEFINITIONS )
 # ----------------------------------------------------------------------------
 MACRO( GEN_ROOT_DICT_SOURCES ROOT_DICT_INPUT_SOURCES )
 
-#IF( NOT DEFINED ROOT_DICT_OUTPUT_DIR )
-#    MESSAGE( FATAL_ERROR "ROOT_DICT_OUTPUT_DIR not defined" )
-#ENDIF()
+    # need to prefix all include dirs with -I
+    set( _dict_includes )
+    FOREACH( _inc ${ROOT_DICT_INCLUDE_DIRS} )
+        SET( _dict_includes "${_dict_includes}\t-I${_inc}")  #fg: the \t fixes a wired string expansion 
+        #SET( _dict_includes ${_dict_includes} -I${_inc} )
+    ENDFOREACH()
 
-# generate dict source file
-#--- need to get the include dirs in a string that rootcint understands...
-set(_incs)
-FOREACH(_current ${ROOT_DICT_INCLUDE_DIRS})
-    SET(_incs "${_incs}\t-I${_current}")  #fg: the \t fixes a wired string expansion 
-ENDFOREACH()
-#MESSAGE(STATUS "--- _incs: " ${_incs} )
 
-SET( ROOT_DICT_OUTPUT_SOURCES )
-FOREACH( dict_src_filename ${ROOT_DICT_INPUT_SOURCES} )
-    STRING( REPLACE "/" "_" dict_src_filename ${dict_src_filename} )
-    SET( dict_src_file ${ROOT_DICT_OUTPUT_DIR}/${dict_src_filename} )
-    ADD_CUSTOM_COMMAND(
-        OUTPUT  ${dict_src_file}
-        COMMAND mkdir ARGS -p ${ROOT_DICT_OUTPUT_DIR}
-        COMMAND rootcint
-        ARGS -f "${dict_src_file}" -c ${ROOT_DICT_CINT_DEFINITIONS} ${_incs} ${ROOT_DICT_INPUT_HEADERS}
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        DEPENDS ${ROOT_DICT_INPUT_HEADERS}
-        COMMENT "generating: ${dict_src_file}"
-    )
-    LIST( APPEND ROOT_DICT_OUTPUT_SOURCES ${dict_src_file} )
-ENDFOREACH()
+    SET( ROOT_DICT_OUTPUT_SOURCES )
+    FOREACH( _dict_src_filename ${ROOT_DICT_INPUT_SOURCES} )
+        STRING( REPLACE "/" "_" _dict_src_filename ${_dict_src_filename} )
+        SET( _dict_src_file ${ROOT_DICT_OUTPUT_DIR}/${_dict_src_filename} )
+        STRING( REGEX REPLACE "^(.*)\\.(.*)$" "\\1.h" _dict_hdr_file "${_dict_src_file}" )
+        ADD_CUSTOM_COMMAND(
+            OUTPUT  ${_dict_src_file} ${_dict_hdr_file}
+            COMMAND mkdir ARGS -p ${ROOT_DICT_OUTPUT_DIR}
+            COMMAND ${LD_LIBRARY_PATH_VAR}=${ROOT_LIBRARY_DIR} ${ROOT_CINT}
+            ARGS -f "${_dict_src_file}" -c ${ROOT_DICT_CINT_DEFINITIONS} ${_dict_includes} ${ROOT_DICT_INPUT_HEADERS}
+            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            DEPENDS ${ROOT_DICT_INPUT_HEADERS}
+            COMMENT "generating: ${_dict_src_file} ${_dict_hdr_file}"
+        )
+        LIST( APPEND ROOT_DICT_OUTPUT_SOURCES ${_dict_src_file} )
+    ENDFOREACH()
 
-#MESSAGE( STATUS "${ROOT_DICT_OUTPUT_SOURCES}" )
-
-ENDMACRO( GEN_ROOT_DICT_SOURCES )
-
-# === end of macro GEN_ROOT_DICT_SOURCES =====================================
+ENDMACRO( GEN_ROOT_DICT_SOURCES ROOT_DICT_INPUT_SOURCES )
+# ============================================================================
 

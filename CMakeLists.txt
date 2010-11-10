@@ -76,13 +76,13 @@ ADD_DEFINITIONS( "-Wno-long-long -fno-strict-aliasing" )
 #-----------------------------------------------------
 
 # macros for generating root dict sources with rootcint
+LIST( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 SET( ROOT_DICT_CINT_DEFINITIONS "-DHANDLE_DICT_EXCEPTIONS=IGNORED_FOR_CINT" )
-INCLUDE( cmake/MacroRootDict.cmake )
 
 ###################################################################################
 
 
-SET( kaldet_req_pkgs KalTest Marlin GEAR )
+SET( kaldet_req_pkgs KalTest Marlin GEAR ROOT )
 
 FOREACH( pkg ${kaldet_req_pkgs} )
 
@@ -102,6 +102,8 @@ FOREACH( pkg ${kaldet_req_pkgs} )
     ENDIF()
 
 ENDFOREACH()
+
+INCLUDE( ${ROOT_DICT_MACROS_FILE} )
 
 # build KalDet library
 

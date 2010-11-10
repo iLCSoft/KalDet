@@ -1,14 +1,22 @@
 ###############################################################################
 # cmake module for finding ROOT
 #
+# requires:
+#   MacroCheckPackageLibs.cmake for checking package libraries
+#
 # Following cmake variables are returned by this module:
 #
-#   ROOT_FOUND              # set to TRUE if ROOT was successfully found
-#   ROOT_INCLUDE_DIRS       # list of directories where ROOT headers live
-#   ROOT_LIBRARIES          # list of all ROOT libraries (including components)
-#   ROOT_DEFINITIONS        # definitions set by this module (-DUSE_ROOT ...)
-#   ROOT_${COMPONENT}_FOUND # for ROOT components, e.g. Minuit2 MathMore ...
-#   ROOT_${COMPONENT}_LIB   # points to the ROOT component library
+#   ROOT_FOUND              : set to TRUE if ROOT found
+#       If FIND_PACKAGE is called with REQUIRED and COMPONENTS arguments
+#       ROOT_FOUND is only set to TRUE if ALL components are found.
+#       If REQUIRED is NOT set components may or may not be available
+#
+#   ROOT_LIBRARIES          : list of ROOT libraries (NOT including COMPONENTS)
+#   ROOT_INCLUDE_DIRS       : list of paths to be used with INCLUDE_DIRECTORIES
+#   ROOT_LIBRARY_DIRS       : list of paths to be used with LINK_DIRECTORIES
+#   ROOT_COMPONENT_LIBRARIES    : list of ROOT component libraries
+#   ROOT_${COMPONENT}_FOUND     : set to TRUE or FALSE for each library
+#   ROOT_${COMPONENT}_LIBRARY   : path to individual libraries
 #   
 #
 #   Please note that by convention components should be entered exactly as
@@ -17,17 +25,20 @@
 #       mathmore or Mathmore or MATHMORE
 #
 #   However to follow the usual cmake convention it is agreed that the
-#   ROOT_${COMPONENT}_FOUND and ROOT_${COMPONENT}_LIB variables are ALL
+#   ROOT_${COMPONENT}_FOUND and ROOT_${COMPONENT}_LIBRARY variables are ALL
 #   uppercase, i.e. the MathMore component returns: ROOT_MATHMORE_FOUND and
-#   ROOT_MATHMORE_LIB NOT ROOT_MathMore_FOUND or ROOT_MathMore_LIB
+#   ROOT_MATHMORE_LIBRARY NOT ROOT_MathMore_FOUND or ROOT_MathMore_LIBRARY
 #
 #
-# The additional ROOT components can be defined directly in the cmake commando:
+# The additional ROOT components should be defined as follows:
 # FIND_PACKAGE( ROOT COMPONENTS MathMore Gdml Geo ...)
 #
-# Or in the variable ROOT_USE_COMPONENTS before calling find_package, i.e.:
-# SET( ROOT_USE_COMPONENTS MathMore Gdml Geo )
-# FIND_PACKAGE( ROOT )
+# If components are required use:
+# FIND_PACKAGE( ROOT REQUIRED COMPONENTS MathMore Gdml Geo ...)
+#
+# If only root is required and components are NOT required use:
+# FIND_PACKAGE( ROOT REQUIRED )
+# FIND_PACKAGE( ROOT COMPONENTS MathMore Gdml Geo ... QUIET )
 #
 # The Minuit2 component is always added for backwards compatibility.
 #
@@ -35,227 +46,195 @@
 ###############################################################################
 
 
+SET( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE )
 
-SET( ROOT_FOUND FALSE )
-MARK_AS_ADVANCED( ROOT_FOUND )
-
-# Threads library is needed for root
-#FIND_PACKAGE( Threads REQUIRED)
-
-# set ROOTSYS for running root-config
-IF( DEFINED ROOT_HOME )
-    SET( ENV{ROOTSYS} "${ROOT_HOME}" )
-ENDIF()
-
-
-
-
-# ==============================================
-# ===          ROOT_INCLUDE_DIR              ===
-# ==============================================
-
-# get include dir from root-config output
-EXEC_PROGRAM( "${ROOT_HOME}/bin/root-config" "${ROOT_HOME}/bin"
-    ARGS --incdir
-    OUTPUT_VARIABLE ROOT_INC_DIR
-    RETURN_VALUE exit_code
-)
-IF( NOT exit_code EQUAL 0 )
-    # clear ROOT_INC_DIR if root-config exits with error
-    # it could have garbage output
-    SET( ROOT_INC_DIR )
-ENDIF()
-
-
-SET( ROOT_INCLUDE_DIR ROOT_INCLUDE_DIR-NOTFOUND )
-MARK_AS_ADVANCED( ROOT_INCLUDE_DIR )
-
-FIND_PATH( ROOT_INCLUDE_DIR
-    NAMES TH1.h
-    PATHS ${ROOT_HOME}/include ${ROOT_INC_DIR}
-    NO_DEFAULT_PATH )
-
-IF( NOT ROOT_INCLUDE_DIR AND NOT ROOT_FIND_QUIETLY )
-    MESSAGE( STATUS "Check for ROOT: ${ROOT_HOME}"
-            " -- failed to find ROOT include directory!!" )
-ENDIF()
-
-
-
-
-# ==============================================
-# ===            ROOT_LIBRARIES              ===
-# ==============================================
-
-# check if this flag is set to FALSE at the end of
-# this module to make sure all libraries were found
-SET( ROOT_FINDLIB_FAILED FALSE )
-MARK_AS_ADVANCED( ROOT_FINDLIB_FAILED )
-
-
-# get library dir from root-config output
-EXEC_PROGRAM( "${ROOT_HOME}/bin/root-config" "${ROOT_HOME}/bin"
-    ARGS --libdir
-    OUTPUT_VARIABLE ROOT_LIB_DIR
-    RETURN_VALUE exit_code
-)
-IF( NOT exit_code EQUAL 0 )
-    # clear ROOT_LIB_DIR if root-config exits with error
-    # it could have garbage output
-    SET( ROOT_LIB_DIR )
-ENDIF()
-
-
-
-# ========== look for standard root libraries =================
-
-# standard root libraries (without components)
-SET( ROOT_LIB_NAMES )
-SET( ROOT_LIBS )
-MARK_AS_ADVANCED( ROOT_LIB_NAMES ROOT_LIBS )
-
-# get standard root libraries from 'root-config --libs' output
-EXEC_PROGRAM( "${ROOT_HOME}/bin/root-config" "${ROOT_HOME}/bin"
-    #ARGS --noauxlibs --glibs
-    ARGS --noauxlibs --libs
-    OUTPUT_VARIABLE cmd_output
-    RETURN_VALUE exit_code
-)
-IF( exit_code EQUAL 0 )
-    
-    # create a list out of the output
-    SEPARATE_ARGUMENTS( cmd_output )
-
-    # remove first item -L compiler flag
-    LIST( REMOVE_AT cmd_output 0 )
-
-    FOREACH( lib ${cmd_output} )
-
-        # extract libnames from -l compiler flags
-        STRING( REGEX REPLACE "^-.(.*)$" "\\1" libname "${lib}")
-
-        # append all library names into a list
-        LIST( APPEND ROOT_LIB_NAMES ${libname} )
-
-        SET( ROOT_LIB_${libname} ROOT_LIB_${libname}-NOTFOUND )
-        MARK_AS_ADVANCED( ROOT_LIB_${libname} )
-
-        FIND_LIBRARY( ROOT_LIB_${libname}
-            NAMES ${libname}
-            PATHS ${ROOT_HOME}/lib ${ROOT_LIB_DIR}
-            NO_DEFAULT_PATH
-        )
-
-        IF( NOT ROOT_LIB_${libname} )
-            SET( ROOT_FINDLIB_FAILED TRUE )
-            IF( NOT ROOT_FIND_QUIETLY )
-                MESSAGE( STATUS "Check for ROOT: ${ROOT_HOME}"
-                        " -- failed to find ROOT library: ${libname}" )
-            ENDIF()
-        ELSE()
-            LIST( APPEND ROOT_LIBS ${ROOT_LIB_${libname}} )
-        ENDIF()
-
-    ENDFOREACH()
-
-    IF( NOT ROOT_FIND_QUIETLY )
-        MESSAGE( STATUS "Check for ROOT: detected libraries: ${ROOT_LIB_NAMES}" )
-    ENDIF()
-
-ELSE()
-    SET( ROOT_FINDLIB_FAILED TRUE )
-ENDIF()
-
-
-
-# ========== look for additional root components =================
-
-SET( ROOT_COMPONENT_LIBS )
-MARK_AS_ADVANCED( ROOT_COMPONENT_LIBS )
-
-# Minuit2 is always included (for backwards compatibility )
-LIST( APPEND ROOT_FIND_COMPONENTS Minuit2 )
-
-# append components defined in the variable ROOT_USE_COMPONENTS
-IF( DEFINED ROOT_USE_COMPONENTS )
-    LIST( APPEND ROOT_FIND_COMPONENTS ${ROOT_USE_COMPONENTS} )
-ENDIF()
-
-# REMOVE_DUPLICATES is only available in cmake versions >= 2.6
-# it is not a problem if a component is duplicated in the list, this is just done
-# for consistency and to display the message below without duplicate components
-IF( ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} EQUAL 2.6 OR
-    ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} GREATER 2.6 )
-    IF( ROOT_FIND_COMPONENTS )
-        LIST(REMOVE_DUPLICATES ROOT_FIND_COMPONENTS)
-    ENDIF()
-ENDIF()
+# -- fix for backwards compatibility
+IF( NOT DEFINED ROOT_DIR AND DEFINED ROOT_HOME )
+    SET( ROOT_DIR "${ROOT_HOME}" )
+ENDIF( NOT DEFINED ROOT_DIR AND DEFINED ROOT_HOME )
 
 IF( NOT ROOT_FIND_QUIETLY )
-    MESSAGE( STATUS "Check for ROOT: additional components: ${ROOT_FIND_COMPONENTS}" )
+    MESSAGE( STATUS "Check for ROOT: ${ROOT_DIR}" )
+ENDIF( NOT ROOT_FIND_QUIETLY )
+
+# set ROOTSYS for running root-config
+IF( DEFINED ROOT_DIR )
+    SET( ENV{ROOTSYS} "${ROOT_DIR}" )
+ENDIF( DEFINED ROOT_DIR )
+
+# find root-config
+SET( ROOT_CONFIG ROOT_CONFIG-NOTFOUND )
+FIND_PROGRAM( ROOT_CONFIG root-config PATHS ${ROOT_DIR}/bin NO_DEFAULT_PATH )
+FIND_PROGRAM( ROOT_CONFIG root-config )
+
+# find rootcint
+SET( ROOT_CINT ROOT_CINT-NOTFOUND )
+FIND_PROGRAM( ROOT_CINT rootcint PATHS ${ROOT_DIR}/bin NO_DEFAULT_PATH )
+FIND_PROGRAM( ROOT_CINT rootcint )
+
+IF( NOT ROOT_FIND_QUIETLY )
+    MESSAGE( STATUS "Check for ROOT_CONFIG: ${ROOT_CONFIG}" )
+    MESSAGE( STATUS "Check for ROOT_CINT: ${ROOT_CINT}" )
 ENDIF()
 
-FOREACH( libname ${ROOT_FIND_COMPONENTS} )
 
-    # name of the component in upper case
-    STRING( TOUPPER ${libname} ulibname)
+IF( ROOT_CONFIG )
 
-    SET( ROOT_${ulibname}_LIB ROOT_${ulibname}_LIB-NOTFOUND )
-    MARK_AS_ADVANCED( ROOT_${ulibname}_LIB )
+    # ==============================================
+    # ===          ROOT_INCLUDE_DIR              ===
+    # ==============================================
 
-    FIND_LIBRARY( ROOT_${ulibname}_LIB
-        NAMES ${libname}
-        PATHS ${ROOT_HOME}/lib ${ROOT_LIB_DIR}
+    # get include dir from root-config output
+    EXECUTE_PROCESS( COMMAND "${ROOT_CONFIG}" --incdir
+        OUTPUT_VARIABLE _inc_dir
+        RESULT_VARIABLE _exit_code
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    IF( NOT _exit_code EQUAL 0 )
+        # clear _inc_dir if root-config exits with error
+        # it might contain garbage
+        SET( _inc_dir )
+    ENDIF()
+
+
+    SET( ROOT_INCLUDE_DIRS ROOT_INCLUDE_DIRS-NOTFOUND )
+    MARK_AS_ADVANCED( ROOT_INCLUDE_DIRS )
+
+    FIND_PATH( ROOT_INCLUDE_DIRS
+        NAMES TH1.h
+        PATHS ${ROOT_DIR}/include ${_inc_dir}
         NO_DEFAULT_PATH
     )
 
-    IF( NOT ROOT_${ulibname}_LIB )
-        SET( ROOT_${ulibname}_FOUND FALSE )
-        #SET( ROOT_FINDLIB_FAILED TRUE )
-        IF( NOT ROOT_FIND_QUIETLY )
-            MESSAGE( STATUS "Check for ROOT: ${ROOT_HOME}"
-                    " -- failed to find ROOT component: ${libname}" )
-        ENDIF()
-    ELSE()
-        SET( ROOT_${ulibname}_FOUND TRUE )
-        LIST( APPEND ROOT_COMPONENT_LIBS ${ROOT_${ulibname}_LIB} )
+
+
+    # ==============================================
+    # ===            ROOT_LIBRARIES              ===
+    # ==============================================
+
+    # get library dir from root-config output
+    EXECUTE_PROCESS( COMMAND "${ROOT_CONFIG}" --libdir
+        OUTPUT_VARIABLE ROOT_LIBRARY_DIR
+        RESULT_VARIABLE _exit_code
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    IF( NOT _exit_code EQUAL 0 )
+        # clear ROOT_LIBRARY_DIR if root-config exits with error
+        # it might contain garbage
+        SET( ROOT_LIBRARY_DIR )
     ENDIF()
-ENDFOREACH()
-
-
-# ====== DL LIBRARY ==================================================
-# workaround for cmake bug in 64 bit:
-# see: http://public.kitware.com/mantis/view.php?id=10813
-IF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-    FIND_LIBRARY( DL_LIB NAMES ${CMAKE_DL_LIBS} dl PATHS /usr/lib64 /lib64 NO_DEFAULT_PATH )
-ENDIF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
-
-FIND_LIBRARY( DL_LIB NAMES ${CMAKE_DL_LIBS} dl )
-
-IF( NOT DL_LIB AND NOT ROOT_FIND_QUIETLY )
-    MESSAGE( STATUS "Check for ROOT: failed to find libdl.so" )
-    SET( ROOT_FINDLIB_FAILED TRUE )
-ELSE()
-    MESSAGE( STATUS "Check for ROOT: using dl library: ${DL_LIB}" )
-ENDIF()
 
 
 
-# set variables and display results
-IF( ROOT_INCLUDE_DIR AND NOT ROOT_FINDLIB_FAILED )
-    SET( ROOT_FOUND TRUE )
-    SET( ROOT_INCLUDE_DIRS ${ROOT_INCLUDE_DIR} )
-    #SET( ROOT_LIBRARIES ${ROOT_LIBS} ${ROOT_COMPONENT_LIBS} ${DL_LIB} ${CMAKE_THREAD_LIBS_INIT} )
-    SET( ROOT_LIBRARIES ${ROOT_LIBS} ${ROOT_COMPONENT_LIBS} ${DL_LIB} )
-    SET( ROOT_DEFINITIONS "-DUSEROOT -DUSE_ROOT -DMARLIN_USE_ROOT" )
-    MARK_AS_ADVANCED( ROOT_LIBRARIES ROOT_DEFINITIONS )
-    MESSAGE( STATUS "Check for ROOT: ${ROOT_HOME} -- works" )
-ELSE()
-    IF( ROOT_FIND_REQUIRED )
-        MESSAGE( FATAL_ERROR "did you set ROOT_HOME with -DROOT_HOME=<path_to_ROOT>?" )
+    # ========== standard root libraries =================
+
+    # standard root libraries (without components)
+    SET( _root_libnames )
+
+    # get standard root libraries from 'root-config --libs' output
+    EXECUTE_PROCESS( COMMAND "${ROOT_CONFIG}" --noauxlibs --libs
+        OUTPUT_VARIABLE _aux
+        RESULT_VARIABLE _exit_code
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    IF( _exit_code EQUAL 0 )
+        
+        # create a list out of the output
+        SEPARATE_ARGUMENTS( _aux )
+
+        # remove first item -L compiler flag
+        LIST( REMOVE_AT _aux 0 )
+
+        FOREACH( _lib ${_aux} )
+
+            # extract libnames from -l compiler flags
+            STRING( REGEX REPLACE "^-.(.*)$" "\\1" _libname "${_lib}")
+
+            # fix for some root-config versions which export -lz even if using --noauxlibs
+            IF( NOT _libname STREQUAL "z" )
+
+                # append all library names into a list
+                LIST( APPEND _root_libnames ${_libname} )
+
+            ENDIF()
+
+        ENDFOREACH()
+
     ENDIF()
+
+
+
+    # ========== additional root components =================
+
+    # FIXME DEPRECATED
+    # append components defined in the variable ROOT_USE_COMPONENTS
+    IF( DEFINED ROOT_USE_COMPONENTS )
+        LIST( APPEND ROOT_FIND_COMPONENTS ${ROOT_USE_COMPONENTS} )
+    ENDIF()
+
+    # FIXME DEPRECATED
+    # Minuit2 is always included (for backwards compatibility )
+    LIST( FIND ROOT_FIND_COMPONENTS "Minuit2" _aux )
+    IF( ${_aux} LESS 0 )
+        LIST( APPEND ROOT_FIND_COMPONENTS Minuit2 )
+    ENDIF()
+
+
+
+    # ---------- libraries --------------------------------------------------------
+    INCLUDE( MacroCheckPackageLibs )
+
+    SET( ROOT_LIB_SEARCH_PATH ${ROOT_LIBRARY_DIR} )
+
+    # only standard libraries should be passed as arguments to CHECK_PACKAGE_LIBS
+    # additional components are set by cmake in variable PKG_FIND_COMPONENTS
+    # first argument should be the package name
+    CHECK_PACKAGE_LIBS( ROOT ${_root_libnames} )
+
+
+
+
+    # ====== DL LIBRARY ==================================================
+    # workaround for cmake bug in 64 bit:
+    # see: http://public.kitware.com/mantis/view.php?id=10813
+    IF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+        FIND_LIBRARY( DL_LIB NAMES ${CMAKE_DL_LIBS} dl PATHS /usr/lib64 /lib64 NO_DEFAULT_PATH )
+    ENDIF( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+
+    FIND_LIBRARY( DL_LIB NAMES ${CMAKE_DL_LIBS} dl )
+
     IF( NOT ROOT_FIND_QUIETLY )
-        MESSAGE( STATUS "Check for ROOT -- failed!! skip this package..." )
+        MESSAGE( STATUS "Check for libdl.so: ${DL_LIB}" )
     ENDIF()
-ENDIF()
+
+ENDIF( ROOT_CONFIG )
+
+# Threads library
+#FIND_PACKAGE( Threads REQUIRED)
+
+
+# ---------- final checking ---------------------------------------------------
+INCLUDE( FindPackageHandleStandardArgs )
+# set ROOT_FOUND to TRUE if all listed variables are TRUE and not empty
+# ROOT_COMPONENT_VARIABLES will be set if FIND_PACKAGE is called with REQUIRED argument
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( ROOT DEFAULT_MSG ROOT_INCLUDE_DIRS ROOT_LIBRARIES ${ROOT_COMPONENT_VARIABLES} DL_LIB )
+
+IF( ROOT_FOUND )
+    LIST( APPEND ROOT_LIBRARIES ${DL_LIB} )
+    # FIXME DEPRECATED
+    SET( ROOT_DEFINITIONS "-DUSEROOT -DUSE_ROOT -DMARLIN_USE_ROOT" )
+    MARK_AS_ADVANCED( ROOT_DEFINITIONS )
+
+    # file including MACROS for generating root dictionary sources
+    GET_FILENAME_COMPONENT( _aux ${CMAKE_CURRENT_LIST_FILE} PATH )
+    SET( ROOT_DICT_MACROS_FILE ${_aux}/MacroRootDict.cmake )
+
+ENDIF( ROOT_FOUND )
+
+# ---------- cmake bug ?! -----------------------------------------------------
+# ROOT_FIND_REQUIRED is not reset between FIND_PACKAGE calls, i.e. the following
+# code fails when geartgeo component not available: (not tested in cmake 2.8)
+# FIND_PACKAGE( ROOT REQUIRED )
+# FIND_PACKAGE( ROOT COMPONENTS geartgeo QUIET )
+SET( ROOT_FIND_REQUIRED )
 
