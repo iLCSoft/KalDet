@@ -14,7 +14,6 @@ ENDIF(APPLE)
 # prepares input headers for GEN_ROOT_DICT_SOURCES
 # expects:
 #   INPUT_DIR - directory to search for headers
-#   HEADERS_INSTALL_DIR - if defined will intall headers to given dir
 #
 # returns:
 #   ROOT_DICT_INPUT_HEADERS - header files found in INPUT_DIR
@@ -35,9 +34,6 @@ MACRO( PREPARE_ROOT_DICT_HEADERS INPUT_DIR )
     FILE( GLOB exclude_headers "${INPUT_DIR}/LinkDef.h" )
     IF( exclude_headers )
         LIST( REMOVE_ITEM ROOT_DICT_INPUT_HEADERS "${exclude_headers}" )
-        IF( HEADERS_INSTALL_DIR )
-            INSTALL( FILES ${ROOT_DICT_INPUT_HEADERS} DESTINATION ${HEADERS_INSTALL_DIR} )
-        ENDIF()
         LIST( APPEND ROOT_DICT_INPUT_HEADERS "${exclude_headers}")
     ENDIF( exclude_headers )
 

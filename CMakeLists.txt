@@ -116,13 +116,15 @@ LIST( APPEND ROOT_DICT_INCLUDE_DIRS ${KalTest_INCLUDE_DIRS} )
 #MESSAGE( STATUS "ROOT_DICT_INCLUDE_DIRS: ${ROOT_DICT_INCLUDE_DIRS}" )
 
 
-SET( HEADERS_INSTALL_DIR "include/kaldet" )
-
 FOREACH( lib_input_dir ${lib_input_dirs} )
 
     AUX_SOURCE_DIRECTORY( ${lib_input_dir} lib_sources )
 
     PREPARE_ROOT_DICT_HEADERS( ${lib_input_dir} )
+
+    INSTALL( DIRECTORY ${lib_input_dir}/ DESTINATION "include/kaldet"
+        FILES_MATCHING PATTERN "*.h" PATTERN "LinkDef.h" EXCLUDE )
+
     GEN_ROOT_DICT_SOURCES( ${lib_input_dir}Dict.cxx )
 
     LIST( APPEND lib_sources ${ROOT_DICT_OUTPUT_SOURCES} )
