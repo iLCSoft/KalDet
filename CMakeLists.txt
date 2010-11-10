@@ -95,7 +95,6 @@ FOREACH( pkg ${kaldet_req_pkgs} )
     IF( ${pkg}_FOUND )
 
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
-        INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS}/kaltest )
         ADD_DEFINITIONS( ${${pkg}_DEFINITIONS} )
         LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
     ELSE()
@@ -112,7 +111,7 @@ FOREACH( lib_input_dir ${lib_input_dirs} )
     LIST( APPEND ROOT_DICT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${lib_input_dir} )
 ENDFOREACH()
 
-LIST( APPEND ROOT_DICT_INCLUDE_DIRS ${KalTest_INCLUDE_DIRS}/kaltest )
+LIST( APPEND ROOT_DICT_INCLUDE_DIRS ${KalTest_INCLUDE_DIRS} )
 
 #MESSAGE( STATUS "ROOT_DICT_INCLUDE_DIRS: ${ROOT_DICT_INCLUDE_DIRS}" )
 
