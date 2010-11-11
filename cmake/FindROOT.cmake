@@ -31,16 +31,24 @@
 #
 #
 # The additional ROOT components should be defined as follows:
-# FIND_PACKAGE( ROOT COMPONENTS MathMore Gdml Geo ...)
+# FIND_PACKAGE( ROOT COMPONENTS MathMore Gdml Geom ...)
 #
 # If components are required use:
-# FIND_PACKAGE( ROOT REQUIRED COMPONENTS MathMore Gdml Geo ...)
+# FIND_PACKAGE( ROOT REQUIRED COMPONENTS MathMore Gdml Geom ...)
 #
 # If only root is required and components are NOT required use:
 # FIND_PACKAGE( ROOT REQUIRED )
-# FIND_PACKAGE( ROOT COMPONENTS MathMore Gdml Geo ... QUIET )
+# FIND_PACKAGE( ROOT COMPONENTS MathMore Gdml Geom ... QUIET )
+#   then you need to check for ROOT_MATHMORE_FOUND, ROOT_GDML_FOUND, etc.
 #
-# The Minuit2 component is always added for backwards compatibility.
+# The variable ROOT_USE_COMPONENTS can also be used before calling
+# FIND_PACKAGE, i.e.:
+# SET( ROOT_USE_COMPONENTS MathMore Gdml Geom )
+# FIND_PACKAGE( ROOT REQUIRED ) # all ROOT_USE_COMPONENTS must also be found
+# FIND_PACKAGE( ROOT ) # check for ROOT_FOUND, ROOT_MATHMORE_FOUND, etc.
+#
+# The Minuit2 component is always added for backwards compatibility. (This will
+#   be DEPRECATED in the future)
 #
 # @author Jan Engels, DESY
 ###############################################################################
@@ -166,19 +174,8 @@ IF( ROOT_CONFIG )
 
     # ========== additional root components =================
 
-    # FIXME DEPRECATED
-    # append components defined in the variable ROOT_USE_COMPONENTS
-    IF( DEFINED ROOT_USE_COMPONENTS )
-        LIST( APPEND ROOT_FIND_COMPONENTS ${ROOT_USE_COMPONENTS} )
-    ENDIF()
-
-    # FIXME DEPRECATED
-    # Minuit2 is always included (for backwards compatibility )
-    LIST( FIND ROOT_FIND_COMPONENTS "Minuit2" _aux )
-    IF( ${_aux} LESS 0 )
-        LIST( APPEND ROOT_FIND_COMPONENTS Minuit2 )
-    ENDIF()
-
+    # Minuit2 is always included for backwards compatibility # FIXME this must be DEPRECATED !!!
+    LIST( APPEND ROOT_FIND_COMPONENTS Minuit2 )
 
 
     # ---------- libraries --------------------------------------------------------

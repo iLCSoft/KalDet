@@ -5,7 +5,9 @@
 # macro usage:
 #   CHECK_PACKAGE_LIBS( PACKAGE_NAME stdlib1 stdlib2 ... stdlibn )
 #       only standard libraries should be passed as arguments to the macro
-#       component libraries are set by cmake in PKG_FIND_COMPONENTS
+#       component libraries are set by cmake in PKG_FIND_COMPONENTS (when
+#       calling FIND_PACKAGE with COMPONENTS argument) or through the
+#       variable PKG_USE_COMPONENTS
 #
 #
 # required variables:
@@ -31,11 +33,16 @@ SET( CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE )
 
 MACRO( CHECK_PACKAGE_LIBS _pkgname )
 
-    SET( _ext_libnames ${${_pkgname}_FIND_COMPONENTS} )
-    SET( _std_libnames ${ARGN} )
-
     SET( _std_lib_missing FALSE )
     SET( _ext_lib_missing FALSE )
+
+    SET( _std_libnames ${ARGN} )
+    SET( _ext_libnames ${${_pkgname}_FIND_COMPONENTS} ${${_pkgname}_USE_COMPONENTS} )
+
+    IF( _ext_libnames )
+        SEPARATE_ARGUMENTS( _ext_libnames )
+        LIST( REMOVE_DUPLICATES _ext_libnames )
+    ENDIF()
 
     IF( NOT ${_pkgname}_FIND_QUIETLY )
         MESSAGE( STATUS "Check for ${_pkgname}_LIBRARIES: ${_std_libnames}" )
