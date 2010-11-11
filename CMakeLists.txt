@@ -76,13 +76,13 @@ ADD_DEFINITIONS( "-Wno-long-long -fno-strict-aliasing" )
 #-----------------------------------------------------
 
 # macros for generating root dict sources with rootcint
+LIST( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake )
 SET( ROOT_DICT_CINT_DEFINITIONS "-DHANDLE_DICT_EXCEPTIONS=IGNORED_FOR_CINT" )
-INCLUDE( cmake/MacroRootDict.cmake )
 
 ###################################################################################
 
 
-SET( kaldet_req_pkgs KalTest Marlin GEAR )
+SET( kaldet_req_pkgs KalTest Marlin GEAR ROOT )
 
 FOREACH( pkg ${kaldet_req_pkgs} )
 
@@ -103,6 +103,8 @@ FOREACH( pkg ${kaldet_req_pkgs} )
 
 ENDFOREACH()
 
+INCLUDE( ${ROOT_DICT_MACROS_FILE} )
+
 # build KalDet library
 
 SET( lib_input_dirs gen kern lctpc/lp1jgem )
@@ -116,13 +118,15 @@ LIST( APPEND ROOT_DICT_INCLUDE_DIRS ${KalTest_INCLUDE_DIRS} )
 #MESSAGE( STATUS "ROOT_DICT_INCLUDE_DIRS: ${ROOT_DICT_INCLUDE_DIRS}" )
 
 
-SET( HEADERS_INSTALL_DIR "include/kaldet" )
-
 FOREACH( lib_input_dir ${lib_input_dirs} )
 
     AUX_SOURCE_DIRECTORY( ${lib_input_dir} lib_sources )
 
     PREPARE_ROOT_DICT_HEADERS( ${lib_input_dir} )
+
+    INSTALL( DIRECTORY ${lib_input_dir}/ DESTINATION "include/kaldet"
+        FILES_MATCHING PATTERN "*.h" PATTERN "LinkDef.h" EXCLUDE )
+
     GEN_ROOT_DICT_SOURCES( ${lib_input_dir}Dict.cxx )
 
     LIST( APPEND lib_sources ${ROOT_DICT_OUTPUT_SOURCES} )
