@@ -15,7 +15,7 @@ Dependencies: KalDet depends on KalTest, ROOT, GEAR and Marlin
 
 ---- Building KalDet with cmake:
 
-The KalTest package has been included in the iLCSoft framework and can be
+The KalDet package has been included in the iLCSoft framework and can be
 installed with ilcinstall and built with cmake. Since all KalDet dependencies
 are included in the iLCSoft framework the easiest way to build KalDet is to
 make use of an existing iLCSoft installation, i.e.:
@@ -30,26 +30,28 @@ cmake -C $ILCSOFT/ILCSoft.cmake ..
 make install
 
 
----- Building against the KalTest Library with cmake:
-
- a) in an iLCSoft package, simply add KalTest to your project dependencies in the CMakeLists.txt, e.g:
+---- Building against the KalDet Library with cmake:
 
 
-      SET( ${PROJECT_NAME}_DEPENDS "Marlin LCIO GEAR KalDet")
+    # configure your project with option -DKalDet_DIR as follows:
+    cmake -DKalDet_DIR=/path/to/KalDet ..
 
 
- b) use the usual cmake mechanism in your CMakeLists.txt :
+    # add the usual cmake mechanism to the CMakeLists.txt of your project, e.g.:
 
-      FIND_PACKAGE( KalDet )
+      FIND_PACKAGE( KalDet ) # if KalDet is optional
 
-      # -- and then use the following variables, as needed:
-      #
-      #  KalDet_INCLUDE_DIRS KalDet_LIBRARY_DIRS KalDet_LIBRARIES
-      #
-      # e.g:
+      IF( KalDet_FOUND )
+        INCLUDE_DIRECTORIES( ${KalDet_INCLUDE_DIRS} )
+        TARGET_LINK_LIBRARIES( ${LIBNAME} ${KalDet_LIBRARIES})
+        #ADD_DEFINITIONS( "-DMYPKG_USE_KALDET" ) # just an example to activate source code
+      ENDIF( KalDet_FOUND )
+
+
+      # if your package doesn't make sense without KalDet, use the REQUIRED option:
+      FIND_PACKAGE( KalDet REQUIRED ) # gives an error if KalDet is not found
 
       INCLUDE_DIRECTORIES( ${KalDet_INCLUDE_DIRS} )
-
       TARGET_LINK_LIBRARIES( ${LIBNAME} ${KalDet_LIBRARIES})
 
 
