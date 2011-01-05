@@ -44,8 +44,7 @@ ENDIF( KalDet_INCLUDE_DIRS )
 
 
 # ---------- libraries --------------------------------------------------------
-LIST( APPEND CMAKE_MODULE_PATH "${KalDet_ROOT}/cmake/MacroCheckPackageLibs.cmake" )
-INCLUDE( MacroCheckPackageLibs )
+INCLUDE( ${KalDet_ROOT}/cmake/MacroCheckPackageLibs.cmake ) # FIXME full path ?!
 
 # only standard libraries should be passed as arguments to CHECK_PACKAGE_LIBS
 # additional components are set by cmake in variable PKG_FIND_COMPONENTS
