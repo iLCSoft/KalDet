@@ -1,70 +1,70 @@
-###############################################
+##############################################################################
 # cmake configuration file for KalDet
-# @author Jan Engels, DESY
-###############################################
+#
+# requires:
+#   MacroCheckPackageLibs.cmake for checking package libraries
+#
+# returns following variables:
+#
+#   KalDet_FOUND      : set to TRUE if KalDet found
+#       if FIND_PACKAGE called with REQUIRED and COMPONENTS arguments
+#       KalDet_FOUND is only set to TRUE if ALL components are also found
+#       if REQUIRED is NOT set components may or may not be available
+#
+#   KalDet_ROOT       : path to this KalDet installation
+#   KalDet_LIBRARIES  : list of KalDet libraries (NOT including COMPONENTS)
+#   KalDet_INCLUDE_DIRS  : list of paths to be used with INCLUDE_DIRECTORIES
+#   KalDet_LIBRARY_DIRS  : list of paths to be used with LINK_DIRECTORIES
+#   KalDet_COMPONENT_LIBRARIES      : list of KalDet component libraries
+#   KalDet_${COMPONENT}_FOUND       : set to TRUE or FALSE for each library
+#   KalDet_${COMPONENT}_LIBRARY     : path to individual libraries
+#   KalDet_${COMPONENT}_LIB_DEPENDS : individual library dependencies
+#
+# @author Jan Engels, Desy
+##############################################################################
 
-SET( KalDet_FOUND FALSE )
-MARK_AS_ADVANCED( KalDet_FOUND )
+SET( KalDet_ROOT "@CMAKE_INSTALL_PREFIX@" )
 
+
+# ---------- include dirs -----------------------------------------------------
 # do not store find results in cache
-SET( KalDet_INCLUDE_DIR KalDet_INCLUDE_DIR-NOTFOUND )
+SET( KalDet_INCLUDE_DIRS KalDet_INCLUDE_DIRS-NOTFOUND )
+MARK_AS_ADVANCED( KalDet_INCLUDE_DIRS )
 
-FIND_PATH( KalDet_INCLUDE_DIR
+FIND_PATH( KalDet_INCLUDE_DIRS
 	NAMES kaldet/EXVKalDetector.h
-	PATHS @CMAKE_INSTALL_PREFIX@/include
+	PATHS ${KalDet_ROOT}/include
 	NO_DEFAULT_PATH
 )
-IF( NOT KalDet_INCLUDE_DIR )
-    MESSAGE( STATUS "Check for KalDet: @CMAKE_INSTALL_PREFIX@"
-					" -- failed to find KalDet include directory!!" )
-ELSE( NOT KalDet_INCLUDE_DIR )
-    MARK_AS_ADVANCED( KalDet_INCLUDE_DIR )
-ENDIF( NOT KalDet_INCLUDE_DIR )
 
-# libraries
-#SET( KalDet_LIB_NAMES S4Kalman S4KalTrack S4KalGeom S4Utils )
-SET( KalDet_LIB_NAMES KalDet )
-SET( KalDet_FINDLIB_FAILED FALSE )
-MARK_AS_ADVANCED( KalDet_LIB_NAMES KalDet_FINDLIB_FAILED )
+# fix for backwards compatibility
+IF( KalDet_INCLUDE_DIRS )
+    LIST( APPEND KalDet_INCLUDE_DIRS ${KalDet_INCLUDE_DIRS}/kaldet )
+ENDIF( KalDet_INCLUDE_DIRS )
 
-FOREACH( libname ${KalDet_LIB_NAMES} )
 
-    # name of the component in upper case
-    STRING( TOUPPER ${libname} ulibname)
+# ---------- libraries --------------------------------------------------------
+LIST( APPEND CMAKE_MODULE_PATH "${KalDet_ROOT}/cmake/MacroCheckPackageLibs.cmake" )
+INCLUDE( MacroCheckPackageLibs )
 
-    SET( KalDet_LIB_${ulibname} KalDet_LIB_${ulibname}-NOTFOUND )
-    MARK_AS_ADVANCED( KalDet_LIB_${ulibname} )
+# only standard libraries should be passed as arguments to CHECK_PACKAGE_LIBS
+# additional components are set by cmake in variable PKG_FIND_COMPONENTS
+# first argument should be the package name
+CHECK_PACKAGE_LIBS( KalDet KalDet )
 
-    FIND_LIBRARY( KalDet_LIB_${ulibname}
-        NAMES ${libname}
-        PATHS @CMAKE_INSTALL_PREFIX@
-        PATH_SUFFIXES lib
-        NO_DEFAULT_PATH )
 
-    IF( NOT KalDet_LIB_${ulibname} )
-        SET( KalDet_FINDLIB_FAILED TRUE )
-        IF( NOT KalDet_FIND_QUIETLY )
-            MESSAGE( STATUS "Check for KalDet: @CMAKE_INSTALL_PREFIX@"
-                    " -- failed to find KalDet ${libname} library!!" )
-        ENDIF()
-    ELSE()
-        LIST( APPEND KalDet_LIBS ${KalDet_LIB_${ulibname}} )
-    ENDIF()
-ENDFOREACH()
 
-# set variables and display results
-IF( KalDet_INCLUDE_DIR AND NOT KalDet_FINDLIB_FAILED )
-    SET( KalDet_FOUND TRUE )
-    SET( KalDet_INCLUDE_DIRS ${KalDet_INCLUDE_DIR} ${KalDet_INCLUDE_DIR}/kaldet )
-    SET( KalDet_LIBRARY_DIRS "@CMAKE_INSTALL_PREFIX@/lib" )
-	SET( KalDet_LIBRARIES ${KalDet_LIBS} )
-    MARK_AS_ADVANCED( KalDet_INCLUDE_DIRS KalDet_LIBRARY_DIRS KalDet_LIBRARIES )
-	MESSAGE( STATUS "Check for KalDet: @CMAKE_INSTALL_PREFIX@ -- works" )
-ELSE()
-	IF( KalDet_FIND_REQUIRED )
-		MESSAGE( FATAL_ERROR "Check for KalDet: @CMAKE_INSTALL_PREFIX@ -- failed!!" )
-    ELSE( KalDet_FIND_REQUIRED )
-        MESSAGE( STATUS "Check for KalDet: @CMAKE_INSTALL_PREFIX@"
-						" -- failed!! will skip this package..." )
-    ENDIF( KalDet_FIND_REQUIRED )
-ENDIF()
+
+# ---------- libraries dependencies -------------------------------------------
+# this sets KalDet_${COMPONENT}_LIB_DEPENDS variables
+INCLUDE( "${KalDet_ROOT}/lib/cmake/KalDetLibDeps.cmake" )
+ 
+
+
+
+# ---------- final checking ---------------------------------------------------
+INCLUDE( FindPackageHandleStandardArgs )
+# set KalDet_FOUND to TRUE if all listed variables are TRUE and not empty
+# KalDet_COMPONENT_VARIABLES will be set if FIND_PACKAGE is called with REQUIRED argument
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( KalDet DEFAULT_MSG KalDet_ROOT KalDet_INCLUDE_DIRS KalDet_LIBRARIES ${KalDet_COMPONENT_VARIABLES} )
+

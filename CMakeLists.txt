@@ -104,6 +104,8 @@ ENDIF( APPLE )
 
 ###################################################################################
 
+# display some variables and write them to cache
+DISPLAY_STD_VARIABLES()
 
 # export library dependencies (keep this as the last line in the file)
 EXPORT_LIBRARY_DEPENDENCIES( "KalDetLibDeps.cmake" )
