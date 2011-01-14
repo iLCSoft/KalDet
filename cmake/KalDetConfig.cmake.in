@@ -63,7 +63,8 @@ INCLUDE( "${KalDet_ROOT}/lib/cmake/KalDetLibDeps.cmake" )
 
 # ---------- final checking ---------------------------------------------------
 INCLUDE( FindPackageHandleStandardArgs )
-# set KalDet_FOUND to TRUE if all listed variables are TRUE and not empty
+# set KALDET_FOUND to TRUE if all listed variables are TRUE and not empty
 # KalDet_COMPONENT_VARIABLES will be set if FIND_PACKAGE is called with REQUIRED argument
 FIND_PACKAGE_HANDLE_STANDARD_ARGS( KalDet DEFAULT_MSG KalDet_ROOT KalDet_INCLUDE_DIRS KalDet_LIBRARIES ${KalDet_COMPONENT_VARIABLES} )
 
+SET( KalDet_FOUND ${KALDET_FOUND} )
