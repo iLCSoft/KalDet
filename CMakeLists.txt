@@ -99,7 +99,7 @@ INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIRS} )
 
 #MESSAGE( STATUS "KalDet lib sources: ${lib_sources}" )
 ADD_SHARED_LIBRARY( KalDet ${lib_sources} )
-INSTALL_SHARED_LIBRARY( KalDet DESTINATION lib )
+INSTALL( TARGETS KalDet DESTINATION lib )
 TARGET_LINK_LIBRARIES( KalDet ${ROOT_LIBRARIES} )
 
 IF( APPLE ) #---- need special linker flags for ROOT dictionary on MacOS
