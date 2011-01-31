@@ -12,7 +12,7 @@ PROJECT( KalDet )
 
 # project version
 SET( KALDET_VERSION_MAJOR 1 )
-SET( KALDET_VERSION_MINOR 0 )
+SET( KALDET_VERSION_MINOR 1 )
 SET( KALDET_VERSION_PATCH 0 )
 
 
@@ -25,20 +25,15 @@ FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES REQUIRED )
 INCLUDE( ilcsoft_default_settings )
 
 
-SET( kaldet_req_pkgs KalTest Marlin GEAR ROOT )
+FIND_PACKAGE( Marlin 1.0 REQUIRED )
+FIND_PACKAGE( KalTest REQUIRED )
+FIND_PACKAGE( ROOT REQUIRED )
 
-FOREACH( pkg ${kaldet_req_pkgs} )
-
-    FIND_PACKAGE( ${pkg} REQUIRED )
+FOREACH( pkg Marlin KalTest ROOT )
 
     IF( ${pkg}_FOUND )
-
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
         LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
-        ADD_DEFINITIONS( ${${pkg}_DEFINITIONS} )
-
-    ELSE()
-        MESSAGE( FATAL_ERROR "required package ${pkg} not found" )
     ENDIF()
 
 ENDFOREACH()

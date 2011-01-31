@@ -76,6 +76,11 @@ make install
 =====================================================================================
 
  --------
+| v01-01 |  - improvements in cmake files - no code changes.
+ -------- 
+
+
+ --------
 | v01-00 |  - first release as part of iLCSoft - no code changes.
  --------     (except header in subdirectory 'include/kaldet', when installed with cmake)
 
