@@ -12,6 +12,7 @@
 #       if REQUIRED is NOT set components may or may not be available
 #
 #   KalDet_ROOT       : path to this KalDet installation
+#   KalDet_VERSION    : package version
 #   KalDet_LIBRARIES  : list of KalDet libraries (NOT including COMPONENTS)
 #   KalDet_INCLUDE_DIRS  : list of paths to be used with INCLUDE_DIRECTORIES
 #   KalDet_LIBRARY_DIRS  : list of paths to be used with LINK_DIRECTORIES
@@ -24,6 +25,7 @@
 ##############################################################################
 
 SET( KalDet_ROOT "@CMAKE_INSTALL_PREFIX@" )
+SET( KalDet_VERSION "@KalDet_VERSION@" )
 
 
 # ---------- include dirs -----------------------------------------------------
