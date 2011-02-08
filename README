@@ -10,7 +10,7 @@ Description: To be filled...
 -------------------------------------------------------------------------------
 
 
-Dependencies: KalDet depends on KalTest, ROOT, GEAR and Marlin
+Dependencies: KalDet depends on KalTest, ROOT, ILCUTIL and Marlin
 
 
 ---- Building KalDet with cmake:
