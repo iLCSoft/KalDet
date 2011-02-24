@@ -29,7 +29,7 @@ FIND_PACKAGE( Marlin 1.0 REQUIRED )
 FIND_PACKAGE( KalTest REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
-FOREACH( pkg Marlin KalTest ROOT )
+FOREACH( pkg Marlin ROOT KalTest )
 
     IF( ${pkg}_FOUND )
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
@@ -84,17 +84,14 @@ FOREACH( lib_input_dir ${lib_input_dirs} )
 
 ENDFOREACH()
 
+#MESSAGE( "KalDet lib sources: ${lib_sources}" )
 
 
 INCLUDE_DIRECTORIES( ${ROOT_DICT_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${ROOT_INCLUDE_DIRS} )
 
 
-
-#MESSAGE( STATUS "KalDet lib sources: ${lib_sources}" )
 ADD_SHARED_LIBRARY( KalDet ${lib_sources} )
 INSTALL_SHARED_LIBRARY( KalDet DESTINATION lib )
-TARGET_LINK_LIBRARIES( KalDet ${ROOT_LIBRARIES} )
 
 IF( APPLE ) #---- need special linker flags for ROOT dictionary on MacOS
     SET_TARGET_PROPERTIES( KalDet PROPERTIES
