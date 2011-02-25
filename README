@@ -75,6 +75,10 @@ make install
 
 =====================================================================================
 
+ -----------
+| v01-01-01 |  - bug fixed in cmake files for mac osx compatibility - no code changes.
+ ----------- 
+
  --------
 | v01-01 |  - improvements in cmake files - no code changes.
  -------- 
