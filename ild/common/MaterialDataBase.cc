@@ -5,6 +5,8 @@
 
 #include "TMaterial.h"
 
+bool MaterialDataBase::_isInitialised = false ;
+
 
 MaterialDataBase::~MaterialDataBase(){
 
@@ -22,40 +24,34 @@ MaterialDataBase::~MaterialDataBase(){
 
 TMaterial* MaterialDataBase::getMaterial(std::string mat_name){
 
-  MaterialDataBaseexception exp;
-  if ( !_isInitialised ) 
-    { 
-      throw exp; 
-    } 
-  else 
-    {
-      std::map<std::string,TMaterial* >::iterator it = _material_map.find(mat_name);        
-      if ( it == _material_map.end() ) { throw exp ; } else { return (*it).second ; }
-    }
+  std::map<std::string,TMaterial* >::iterator it = _material_map.find(mat_name) ;        
+
+  if ( it == _material_map.end() ) { 
+    MaterialDataBaseException exp;
+    throw exp ; 
+  } 
+  else { 
+    return (*it).second ; 
+  }
+
 }
 
 void MaterialDataBase::initialise(){
 
-  if ( _isInitialised ) 
-    { 
-      MaterialDataBaseexception exp;
-      throw exp; 
-    } 
-  else 
-    {
-      this->createMaterials(); 
-      _isInitialised=true;
-    }
+  this->createMaterials(); 
+  _isInitialised = true ;
+
 }
 
 void MaterialDataBase::addMaterial(TMaterial* mat, std::string name) {
   std::map<std::string, TMaterial*>::iterator it = _material_map.find(name) ; 
-  MaterialDataBaseexception exp;
+  MaterialDataBaseException exp;
   if ( it != _material_map.end() ) 
     { throw exp; } 
   else 
     { _material_map[name] = mat  ; }
 }
+
 
 void MaterialDataBase::createMaterials(){
   

@@ -7,21 +7,30 @@
 
 class TMaterial;
 
-class MaterialDataBaseexception: public std::exception
+class MaterialDataBaseException: public std::exception
 {
   virtual const char* what() const throw()
   {
-    return "MaterialDataBaseexception occurred";
+    return "MaterialDataBaseException occurred";
     }
 } ;
 
+
 class MaterialDataBase 
 {
+
   public:
+
   static MaterialDataBase& Instance()
   {
     static MaterialDataBase singleton;
+
+    if( ! _isInitialised ){
+      singleton.initialise() ;
+    }
+
     return singleton;
+
   }
   
     // Other non-static member functions
@@ -31,10 +40,14 @@ class MaterialDataBase
   ~MaterialDataBase();   
 
   TMaterial* getMaterial(std::string mat_name) ;  
-  void initialise() ;
+
   
  private:
- MaterialDataBase(): _isInitialised(false) { _material_map.clear() ;} ;                               // Private constructor
+
+ MaterialDataBase() { _material_map.clear() ;} ;                               // Private constructor
+
+  void initialise() ;
+
   MaterialDataBase(const MaterialDataBase&) ;                 // Prevent copy-construction
   MaterialDataBase& operator=(const MaterialDataBase&) ;      // Prevent assignment
   
@@ -44,8 +57,10 @@ class MaterialDataBase
   // private memeber variables
   std::map<std::string,TMaterial* > _material_map;
   
-  bool _isInitialised;
+  static bool _isInitialised;
   
 };
+
+
 
 #endif
