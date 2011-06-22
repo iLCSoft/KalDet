@@ -2,6 +2,7 @@
 #include "MaterialDataBase.h"
 
 #include <stdexcept>
+#include <vector>
 
 #include "TMaterial.h"
 
