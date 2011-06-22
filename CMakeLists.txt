@@ -26,11 +26,10 @@ INCLUDE( ilcsoft_default_settings )
 
 
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
-FIND_PACKAGE( MarlinUtil 1.0 REQUIRED )
 FIND_PACKAGE( KalTest 1.1.1 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
-FOREACH( pkg Marlin MarlinUtil ROOT KalTest )
+FOREACH( pkg Marlin KalTest ROOT )
 
     IF( ${pkg}_FOUND )
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
