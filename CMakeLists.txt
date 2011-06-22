@@ -26,10 +26,11 @@ INCLUDE( ilcsoft_default_settings )
 
 
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
+FIND_PACKAGE( MarlinUtil 1.0 REQUIRED )
 FIND_PACKAGE( KalTest 1.1.1 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
-FOREACH( pkg Marlin ROOT KalTest )
+FOREACH( pkg Marlin MarlinUtil ROOT KalTest )
 
     IF( ${pkg}_FOUND )
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
@@ -90,7 +91,13 @@ ENDFOREACH()
 INCLUDE_DIRECTORIES( ${ROOT_DICT_INCLUDE_DIRS} )
 
 
-ADD_SHARED_LIBRARY( KalDet ${lib_sources} )
+FILE( GLOB_RECURSE ild_sources "ild/*.cc" )
+FILE( GLOB_RECURSE ild_headers "ild/*.h" )
+INCLUDE_DIRECTORIES( ild/common )
+
+INSTALL( FILES ${ild_headers} DESTINATION "include/kaldet" )
+
+ADD_SHARED_LIBRARY( KalDet ${lib_sources} ${ild_sources} )
 INSTALL_SHARED_LIBRARY( KalDet DESTINATION lib )
 
 IF( APPLE ) #---- need special linker flags for ROOT dictionary on MacOS
