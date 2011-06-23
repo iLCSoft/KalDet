@@ -29,7 +29,7 @@ FIND_PACKAGE( Marlin 1.0 REQUIRED )
 FIND_PACKAGE( KalTest 1.1.1 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
-FOREACH( pkg Marlin KalTest ROOT )
+FOREACH( pkg Marlin ROOT KalTest )
 
     IF( ${pkg}_FOUND )
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
