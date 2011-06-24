@@ -8,7 +8,7 @@
 //* (Description)
 //*   User defined measurement layer class
 //* (Requires)
-//*     TVMeasLayer
+//*     ILDVMeasLayer
 //* (Provides)
 //*     class ILDCylinderMeasLayer
 //*

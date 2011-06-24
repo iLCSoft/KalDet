@@ -9,19 +9,20 @@
 //*   User defined hit class
 //*   provides coordinate vector as defined by the MeasLayer
 //* (Requires)
-//*     TVTrackHit
+//*     ILDVTrackHit
 //* (Provides)
 //*     class ILDCylinderHit
 //*
 //*************************************************************************
 //
 #include "kaltest/KalTrackDim.h"
-#include "kaltest/TVTrackHit.h"
+
+#include "ILDVTrackHit.h"
 
 #include "ILDCylinderMeasLayer.h"
 
 
-class ILDCylinderHit : public TVTrackHit {
+class ILDCylinderHit : public ILDVTrackHit {
 
 public:
   
@@ -31,7 +32,7 @@ public:
   virtual ~ILDCylinderHit();
 
   virtual TKalMatrix XvToMv(const TVector3 &xv, Double_t t0) const;
-  virtual void       DebugPrint(Option_t *opt = "")          const;
+  virtual void       DebugPrint(Option_t *opt = "")         const;
 
 
 private:

@@ -35,7 +35,7 @@ using std::resetiosflags;
 
 ILDCylinderHit::ILDCylinderHit(const TVMeasLayer &ms, Double_t *x, Double_t *dx, 
 		     Double_t bfield ) 
-  : TVTrackHit(ms, x, dx, bfield, 2) 
+  : ILDVTrackHit(ms, x, dx, bfield, 2) 
 {
 
   //SJA:FIXME is there any way to check the size of the Double_t supplied?
