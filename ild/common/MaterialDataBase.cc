@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 #include "TMaterial.h"
 
