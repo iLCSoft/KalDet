@@ -119,8 +119,27 @@ void ILDPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
 
 Bool_t ILDPlanarMeasLayer::IsOnSurface(const TVector3 &xx) const
 {
-  Double_t xi   = (xx.X()-GetXc().X())*GetNormal().Y()/GetNormal().Perp() - (xx.Y()-GetXc().Y())*GetNormal().X()/GetNormal().Perp();
+  
+  //  std::cout << "IsOnSurface " << std::endl;  
+
+  Double_t xi   = (xx.Y()-GetXc().Y())*GetNormal().X()/GetNormal().Perp() - (xx.X()-GetXc().X())*GetNormal().Y()/GetNormal().Perp() ;
   Double_t zeta = xx.Z();
+
+//  std::cout << "GetNormal().X() " <<  GetNormal().X() << std::endl;  
+//  std::cout << "GetNormal().Y() " <<  GetNormal().Y() << std::endl;  
+//  std::cout << "GetNormal().Perp() " << GetNormal().Perp() << std::endl;  
+//  std::cout << "GetNormal().X()/GetNormal().Perp() " << GetNormal().X()/GetNormal().Perp() << std::endl;  
+//  std::cout << "GetNormal().Y()/GetNormal().Perp() " << GetNormal().Y()/GetNormal().Perp() << std::endl;  
+//  std::cout << "xx.X()-GetXc().X() " <<  xx.X()-GetXc().X() << std::endl;  
+//  std::cout << "xx.Y()-GetXc().Y() " <<  xx.Y()-GetXc().Y() << std::endl;  
+//
+//  std::cout << "zeta " << zeta << std::endl;  
+//  std::cout << "xi "   << xi   << std::endl;  
+//  std::cout << "zeta half width " << GetZetawidth()/2 << std::endl;  
+//  std::cout << "xi half width " << GetXiwidth()/2 << std::endl;  
+//  std::cout << "offset  " << GetXioffset() << std::endl;  
+//
+//  std::cout << "distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl; 
 
   bool onSurface = false ;
 

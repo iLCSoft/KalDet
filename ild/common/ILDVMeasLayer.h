@@ -34,7 +34,7 @@ public:
  
   virtual ~ILDVMeasLayer();
   
-  inline int getLayerID(){ return _layerID ; } 
+  inline int getLayerID() const { return _layerID ; } 
   
   inline TString GetMLName() const { return _name;    }
   
