@@ -76,8 +76,6 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
       cosphi = cos(currPhi);
       sinphi = sin(currPhi);
 
-      //Add(new EXVTXMeasLayer(air, si, xc, normal, rmin + 2*ladder*eps, plyhwidth - sximin, 2*hlength, (plyhwidth + sximin)/2, sigmaxi, sigmazeta, inner,ss.str().data()));
-
       TVector3 normal( cosphi, sinphi, 0) ;
 
       TVector3 sen_front_face_centre( sensitive_distance*cosphi, sensitive_distance*sinphi, 0) ; 
@@ -113,7 +111,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
 	}	 
       }
-      else{ //SJA::FIXME: in mokka the hits will be placed on the surface facing the IP so the inner surface is defined as active here 
+      else{ 
 
 	Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, bz, sen_front_sorting_policy, sensitive_width, sensitive_length, sensitive_offset, active, layerID )) ;
 	Add(new ILDPlanarMeasLayer(silicon, air, sen_back_face_centre, normal, bz, sen_back_sorting_policy, sensitive_width, sensitive_length, sensitive_offset, dummy )) ; // back side declared not sensitive
