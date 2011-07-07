@@ -6,7 +6,8 @@
 #include "ILDPlanarMeasLayer.h"
 #include "ILDPlanarHit.h"
 
-#include <ILDDetectorIDs.h>
+#include <UTIL/BitField64.h>
+#include <ILDCellIDEncoding.h>
 
 #include <gear/GEAR.h>
 #include "gear/BField.h"
@@ -43,6 +44,8 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
   Bool_t dummy  = false;
   
   static const Double_t eps = 1e-6; 
+
+  UTIL::BitField64 encoder( ILDCellIDEncoding::encoder_string ) ; 
 
   for (int layer=0; layer<nLayersVTX; ++layer) {
 
@@ -84,11 +87,15 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
       Double_t sen_front_sorting_policy = sensitive_distance + (2 * ladder) * eps ;
       Double_t sen_back_sorting_policy = sensitive_distance + (2 * ladder+1) * eps ;
 
-      int layerID = ILDDetectorIDs::DetID::VXD * ILDDetectorIDs::DetID::Factor  + layer * 100 + ladder;
-
+      encoder[ILDCellIDEncoding::Fields::subdet] = ILDCellIDEncoding::DetID::VXD ;
+      encoder[ILDCellIDEncoding::Fields::layer]  = layer ;
+      encoder[ILDCellIDEncoding::Fields::module] = ladder ;
+      encoder[ILDCellIDEncoding::Fields::side] = 0 ;
+      int layerID = encoder.lowWord() ;
+      
       if(layer%2 == 0 ){ // overlap section of ladder0 is defined after the last ladder,
 	if(ladder==0){   // bacause overlap section of ladder0 is further outer than the last ladder.
-
+	  
 	  // non overlapping region
 	  Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, bz, sen_front_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, sensitive_length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, active, layerID )) ;
 	  Add(new ILDPlanarMeasLayer(silicon, air, sen_back_face_centre, normal, bz, sen_back_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, sensitive_length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, dummy)) ; // back side declared not sensitive	  

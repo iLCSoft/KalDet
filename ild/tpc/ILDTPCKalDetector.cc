@@ -17,7 +17,8 @@
 #include "gear/PadRowLayout2D.h"
 #include "gearimpl/Util.h"
 
-#include <ILDDetectorIDs.h>
+#include <UTIL/BitField64.h>
+#include <ILDCellIDEncoding.h>
 
 #include "streamlog/streamlog.h"
 
@@ -71,23 +72,29 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
   // create measurement layers
   Double_t r = rmin;
 
+  UTIL::BitField64 encoder( ILDCellIDEncoding::encoder_string ) ; 
+
   for (Int_t layer = 0; layer < nlayers; layer++) {
     
-    int layerID = ILDDetectorIDs::DetID::TPC * ILDDetectorIDs::DetID::Factor  + layer ;
+    encoder[ILDCellIDEncoding::Fields::subdet] = ILDCellIDEncoding::DetID::TPC ;
+    encoder[ILDCellIDEncoding::Fields::layer] = layer ;
+    encoder[ILDCellIDEncoding::Fields::module] = 0 ;
+    encoder[ILDCellIDEncoding::Fields::side] = 0 ;
+    int layerID = encoder.lowWord() ;
 
     ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, layerID) ;
 
     Add( tpcL ) ;  
     
     int nth_layers(10) ;
-    streamlog_out( DEBUG4 )   << " *** for TPC Gas printing only every " << nth_layers << "th layer"  << std::endl ;
 
     if( layer % nth_layers == 0 ){
- 
-	streamlog_out( DEBUG4 )   << " *** adding " << name << " Measurement layer using layerID: [" << layerID <<  "] at R = " << r
-				  << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
-				  << std::endl ;  
-          }
+      
+      streamlog_out( DEBUG4 )   << " *** for TPC Gas printing only every " << nth_layers << "th layer"  << std::endl ; 
+      streamlog_out( DEBUG4 )   << " *** adding " << name << " Measurement layer using layerID: [" << layerID <<  "] at R = " << r
+				<< " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
+				<< std::endl ;  
+    }
     r += rstep;
   }
 
