@@ -20,6 +20,8 @@
 #include "math.h"
 #include <sstream>
 
+#include "streamlog/streamlog.h"
+
 ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
                 : TVKalDetector(6) // SJA:FIXME initial size, 6 looks reasonable for ILD, though this would be better stored as a const somewhere
 {
@@ -93,11 +95,18 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
       encoder[ILDCellIDEncoding::Fields::side] = 0 ;
       int layerID = encoder.lowWord() ;
       
+      
       if(layer%2 == 0 ){ // overlap section of ladder0 is defined after the last ladder,
 	if(ladder==0){   // bacause overlap section of ladder0 is further outer than the last ladder.
 	  
+	  
+
 	  // non overlapping region
 	  Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, bz, sen_front_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, sensitive_length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, active, layerID )) ;
+	  streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+			    << layerID
+			    << std::endl ;
+
 	  Add(new ILDPlanarMeasLayer(silicon, air, sen_back_face_centre, normal, bz, sen_back_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, sensitive_length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, dummy)) ; // back side declared not sensitive	  
 
 	  // overlapping region
@@ -108,12 +117,19 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 	  Double_t overlap_back_sorting_policy  = sensitive_distance + (2*nLadders+1)*eps;
 
 	  Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, bz, overlap_front_sorting_policy, overlap_region_width, sensitive_length, overlap_region_offset, active, layerID )) ;
+	  streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+				<< layerID
+				<< std::endl ;
+
 	  Add(new ILDPlanarMeasLayer(silicon, air, sen_back_face_centre, normal, bz, overlap_back_sorting_policy, overlap_region_width, sensitive_length, overlap_region_offset, dummy)) ; // back side declared not sensitive	  
 	  
 	}
 	else{
 	  
 	  Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, bz, sen_front_sorting_policy, sensitive_width, sensitive_length, sensitive_offset, active, layerID )) ;
+	  streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+				<< layerID
+				<< std::endl ;
 	  Add(new ILDPlanarMeasLayer(silicon, air, sen_back_face_centre, normal, bz, sen_back_sorting_policy, sensitive_width, sensitive_length, sensitive_offset, dummy )) ; // back side declared not sensitive
 
 	}	 
@@ -121,6 +137,9 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
       else{ 
 
 	Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, bz, sen_front_sorting_policy, sensitive_width, sensitive_length, sensitive_offset, active, layerID )) ;
+	streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+			      << layerID
+			      << std::endl ;
 	Add(new ILDPlanarMeasLayer(silicon, air, sen_back_face_centre, normal, bz, sen_back_sorting_policy, sensitive_width, sensitive_length, sensitive_offset, dummy )) ; // back side declared not sensitive
 
       }
