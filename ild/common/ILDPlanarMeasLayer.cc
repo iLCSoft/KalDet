@@ -135,22 +135,24 @@ Bool_t ILDPlanarMeasLayer::IsOnSurface(const TVector3 &xx) const
 //  std::cout << "GetNormal().Y()/GetNormal().Perp() " << GetNormal().Y()/GetNormal().Perp() << std::endl;  
 //  std::cout << "xx.X()-GetXc().X() " <<  xx.X()-GetXc().X() << std::endl;  
 //  std::cout << "xx.Y()-GetXc().Y() " <<  xx.Y()-GetXc().Y() << std::endl;  
-//
+//  
 //  std::cout << "zeta " << zeta << std::endl;  
 //  std::cout << "xi "   << xi   << std::endl;  
 //  std::cout << "zeta half width " << GetZetawidth()/2 << std::endl;  
 //  std::cout << "xi half width " << GetXiwidth()/2 << std::endl;  
 //  std::cout << "offset  " << GetXioffset() << std::endl;  
-//
+//  
 //  std::cout << "distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl; 
-
+  
   bool onSurface = false ;
 
   if( (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() < 1e-4){
     if( xi <= GetXioffset() + GetXiwidth()/2  && xi >= GetXioffset() - GetXiwidth()/2  && TMath::Abs(zeta) <= GetZetawidth()/2){
+      //      std::cout << "on surface  " << std::endl;   
       onSurface = true;
     }
     else{
+      //      std::cout << "on surface  but fails limits" << std::endl;   
       onSurface = false;
     }
   }
@@ -180,6 +182,8 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   dx[0] = plane_hit->getdU() ;
   dx[1] = plane_hit->getdV() ;
   
+  bool hit_on_surface = IsOnSurface(hit);
+
   streamlog_out(DEBUG3) << "ILDPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
 			<< " Layer R = " << this->GetXc().Mag() 
 			<< " Layer phi = " << this->GetXc().Phi() 
@@ -190,6 +194,7 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
 			<< " x = " << plane_hit->getPosition()[0]
 			<< " y = " << plane_hit->getPosition()[1]
 			<< " z = " << plane_hit->getPosition()[2]
+			<< " onSurface = " << hit_on_surface
 			<< std::endl ;
 
   return new ILDPlanarHit( *this , x, dx, this->GetBz()) ; 
