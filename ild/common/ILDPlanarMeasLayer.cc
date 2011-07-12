@@ -28,7 +28,10 @@
 #include "TNode.h"
 #include "TString.h"
 
-                                                                                
+#include <EVENT/TrackerHitPlane.h>
+                    
+#include "streamlog/streamlog.h"
+                                                            
 ILDPlanarMeasLayer::ILDPlanarMeasLayer(TMaterial &min,
 				       TMaterial &mout,
 				       const TVector3  &center,
@@ -157,3 +160,39 @@ Bool_t ILDPlanarMeasLayer::IsOnSurface(const TVector3 &xx) const
 }
 
 
+ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
+
+  EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
+
+  if( plane_hit == NULL )  return NULL; // SJA:FIXME: should be replaced with an exception  
+
+  const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
+
+  // convert to layer coordinates 	
+  TKalMatrix h    = this->XvToMv(hit);
+
+  Double_t  x[2] ;
+  Double_t dx[2] ;
+  
+  x[0] = h(0, 0);
+  x[1] = h(1, 0);
+  
+  dx[0] = plane_hit->getdU() ;
+  dx[1] = plane_hit->getdV() ;
+  
+  streamlog_out(DEBUG3) << "ILDPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
+			<< " Layer R = " << this->GetXc().Mag() 
+			<< " Layer phi = " << this->GetXc().Phi() 
+			<< " u = "  <<  x[0]
+			<< " v = "  <<  x[1]
+			<< " du = " << dx[0]
+			<< " dv = " << dx[1]
+			<< " x = " << plane_hit->getPosition()[0]
+			<< " y = " << plane_hit->getPosition()[1]
+			<< " z = " << plane_hit->getPosition()[2]
+			<< std::endl ;
+
+  return new ILDPlanarHit( *this , x, dx, this->GetBz()) ; 
+
+
+}

@@ -45,6 +45,8 @@ public:
                                 const TKalMatrix &dxphiada,
                                       TKalMatrix &H)    const;
 
+  virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const ;
+
 private:
   
 };

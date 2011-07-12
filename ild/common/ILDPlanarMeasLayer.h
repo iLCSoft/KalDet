@@ -59,6 +59,7 @@ public:
                                  const TKalMatrix &dxphiada,
                                        TKalMatrix &H)  const;
    
+   virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const ;
    
    inline virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
    

@@ -23,6 +23,11 @@
 
 class TVTrackHit;
 class TNode;
+class ILDVTrackHit;
+
+namespace EVENT{
+  class TrackerHit;
+}
 
 class ILDVMeasLayer : public TVMeasLayer {
 public:
@@ -39,6 +44,8 @@ public:
   inline TString GetMLName() const { return _name;    }
   
   inline Double_t GetBz() const { return _Bz; } 
+
+  virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const = 0 ;
 
  protected:
   

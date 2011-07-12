@@ -16,8 +16,15 @@
 
 #include "TKalTrack.h" 
 
+#include "ILDVTrackHit.h"
 #include "ILDCylinderMeasLayer.h"
 #include "ILDCylinderHit.h"
+
+
+#include <lcio.h>
+#include <EVENT/TrackerHit.h>
+
+#include "streamlog/streamlog.h"
 
 #include "TMath.h"
 #include <cmath>
@@ -128,4 +135,36 @@ void ILDCylinderMeasLayer::CalcDhDa(const TVTrackHit &vht, // tracker hit not us
 
 }
 
+ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
 
+
+  const TVector3 hit( trkhit->getPosition()[0], trkhit->getPosition()[1], trkhit->getPosition()[2]) ;
+
+  // convert to layer coordinates 	
+  TKalMatrix h    = this->XvToMv(hit);
+
+  Double_t  x[2] ;
+  Double_t dx[2] ;
+  
+  x[0] = h(0, 0);
+  x[1] = h(1, 0);
+
+  // convert errors
+  dx[0] = sqrt(trkhit->getCovMatrix()[0] + trkhit->getCovMatrix()[2]) ;
+  dx[1] = sqrt(trkhit->getCovMatrix()[5]) ; 
+  
+  streamlog_out(DEBUG3) << "ILDCylinderMeasLayer::ConvertLCIOTrkHit ILDCylinderHit created" 
+			<< " R = " << hit.Perp()
+			<< " Layer R = " << this->GetR() 
+			<< " RPhi = "  <<  x[0]
+			<< " Z = "     <<  x[1]
+			<< " dRPhi = " << dx[0]
+			<< " dZ = "    << dx[1]
+			<< " x = " << trkhit->getPosition()[0]
+			<< " y = " << trkhit->getPosition()[1]
+			<< " z = " << trkhit->getPosition()[2]
+			<< std::endl ;  
+
+  return new ILDCylinderHit( *this , x, dx, this->GetBz()) ; 
+
+}
