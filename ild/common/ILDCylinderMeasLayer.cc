@@ -153,6 +153,8 @@ ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit
   dx[0] = sqrt(trkhit->getCovMatrix()[0] + trkhit->getCovMatrix()[2]) ;
   dx[1] = sqrt(trkhit->getCovMatrix()[5]) ; 
   
+  bool hit_on_surface = IsOnSurface(hit);
+
   streamlog_out(DEBUG3) << "ILDCylinderMeasLayer::ConvertLCIOTrkHit ILDCylinderHit created" 
 			<< " R = " << hit.Perp()
 			<< " Layer R = " << this->GetR() 
@@ -163,8 +165,10 @@ ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit
 			<< " x = " << trkhit->getPosition()[0]
 			<< " y = " << trkhit->getPosition()[1]
 			<< " z = " << trkhit->getPosition()[2]
+			<< " onSurface = " << hit_on_surface
 			<< std::endl ;  
 
   return new ILDCylinderHit( *this , x, dx, this->GetBz()) ; 
 
 }
+
