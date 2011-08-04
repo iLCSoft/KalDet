@@ -73,7 +73,7 @@ void EXEventGen::Swim(THelicalTrack &heltrk)
       }
       // should use the material behind the surface since dfi is measured 
       // from the last point to the current surface
-      Bool_t   dir    = dlyr < 0 ? kTRUE : kFALSE;
+      // Bool_t   dir    = dlyr < 0 ? kTRUE : kFALSE;
 
       dfisum += dfi;
 

@@ -118,7 +118,7 @@ EXTPCKalDetector::EXTPCKalDetector(Int_t m)
 #endif
 
   Bool_t active = EXTPCMeasLayer::kActive;
-  Bool_t dummy  = EXTPCMeasLayer::kDummy;
+  // Bool_t dummy  = EXTPCMeasLayer::kDummy;
 
   // create measurement layers of central tracker
   for (Int_t layer = 0; layer < nlayers; layer++) {
