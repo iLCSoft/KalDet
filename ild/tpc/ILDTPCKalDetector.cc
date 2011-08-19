@@ -18,7 +18,7 @@
 #include "gearimpl/Util.h"
 
 #include <UTIL/BitField64.h>
-#include <ILDCellIDEncoding.h>
+#include <UTIL/ILDConf.h>
 
 #include "streamlog/streamlog.h"
 
@@ -72,16 +72,17 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
   // create measurement layers
   Double_t r = rmin;
 
-  UTIL::BitField64 encoder( ILDCellIDEncoding::encoder_string ) ; 
-
+  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  
   for (Int_t layer = 0; layer < nlayers; layer++) {
     
-    encoder[ILDCellIDEncoding::Fields::subdet] = ILDCellIDEncoding::DetID::TPC ;
-    encoder[ILDCellIDEncoding::Fields::layer] = layer ;
-    encoder[ILDCellIDEncoding::Fields::module] = 0 ;
-    encoder[ILDCellIDEncoding::Fields::side] = 0 ;
+    encoder.reset() ;  // reset to 0
+    
+    encoder[ILDCellID0::subdet] = ILDDetID::TPC ;
+    encoder[ILDCellID0::layer] = layer ;
+    
     int layerID = encoder.lowWord() ;
-
+    
     ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, layerID) ;
 
     Add( tpcL ) ;  

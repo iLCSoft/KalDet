@@ -7,7 +7,7 @@
 #include "ILDPlanarHit.h"
 
 #include <UTIL/BitField64.h>
-#include <ILDCellIDEncoding.h>
+#include <UTIL/ILDConf.h>
 
 #include <gear/GEAR.h>
 #include "gear/BField.h"
@@ -29,7 +29,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
-  TMaterial & carbon   = *MaterialDataBase::Instance().getMaterial("carbon");
+  //  TMaterial & carbon   = *MaterialDataBase::Instance().getMaterial("carbon");
 
   const gear::VXDParameters& pVXDDetMain = gearMgr.getVXDParameters();
   const gear::VXDLayerLayout& pVXDLayerLayout = pVXDDetMain.getVXDLayerLayout();
@@ -47,18 +47,18 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
   
   static const Double_t eps = 1e-6; 
 
-  UTIL::BitField64 encoder( ILDCellIDEncoding::encoder_string ) ; 
-
+  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+ 
   for (int layer=0; layer<nLayersVTX; ++layer) {
 
     nLadders = pVXDLayerLayout.getNLadders(layer);
     
     float ladder_phi0 = float(pVXDLayerLayout.getPhi0(layer));
 
-    float ladder_distance = float(pVXDLayerLayout.getLadderDistance(layer));
-    float ladder_thickness = float(pVXDLayerLayout.getLadderThickness(layer));
-    float ladder_width = float(pVXDLayerLayout.getLadderWidth(layer));
-    float ladder_length = float (pVXDLayerLayout.getLadderLength(layer));
+    // float ladder_distance = float(pVXDLayerLayout.getLadderDistance(layer));
+    // float ladder_thickness = float(pVXDLayerLayout.getLadderThickness(layer));
+    // float ladder_width = float(pVXDLayerLayout.getLadderWidth(layer));
+    // float ladder_length = float (pVXDLayerLayout.getLadderLength(layer));
     float ladder_offset = float (pVXDLayerLayout.getLadderOffset(layer));
     
     float sensitive_distance = float(pVXDLayerLayout.getSensitiveDistance(layer));
@@ -77,6 +77,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
     for (int ladder=0; ladder<nLadders; ++ladder) {
       
+      
       currPhi = ladder_phi0 + (angleLadders * ladder);
       cosphi = cos(currPhi);
       sinphi = sin(currPhi);
@@ -89,10 +90,14 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
       Double_t sen_front_sorting_policy = sensitive_distance + (2 * ladder) * eps ;
       Double_t sen_back_sorting_policy = sensitive_distance + (2 * ladder+1) * eps ;
 
-      encoder[ILDCellIDEncoding::Fields::subdet] = ILDCellIDEncoding::DetID::VXD ;
-      encoder[ILDCellIDEncoding::Fields::layer]  = layer ;
-      encoder[ILDCellIDEncoding::Fields::module] = ladder ;
-      encoder[ILDCellIDEncoding::Fields::side] = 0 ;
+      
+      encoder.reset() ;  // reset to 0
+
+      encoder[ILDCellID0::subdet] = ILDDetID::VXD ;
+      encoder[ILDCellID0::layer]  = layer ;
+      encoder[ILDCellID0::module] = ladder ;
+      // encoder[ILDCellID0::side] = 0 ;
+
       int layerID = encoder.lowWord() ;
       
       
