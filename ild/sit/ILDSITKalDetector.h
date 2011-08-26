@@ -1,5 +1,5 @@
-#ifndef __ILDVXDKALDETECTOR__
-#define __ILDVXDKALDETECTOR__
+#ifndef __ILDSITKALDETECTOR__
+#define __ILDSITKALDETECTOR__
 
 #include "kaltest/TVKalDetector.h"
 
@@ -12,13 +12,13 @@ namespace gear{
 }
 
 
-class ILDVXDKalDetector : public TVKalDetector {
+class ILDSITKalDetector : public TVKalDetector {
     
  public:
 
-  ILDVXDKalDetector( const gear::GearMgr& gearMgr );
+  ILDSITKalDetector( const gear::GearMgr& gearMgr );
 
-  ~ILDVXDKalDetector();
+  ~ILDSITKalDetector();
   
  private:
 
@@ -27,7 +27,7 @@ class ILDVXDKalDetector : public TVKalDetector {
   int _nLayers ;
   double _bZ ;
 
-  struct VXD_Layer {
+  struct SIT_Layer {
     int nLadders;
     double phi0;
     double dphi;
@@ -39,7 +39,7 @@ class ILDVXDKalDetector : public TVKalDetector {
     double senThickness;
     double supThickness;
   };
-  std::vector<VXD_Layer> _VXDgeo;
+  std::vector<SIT_Layer> _SITgeo;
 
 };
 

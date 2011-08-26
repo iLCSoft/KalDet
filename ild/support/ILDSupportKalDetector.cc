@@ -21,6 +21,8 @@ ILDSupportKalDetector::ILDSupportKalDetector( const gear::GearMgr& gearMgr ) :
   TVKalDetector(10) 
 {
   
+  streamlog_out(DEBUG4) << "ILDSupportKalDetector building beampipe using GEAR " << std::endl ;
+
   const gear::GearParameters& pBeamPipe = gearMgr.getGearParameters("BeamPipe");
   const Double_t bz = gearMgr.getBField().at( gear::Vector3D( 0.,0.,0.)  ).z() ;
 
@@ -37,13 +39,13 @@ ILDSupportKalDetector::ILDSupportKalDetector( const gear::GearMgr& gearMgr ) :
   std::string name = "Support";
 
  // add beam pipe
-  Add( new ILDCylinderMeasLayer(air, aluminium , rtub, halfZ, bz, dummy ) );
-  streamlog_out( DEBUG4 )   << " *** adding " << name << " Measurement layer using layerID: [ beampipe ] at R = " << rtub
+  Add( new ILDCylinderMeasLayer(beam, aluminium , rtub, halfZ, bz, dummy ) );
+  streamlog_out( DEBUG3 )   << " *** adding " << name << " Measurement layer using layerID: [ beampipe ] at R = " << rtub
 			    << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
 			    << std::endl ;  
 
   Add( new ILDCylinderMeasLayer(aluminium , air, rtub+thickness, halfZ, bz, dummy ) );
-  streamlog_out( DEBUG4 )   << " *** adding " << name << " Measurement layer using layerID: [ beampipe ] at R = " << rtub+thickness
+  streamlog_out( DEBUG3 )   << " *** adding " << name << " Measurement layer using layerID: [ beampipe ] at R = " << rtub+thickness
 			    << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
 			    << std::endl ;  
 
