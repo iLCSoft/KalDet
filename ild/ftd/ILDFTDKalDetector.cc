@@ -13,6 +13,7 @@
 
 #include "ILDRotatedTrapMeaslayer.h"
 #include "ILDPlanarHit.h"
+#include "ILDDiscMeasLayer.h"
 
 #include <UTIL/BitField64.h>
 #include <UTIL/ILDConf.h>
@@ -40,6 +41,8 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
   
   UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
 
+
+  double z_of_last_disc = 0.0 ;
 
   for (int idisk = 0; idisk < _nDisks; ++idisk) {
 
@@ -109,38 +112,136 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 
       double dist_to_IP =  sen_front_face_centre_fwd.Mag() ;
 
-      // +z
-      // air - sensitive boundary
-      Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+3*ipet*eps1,
-				       height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_FWD) );
-      streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
-			    << CELL_ID_FWD
-			    << std::endl ;
-      // sensitive - support boundary 
-      Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+1)*eps1,
-				       height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
+      if(ipet == 0 ){ // need to split the first petal due to overlap
+	// sorting policy is modified for the half which is further from the IP than the last petal in the disc. 
+	// sorting policy = dist_to_IP+3*npetals*eps1 
+	// note it is npetals used here not ipetal 
+	// also the int side argument is set to 1 and -1 as opposed to 0 for the other petals 
 
-      // support - air boundary
-      Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+2)*eps1,
-				       height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
+	// +z
+	// air - sensitive boundary
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+3*ipet*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, active , CELL_ID_FWD) );
+	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+			      << CELL_ID_FWD
+			      << std::endl ;
+	// sensitive - support boundary 
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+1)*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
+	
+	// support - air boundary
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+2)*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
 
+	// +z
+	// air - sensitive boundary
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+3*npetals*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, active , CELL_ID_FWD) );
+	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+			      << CELL_ID_FWD
+			      << std::endl ;
+	// sensitive - support boundary 
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*npetals+1)*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
+	
+	// support - air boundary
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*npetals+2)*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
+
+	// -z
+	// air - sensitive boundary
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+3*ipet*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, active , CELL_ID_BWD) );
+	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+			      << CELL_ID_BWD
+			      << std::endl ;
+	// sensitive - support boundary 
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+1)*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
+	
+	// support - air boundary
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+2)*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
+
+
+	// -z
+	// air - sensitive boundary
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+3*npetals*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, active , CELL_ID_BWD) );
+	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+			      << CELL_ID_BWD
+			      << std::endl ;
+	// sensitive - support boundary 
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*npetals+1)*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
+	
+	// support - air boundary
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*npetals+2)*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
+
+
+
+      }
+      else{
+	
+	// +z
+	// air - sensitive boundary
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+3*ipet*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_FWD) );
+	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+			      << CELL_ID_FWD
+			      << std::endl ;
+	// sensitive - support boundary 
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+1)*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
+	
+	// support - air boundary
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+2)*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
+	
+	
+	// -z
+	// air - sensitive boundary
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+3*ipet*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_BWD) );
+	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+			      << CELL_ID_BWD
+			      << std::endl ;
+	// sensitive - support boundary 
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+1)*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
+	
+	// support - air boundary
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+2)*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
+	
+      }
       
-      // -z
-      // air - sensitive boundary
-      Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+3*ipet*eps1+eps2,
-				       height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_BWD) );
-      streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
-			    << CELL_ID_BWD
-			    << std::endl ;
-      // sensitive - support boundary 
-      Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+1)*eps1+eps2,
-				       height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
-
-      // support - air boundary
-      Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+2)*eps1+eps2,
-				       height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
-
+    }
+    
+    // place air discs to help transport during track extrapolation
+    if( idisk != 0 ){
       
+      // place the disc half way between the two discs 
+      double z = z_of_last_disc + (zPos - z_of_last_disc) * 0.5 ;
+
+      TVector3 xc_fwd(0.0, 0.0, z) ;
+      TVector3 normal_fwd(xc_fwd) ;
+      normal_fwd.SetMag(1.0) ;
+
+      Add(new ILDDiscMeasLayer( air, air, xc_fwd, normal_fwd, _bZ, z,
+				rInner, rInner+height, dummy ) );
+
+      TVector3 xc_bwd(0.0, 0.0, -z) ;
+      TVector3 normal_bwd(xc_bwd) ;
+      normal_bwd.SetMag(1.0) ;
+
+      Add(new ILDDiscMeasLayer( air, air, xc_bwd, normal_bwd, _bZ, z+eps2,
+				rInner, rInner+height, dummy ) );
+
+
+      // save the position of this disc for the next loop
+      z_of_last_disc = zPos ;   
     }
 
 
