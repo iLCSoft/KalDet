@@ -42,7 +42,6 @@ public:
 		      Int_t      layerID = -1,
 		      const Char_t    *name = "ILDDiscMeasL");
    
-   virtual ~ILDDiscMeasLayer();
 
    // Parrent's pure virtuals that must be implemented
 
