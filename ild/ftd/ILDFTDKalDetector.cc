@@ -85,6 +85,10 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 
       TVector3 sen_front_face_centre_fwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, +zPos );         // for +z  
 
+      TVector3 measurement_plane_centre_fwd( sen_front_face_centre_fwd.X(), 
+					     sen_front_face_centre_fwd.Y(), 
+					     sen_front_face_centre_fwd.Z() + senThickness*0.5 ); 
+      
       TVector3 sen_rear_face_centre_fwd( sen_front_face_centre_fwd.X(), 
 					 sen_front_face_centre_fwd.Y(), 
 					 sen_front_face_centre_fwd.Z() + senThickness ); 
@@ -97,6 +101,10 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 
       // note this is the petal facing the one in +z, not the rotated one 
       TVector3 sen_front_face_centre_bwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, -zPos );         // for -z  
+
+      TVector3 measurement_plane_centre_bwd( sen_front_face_centre_bwd.X(), 
+					     sen_front_face_centre_bwd.Y(), 
+					     sen_front_face_centre_bwd.Z() - senThickness*0.5 ); 
 
       TVector3 sen_rear_face_centre_bwd( sen_front_face_centre_bwd.X(), 
 					 sen_front_face_centre_bwd.Y(), 
@@ -120,63 +128,83 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 
 	// +z
 	// air - sensitive boundary
-	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+3*ipet*eps1,
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+4*ipet*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy) );
+
+	// measurement plane defined as the middle of the sensitive volume
+	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, active , CELL_ID_FWD) );
 	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_FWD
 			      << std::endl ;
+
 	// sensitive - support boundary 
-	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+1)*eps1,
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+2)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
 	
 	// support - air boundary
-	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+2)*eps1,
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+3)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
 
 	// +z
 	// air - sensitive boundary
-	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+3*npetals*eps1,
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+4*npetals*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy) );
+
+	// measurement plane defined as the middle of the sensitive volume
+	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*npetals+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, active , CELL_ID_FWD) );
 	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_FWD
 			      << std::endl ;
+
 	// sensitive - support boundary 
-	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*npetals+1)*eps1,
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*npetals+2)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
 	
 	// support - air boundary
-	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*npetals+2)*eps1,
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*npetals+3)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
 
 	// -z
 	// air - sensitive boundary
-	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+3*ipet*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+4*ipet*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy) );
+
+	// measurement plane defined as the middle of the sensitive volume
+	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, active , CELL_ID_BWD) );
 	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_BWD
 			      << std::endl ;
+
 	// sensitive - support boundary 
-	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+1)*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+2)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
 	
 	// support - air boundary
-	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+2)*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+3)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
 
 
 	// -z
 	// air - sensitive boundary
-	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+3*npetals*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+4*npetals*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy) );
+
+	// measurement plane defined as the middle of the sensitive volume
+	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, active , CELL_ID_BWD) );
 	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_BWD
 			      << std::endl ;
+
 	// sensitive - support boundary 
-	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*npetals+1)*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*npetals+2)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
 	
 	// support - air boundary
-	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*npetals+2)*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*npetals+3)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
 
 
@@ -186,33 +214,43 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 	
 	// +z
 	// air - sensitive boundary
-	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+3*ipet*eps1,
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+4*ipet*eps1,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
+
+	// measurement plane defined as the middle of the sensitive volume
+	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_FWD) );
 	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_FWD
 			      << std::endl ;
+
 	// sensitive - support boundary 
-	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+1)*eps1,
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+2)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
 	
 	// support - air boundary
-	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(3*ipet+2)*eps1,
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+3)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
 	
 	
 	// -z
 	// air - sensitive boundary
-	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+3*ipet*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+4*ipet*eps1+eps2,
+					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy) );
+
+	// measurement plane defined as the middle of the sensitive volume
+	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_BWD) );
 	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
-			      << CELL_ID_BWD
+			      << CELL_ID_FWD
 			      << std::endl ;
+
 	// sensitive - support boundary 
-	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+1)*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+2)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
 	
 	// support - air boundary
-	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(3*ipet+2)*eps1+eps2,
+	Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+3)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
 	
       }

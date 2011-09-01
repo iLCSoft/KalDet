@@ -93,22 +93,25 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
       
       
       TVector3 sen_front_face_centre( sensitive_distance*cosphi, sensitive_distance*sinphi, 0) ; 
+      TVector3 measurement_plane_centre( (sensitive_distance+sensitive_thickness*0.5)*cosphi, (sensitive_distance+sensitive_thickness*0.5)*sinphi, 0) ; 
       TVector3 sen_back_face_centre( (sensitive_distance+sensitive_thickness)*cosphi, (sensitive_distance+sensitive_thickness)*sinphi, 0) ; 
       TVector3 sup_back_face_centre( (ladder_distance+ladder_thickness)*cosphi, (ladder_distance+ladder_thickness)*sinphi, 0) ; 
       
-      double sen_front_sorting_policy = sensitive_distance + (3 * ladder+0) * eps ;
-      double sen_back_sorting_policy = sensitive_distance  + (3 * ladder+1) * eps ;
-      double sup_back_sorting_policy = ladder_distance     + (3 * ladder+2) * eps ;
+      double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps ;
+      double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps ;
+      double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps ;
+      double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+3) * eps ;
       
 
-
-
       // air - sensitive boundary
-      Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, _bZ, sen_front_sorting_policy, width, length, offset, active, layerID )) ;
+      Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, _bZ, sen_front_sorting_policy, width, length, offset, dummy)) ;
+
+      // measurement plane defined as the middle of the sensitive volume 
+      Add(new ILDPlanarMeasLayer(silicon, silicon, measurement_plane_centre, normal, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID )) ;
       streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with layerID = "
 			    << layerID
 			    << std::endl ;
-      
+
       // sensitive - support boundary 
       Add(new ILDPlanarMeasLayer(silicon, carbon, sen_back_face_centre, normal, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ; 
       
