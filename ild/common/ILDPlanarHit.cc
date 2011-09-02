@@ -1,6 +1,7 @@
 
 #include "ILDPlanarHit.h"
 #include "ILDPlanarMeasLayer.h"
+#include "ILDDiscMeasLayer.h"
 #include "TMath.h"
 
 #include <iostream>
@@ -34,7 +35,24 @@ ILDPlanarHit::~ILDPlanarHit()
 
 TKalMatrix ILDPlanarHit::XvToMv(const TVector3 &xv, Double_t /*t0*/) const
 {
-   return dynamic_cast<const ILDPlanarMeasLayer &>(GetMeasLayer()).XvToMv(xv);
+  
+  if ( dynamic_cast<const ILDPlanarMeasLayer*>(&(this->GetMeasLayer())) ) {
+    
+    return static_cast<const ILDPlanarMeasLayer &>(this->GetMeasLayer()).XvToMv(xv); 
+    
+  }
+  else if ( dynamic_cast<const ILDDiscMeasLayer*>(&(this->GetMeasLayer())) ) {
+
+    return static_cast<const ILDDiscMeasLayer &>(this->GetMeasLayer()).XvToMv(xv); 
+
+  }
+  else {
+    cerr << "<<<<<<<<< ILDPlanarHit::XvToMv: dynamic_cast failed for measurement layer exit(1) >>>>>>>" << std::endl;
+    exit(1) ;
+  }
+ 
+  
+
 }
 
 void ILDPlanarHit::DebugPrint(Option_t *) const
