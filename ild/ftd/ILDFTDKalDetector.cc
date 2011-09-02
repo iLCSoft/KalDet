@@ -298,7 +298,7 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   
   _bZ = gearMgr.getBField().at( gear::Vector3D( 0.,0.,0.)  ).z() ;
 
-  _nDisks = 1 ; // just do the first disk for now 
+  _nDisks = ftdlayers.getNLayers() ; // just do the first disk for now 
   _FTDgeo.resize(_nDisks);
 
   //SJA:FIXME: for now the support is taken as the same size the sensitive
