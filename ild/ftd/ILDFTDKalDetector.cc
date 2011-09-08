@@ -58,7 +58,19 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
     double outerBaseLength = _FTDgeo[idisk].outerBaseLength ;
     double senThickness = _FTDgeo[idisk].senThickness ;
     double supThickness = _FTDgeo[idisk].supThickness ;
-    double zPos = _FTDgeo[idisk].zPos;
+    double senZPos = _FTDgeo[idisk].senZPos;
+    double supZPos = _FTDgeo[idisk].supZPos;
+
+    // for this design we are assumming that the sensitive and support are share a common boundary
+    // here we check if this is the case and exit if not
+    double sepration = fabs( senZPos - supZPos ) - ( 0.5*senThickness + 0.5*supThickness ) ;
+    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
+      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
+			    << sepration << " microns. exit(1) called" 
+			    << std::endl ;
+      exit(1);
+    }
+
 
     double dphi = M_PI / npetals;
    
@@ -83,7 +95,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
       double sinalpha = sin( alpha ) ;
       double cosalpha = cos( alpha ) ;
 
-      TVector3 sen_front_face_centre_fwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, +zPos );         // for +z  
+      TVector3 sen_front_face_centre_fwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, +senZPos - senThickness*0.5 );         // for +z  
 
       TVector3 measurement_plane_centre_fwd( sen_front_face_centre_fwd.X(), 
 					     sen_front_face_centre_fwd.Y(), 
@@ -100,7 +112,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 
 
       // note this is the petal facing the one in +z, not the rotated one 
-      TVector3 sen_front_face_centre_bwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, -zPos );         // for -z  
+      TVector3 sen_front_face_centre_bwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, -senZPos + senThickness*0.5 );         // for -z  
 
       TVector3 measurement_plane_centre_bwd( sen_front_face_centre_bwd.X(), 
 					     sen_front_face_centre_bwd.Y(), 
@@ -261,7 +273,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
     if( idisk != 0 ){
       
       // place the disc half way between the two discs 
-      double z = z_of_last_disc + (zPos - z_of_last_disc) * 0.5 ;
+      double z = z_of_last_disc + (senZPos - z_of_last_disc) * 0.5 ;
 
       TVector3 xc_fwd(0.0, 0.0, z) ;
       TVector3 normal_fwd(xc_fwd) ;
@@ -279,7 +291,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 
 
       // save the position of this disc for the next loop
-      z_of_last_disc = zPos ;   
+      z_of_last_disc = senZPos ;   
     }
 
 
@@ -309,17 +321,18 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   for(int disk=0; disk< _nDisks; ++disk){
     
     // numbers taken from the ILD_01 gear file for the sensitive part 
-    _FTDgeo[disk].nPetals = ftdlayers.getNLadders(disk) ;    
+    _FTDgeo[disk].nPetals = ftdlayers.getNPetals(disk) ;    
     _FTDgeo[disk].dphi = 2*M_PI /  _FTDgeo[disk].nPetals ;
-    _FTDgeo[disk].phi0 = ftdlayers.getPhi(disk) + 0.5 * _FTDgeo[disk].dphi ; // SJA:FIXME: phi0 is not well defined, the gear file has it as the phi angle of the trailing edge of the first petal
+    _FTDgeo[disk].phi0 = ftdlayers.getPhi0(disk) ;
     _FTDgeo[disk].alpha = ftdlayers.getAlpha(disk) ;
     _FTDgeo[disk].rInner = ftdlayers.getSensitiveRinner(disk) ;
     _FTDgeo[disk].height = ftdlayers.getSensitiveWidth(disk) ;
     _FTDgeo[disk].innerBaseLength =  ftdlayers.getSensitiveLengthMin(disk) ;
     _FTDgeo[disk].outerBaseLength =  ftdlayers.getSensitiveLengthMax(disk) ;
     _FTDgeo[disk].senThickness =  ftdlayers.getSensitiveThickness(disk) ;
-    _FTDgeo[disk].supThickness =  ftdlayers.getLadderThickness(disk) ;
-    _FTDgeo[disk].zPos = ftdlayers.getZposition(disk) ;
+    _FTDgeo[disk].supThickness =  ftdlayers.getSupportThickness(disk) ;
+    _FTDgeo[disk].senZPos = ftdlayers.getSensitiveZposition(disk) ;
+    _FTDgeo[disk].supZPos = ftdlayers.getSupportZposition(disk) ;
 
 
   }

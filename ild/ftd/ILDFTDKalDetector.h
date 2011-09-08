@@ -36,7 +36,8 @@ public:
     double outerBaseLength;
     double senThickness;
     double supThickness;
-    double zPos;
+    double senZPos;
+    double supZPos;
 
   };
   std::vector<FTD_Disk> _FTDgeo;
