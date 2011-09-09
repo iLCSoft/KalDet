@@ -210,7 +210,7 @@ void EXTPCKalDetector::Draw(Int_t color, const Char_t *opt)
     tubep->SetBit(kCanDelete);
     fNodePtr = new TNode(nname, nname, name);
     fNodePtr->SetLineColor(color);
-    fNodePtr->SetLineWidth(0.01);
+    fNodePtr->SetLineWidth(1); // line width given in number of pixels
   }
   EXVKalDetector::Draw(color, opt);
 }
