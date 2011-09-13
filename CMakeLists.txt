@@ -12,8 +12,8 @@ PROJECT( KalDet )
 
 # project version
 SET( KalDet_VERSION_MAJOR 1 )
-SET( KalDet_VERSION_MINOR 1 )
-SET( KalDet_VERSION_PATCH 1 )
+SET( KalDet_VERSION_MINOR 2 )
+SET( KalDet_VERSION_PATCH 0 )
 
 
 
@@ -27,7 +27,7 @@ INCLUDE( ilcsoft_default_settings )
 
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
 FIND_PACKAGE( MarlinUtil 1.4 REQUIRED )
-FIND_PACKAGE( KalTest 1.1.1 REQUIRED )
+FIND_PACKAGE( KalTest 1.2 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
 FOREACH( pkg Marlin MarlinUtil ROOT KalTest )
