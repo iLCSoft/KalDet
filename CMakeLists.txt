@@ -15,6 +15,7 @@ SET( KalDet_VERSION_MAJOR 1 )
 SET( KalDet_VERSION_MINOR 2 )
 SET( KalDet_VERSION_PATCH 0 )
 
+cmake_policy(SET CMP0008 NEW)
 
 
 ### DEPENDENCIES ############################################################
