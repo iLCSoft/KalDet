@@ -184,7 +184,7 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   
   bool hit_on_surface = IsOnSurface(hit);
 
-  streamlog_out(DEBUG3) << "ILDPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
+  streamlog_out(DEBUG0) << "ILDPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
 			<< " Layer R = " << this->GetXc().Mag() 
 			<< " Layer phi = " << this->GetXc().Phi() 
 			<< " u = "  <<  x[0]

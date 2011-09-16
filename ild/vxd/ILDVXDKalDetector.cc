@@ -26,7 +26,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
                 : TVKalDetector(300) // SJA:FIXME initial size, 300 looks reasonable for ILD, though this would be better stored as a const somewhere
 {
    
-  streamlog_out(DEBUG4) << "ILDVXDKalDetector building VXD detector using GEAR " << std::endl ;
+  streamlog_out(DEBUG1) << "ILDVXDKalDetector building VXD detector using GEAR " << std::endl ;
 
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
@@ -111,7 +111,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
 	  // measurement plane defined as the middle of the sensitive volume 
 	  Add(new ILDPlanarMeasLayer(silicon, silicon, measurement_plane_centre, normal, _bZ, measurement_plane_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, active, layerID )) ;
-	  streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+	  streamlog_out(DEBUG0) << "ILDVXDKalDetector add surface with layerID = "
 			    << layerID
 			    << std::endl ;
 
@@ -137,7 +137,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
 	  // measurement plane defined as the middle of the sensitive volume
 	  Add(new ILDPlanarMeasLayer(silicon, silicon, measurement_plane_centre, normal, _bZ, overlap_measurement_plane_sorting_policy, overlap_region_width, length, overlap_region_offset, active, layerID )) ;
-	  streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+	  streamlog_out(DEBUG0) << "ILDVXDKalDetector add surface with layerID = "
 				<< layerID
 				<< std::endl ;
 
@@ -156,7 +156,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
 	  // measurement plane defined as the middle of the sensitive volume
 	  Add(new ILDPlanarMeasLayer(silicon, silicon, measurement_plane_centre, normal, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID )) ;
-	  streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+	  streamlog_out(DEBUG0) << "ILDVXDKalDetector add surface with layerID = "
 				<< layerID
 				<< std::endl ;
 
@@ -189,7 +189,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
 	// measurement plane defined as the middle of the sensitive volume
 	Add(new ILDPlanarMeasLayer(silicon, silicon, measurement_plane_centre, normal, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID )) ; 
-	streamlog_out(DEBUG3) << "ILDVXDKalDetector add surface with layerID = "
+	streamlog_out(DEBUG0) << "ILDVXDKalDetector add surface with layerID = "
 			      << layerID
 			      << std::endl ;
 

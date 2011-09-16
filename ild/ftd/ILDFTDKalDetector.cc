@@ -26,7 +26,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
   TVKalDetector(300), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable for ILD, though this would be better stored as a const somewhere
 {
 
-  streamlog_out(DEBUG4) << "ILDFTDKalDetector building FTD detector using GEAR " << std::endl ;
+  streamlog_out(DEBUG1) << "ILDFTDKalDetector building FTD detector using GEAR " << std::endl ;
 
   setupGearGeom( gearMgr ) ; 
 
@@ -146,7 +146,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 	// measurement plane defined as the middle of the sensitive volume
 	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, active , CELL_ID_FWD) );
-	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+	streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_FWD
 			      << std::endl ;
 
@@ -166,7 +166,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 	// measurement plane defined as the middle of the sensitive volume
 	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*npetals+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, active , CELL_ID_FWD) );
-	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+	streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_FWD
 			      << std::endl ;
 
@@ -186,7 +186,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 	// measurement plane defined as the middle of the sensitive volume
 	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 1, active , CELL_ID_BWD) );
-	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+	streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_BWD
 			      << std::endl ;
 
@@ -207,7 +207,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 	// measurement plane defined as the middle of the sensitive volume
 	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, -1, active , CELL_ID_BWD) );
-	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+	streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_BWD
 			      << std::endl ;
 
@@ -232,7 +232,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 	// measurement plane defined as the middle of the sensitive volume
 	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+1)*eps1,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_FWD) );
-	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+	streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_FWD
 			      << std::endl ;
 
@@ -253,7 +253,7 @@ ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) :
 	// measurement plane defined as the middle of the sensitive volume
 	Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1+eps2,
 					 height, innerBaseLength, outerBaseLength, alpha, 0, active , CELL_ID_BWD) );
-	streamlog_out(DEBUG3) << "ILDFTDKalDetector add surface with layerID = "
+	streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with layerID = "
 			      << CELL_ID_FWD
 			      << std::endl ;
 

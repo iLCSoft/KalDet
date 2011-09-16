@@ -25,7 +25,7 @@ ILDFTDDiscBasedKalDetector::ILDFTDDiscBasedKalDetector( const gear::GearMgr& gea
   TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable for ILD, though this would be better stored as a const somewhere
 {
 
-  streamlog_out(DEBUG4) << "ILDFTDDiscBasedKalDetector building Simple Disc Based FTD detector using GEAR " << std::endl ;
+  streamlog_out(DEBUG1) << "ILDFTDDiscBasedKalDetector building Simple Disc Based FTD detector using GEAR " << std::endl ;
 
   setupGearGeom( gearMgr ) ; 
 

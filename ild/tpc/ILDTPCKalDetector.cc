@@ -27,7 +27,7 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
   TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, though this would be better stored as a const somewhere
 {
   
-  streamlog_out(DEBUG4) << "ILDTPCKalDetector building TPC detector using GEAR " << std::endl ;
+  streamlog_out(DEBUG1) << "ILDTPCKalDetector building TPC detector using GEAR " << std::endl ;
 
   const gear::TPCParameters& tpcParams = gearMgr.getTPCParameters();
 
@@ -43,7 +43,7 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
   // assuming that this is the radius of the first measurment layer ....
   static const Double_t rmin      =  tpcParams.getPlaneExtent()[0]   + rstep/2. ;   // minimum radius
 
-  streamlog_out( DEBUG2 ) << tpcParams << std::endl ;
+  streamlog_out( DEBUG0 ) << tpcParams << std::endl ;
   
   static const Double_t rtub      = tpcParams.getDoubleVal("tpcInnerRadius")  ; // inner r of support tube
   static const Double_t outerr    = tpcParams.getDoubleVal("tpcOuterRadius")  ; // outer radius of TPC
@@ -62,12 +62,12 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
 
  // add inner field cage
   Add( new ILDCylinderMeasLayer(air, aluminium , rtub, lhalf, bz, dummy ) );
-  streamlog_out( DEBUG3 )   << " *** adding " << name << " Measurement layer using layerID: [ inner field cage ] at R = " << rtub
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ inner field cage ] at R = " << rtub
 			    << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
 			    << std::endl ;  
 
   Add( new ILDCylinderMeasLayer(aluminium , tpcgas, rtub+inthick, lhalf, bz, dummy ) );
-  streamlog_out( DEBUG3 )   << " *** adding " << name << " Measurement layer using layerID: [ inner field cage ] at R = " << rtub+inthick
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ inner field cage ] at R = " << rtub+inthick
 			    << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
 			    << std::endl ;  
 
@@ -93,8 +93,8 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
 
     if( layer % nth_layers == 0 ){
       
-      streamlog_out( DEBUG3 )   << " *** for TPC Gas printing only every " << nth_layers << "th layer"  << std::endl ; 
-      streamlog_out( DEBUG3 )   << " *** adding " << name << " Measurement layer using layerID: [" << layerID <<  "] at R = " << r
+      streamlog_out( DEBUG0 )   << " *** for TPC Gas printing only every " << nth_layers << "th layer"  << std::endl ; 
+      streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [" << layerID <<  "] at R = " << r
 				<< " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
 				<< std::endl ;  
     }
@@ -103,12 +103,12 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
 
   // add outer field cage
   Add( new ILDCylinderMeasLayer(tpcgas, aluminium, outerr-outthick, lhalf, bz, dummy) ) ;
-  streamlog_out( DEBUG3 )   << " *** adding " << name << " Measurement layer using layerID: [ outer field cage ] at R = " << outerr-outthick
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ outer field cage ] at R = " << outerr-outthick
 			    << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
 			    << std::endl ;  
 
   Add( new ILDCylinderMeasLayer(aluminium, air, outerr, lhalf, bz, dummy) ) ;
-  streamlog_out( DEBUG3 )   << " *** adding " << name << " Measurement layer using layerID: [ outer field cage ] at R = " << outerr
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ outer field cage ] at R = " << outerr
 			    << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
 			    << std::endl ;  
 
