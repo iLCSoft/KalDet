@@ -331,8 +331,8 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _FTDgeo[disk].outerBaseLength =  ftdlayers.getSensitiveLengthMax(disk) ;
     _FTDgeo[disk].senThickness =  ftdlayers.getSensitiveThickness(disk) ;
     _FTDgeo[disk].supThickness =  ftdlayers.getSupportThickness(disk) ;
-    _FTDgeo[disk].senZPos = ftdlayers.getSensitiveZposition(disk) ;
-    _FTDgeo[disk].supZPos = ftdlayers.getSupportZposition(disk) ;
+    _FTDgeo[disk].senZPos = ftdlayers.getSensitiveZposition(disk, 0, 0) ; //SJA:FIXME: take common z position from 1st petal and sensor
+    _FTDgeo[disk].supZPos = ftdlayers.getSupportZposition(disk, 0) ; //SJA:FIXME: take common z position from 1st petal
 
 
   }
