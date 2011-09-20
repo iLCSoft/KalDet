@@ -9,6 +9,7 @@ namespace gear{
   class GearMgr ;
 }
 
+class ILDCylinderMeasLayer;
 
 class ILDSupportKalDetector : public TVKalDetector {
 public:
@@ -17,9 +18,13 @@ public:
   ILDSupportKalDetector( const gear::GearMgr& gearMgr );
   
   ~ILDSupportKalDetector();
-  
+
+  ILDCylinderMeasLayer* getIPLayer() { return _ipLayer; }
+	
  private:
 
+	ILDCylinderMeasLayer* _ipLayer;
+	
 };
 
 #endif

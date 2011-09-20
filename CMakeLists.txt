@@ -98,7 +98,15 @@ INCLUDE_DIRECTORIES( ild/common )
 
 INSTALL( FILES ${ild_headers} DESTINATION "include/kaldet" )
 
-ADD_SHARED_LIBRARY( KalDet ${lib_sources} ${ild_sources} )
+# needed for adding header files to xcode project
+IF(CMAKE_GENERATOR MATCHES "Xcode")
+FILE( GLOB_RECURSE library_headers "*.h" )
+ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources} ${ild_sources} ${ild_headers})
+ELSE()
+ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${lib_sources} ${ild_sources} )
+ENDIF()      
+
+
 INSTALL_SHARED_LIBRARY( KalDet DESTINATION lib )
 
 IF( APPLE ) #---- need special linker flags for ROOT dictionary on MacOS
