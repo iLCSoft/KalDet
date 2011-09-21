@@ -3,7 +3,8 @@
 
 #include "MaterialDataBase.h"
 
-#include "ILDPlanarMeasLayer.h"
+#include "ILDParallelPlanarMeasLayer.h"
+
 #include "ILDPlanarHit.h"
 
 #include <UTIL/BitField64.h>
@@ -31,7 +32,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
 
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
-  TMaterial & carbon   = *MaterialDataBase::Instance().getMaterial("carbon");
+  TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon");
 
 
   this->setupGearGeom(gearMgr) ;
@@ -70,16 +71,11 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
     
     double currPhi;
     double dphi = _SITgeo[layer].dphi ;
-    double cosphi, sinphi;
 
     for (int ladder=0; ladder<nLadders; ++ladder) {
       
       
       currPhi = phi0 + (dphi * ladder);
-      cosphi = cos(currPhi);
-      sinphi = sin(currPhi);
-
-      TVector3 normal( cosphi, sinphi, 0) ;
       
       encoder.reset() ;  // reset to 0
 
@@ -92,31 +88,26 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
       int layerID = encoder.lowWord() ;
       
       
-      TVector3 sen_front_face_centre( sensitive_distance*cosphi, sensitive_distance*sinphi, 0) ; 
-      TVector3 measurement_plane_centre( (sensitive_distance+sensitive_thickness*0.5)*cosphi, (sensitive_distance+sensitive_thickness*0.5)*sinphi, 0) ; 
-      TVector3 sen_back_face_centre( (sensitive_distance+sensitive_thickness)*cosphi, (sensitive_distance+sensitive_thickness)*sinphi, 0) ; 
-      TVector3 sup_back_face_centre( (ladder_distance+ladder_thickness)*cosphi, (ladder_distance+ladder_thickness)*sinphi, 0) ; 
-      
       double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps ;
       double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps ;
       double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps ;
       double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+3) * eps ;
       
-
+      streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with layerID = "
+      << layerID
+      << std::endl ;
+      
       // air - sensitive boundary
-      Add(new ILDPlanarMeasLayer(air, silicon, sen_front_face_centre, normal, _bZ, sen_front_sorting_policy, width, length, offset, dummy)) ;
+      Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy)) ;
 
       // measurement plane defined as the middle of the sensitive volume 
-      Add(new ILDPlanarMeasLayer(silicon, silicon, measurement_plane_centre, normal, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID )) ;
-      streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with layerID = "
-			    << layerID
-			    << std::endl ;
-
+      Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID, "SIT" )) ;
+  
       // sensitive - support boundary 
-      Add(new ILDPlanarMeasLayer(silicon, carbon, sen_back_face_centre, normal, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ; 
+      Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ; 
       
       // support - air boundary
-      Add(new ILDPlanarMeasLayer(carbon, air, sup_back_face_centre, normal, _bZ, sup_back_sorting_policy, width, length, offset, dummy )) ; 
+      Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, dummy )) ; 
       
     }	 
 

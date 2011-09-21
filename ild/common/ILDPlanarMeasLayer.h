@@ -61,7 +61,7 @@ public:
    
    virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const ;
    
-   inline virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
+   virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
    
    Double_t GetSortingPolicy() const { return fSortingPolicy; }
    Double_t GetXiwidth() const { return fXiwidth; }

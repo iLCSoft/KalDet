@@ -85,7 +85,7 @@ ILDTPCKalDetector::ILDTPCKalDetector( const gear::GearMgr& gearMgr ) :
     
     int layerID = encoder.lowWord() ;
     
-    ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, layerID) ;
+    ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, layerID, "TPC") ;
 
     Add( tpcL ) ;  
     
