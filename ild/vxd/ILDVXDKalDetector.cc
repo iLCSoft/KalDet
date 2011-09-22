@@ -217,7 +217,7 @@ void ILDVXDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _VXDgeo[layer].dphi = 2*M_PI / _VXDgeo[layer].nLadders; 
     _VXDgeo[layer].senRMin = pVXDLayerLayout.getSensitiveDistance(layer); 
     _VXDgeo[layer].supRMin = pVXDLayerLayout.getLadderDistance(layer); 
-    _VXDgeo[layer].length = pVXDLayerLayout.getSensitiveLength(layer); 
+    _VXDgeo[layer].length = pVXDLayerLayout.getSensitiveLength(layer) * 2.0 ; // note: gear for historical reasons uses the halflength 
     _VXDgeo[layer].width = pVXDLayerLayout.getSensitiveWidth(layer); 
     _VXDgeo[layer].offset = pVXDLayerLayout.getSensitiveOffset(layer); 
     _VXDgeo[layer].senThickness = pVXDLayerLayout.getSensitiveThickness(layer); 
