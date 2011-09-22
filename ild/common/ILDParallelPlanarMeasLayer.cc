@@ -117,9 +117,9 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 	double u1 ; // first solution
 	double u2 ; // second solution
 	
-	double x_ins; 
-	double y_ins;
-	double s_ins;
+	double x_ins = DBL_MAX; 
+	double y_ins = DBL_MAX;
+	double s_ins = DBL_MAX;
 	
 	/* Check for solvability. */
 	if (bb4ac + eps < 0.0 ) { // no intersection
@@ -136,7 +136,7 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 	// test values of u 
 	// case i)   ( u1 < 0 && u2 < 0 ) || ( u1 > 1 && u2 > 1 )
 	// Line segment doesn't intersect and is on outside of the circle 
-	if ( ( u1 < 0 && u2 < 0 ) || ( u1 > 1 && u2 > 1 ) ) {
+	if ( ( u1 <= 0 && u2 <= 0 ) || ( u1 >= 1 && u2 >= 1 ) ) {
 
 //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Line segment doesn't intersect and is outside the circle " << std::endl;
 //		const double x_ins1 = x1 + u1 * (dx) ;
@@ -155,7 +155,7 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 	
 	// case ii)  ( u1 < 0 && u2 > 1 ) || ( u1 > 1 && u2 < 0 )
 	// Line segment doesn't intersect and is inside the circle 
-	else if ( ( u1 < 0 && u2 > 1 ) || ( u1 > 1 && u2 < 0 ) ) {
+	else if ( ( u1 <= 0 && u2 >= 1 ) || ( u1 >= 1 && u2 <= 0 ) ) {
 
 //    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Line segment doesn't intersect and is inside the circle " << std::endl;
 //		
@@ -176,7 +176,7 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 	
 	// case iii) ( u1 > 0 && u1 < 1 && u2 < 0 && u2 > 1 ) || ( u2 > 0 && u2 < 1 && u1 < 0 && u1 > 1 )
 	// Line segment intersects at one point
-	else if ( ( u1 > 0 && u1 < 1 && (u2 < 0 || u2 > 1) ) || ( u2 > 0 && u2 < 1 && ( u1 < 0 || u1 > 1 )) ) {
+	else if ( ( u1 > 0 && u1 < 1 && (u2 <= 0 || u2 >= 1) ) || ( u2 > 0 && u2 < 1 && ( u1 <= 0 || u1 >= 1 )) ) {
     
 //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Only one possible solution" << std::endl;
 //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
