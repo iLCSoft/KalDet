@@ -88,6 +88,12 @@ make install
 	
 	- uses UTIL/ILDConf.h from lcio for detector element encoding
 
+    - Added ILDParallelPlanarMeasLayer for VXD and SIT, which has closed
+      solution for calculating the crossing point of a helix.
+      Constructor ensures that it is parallel by supplying only r and phi,
+      which are used to calculate the normal and centre for planar surface.
+
+
 
  -----------
 | v01-01-01 |  - bug fixed in cmake files for mac osx compatibility - no code changes.

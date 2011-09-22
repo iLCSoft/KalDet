@@ -4,15 +4,12 @@
 //* ===================
 //*
 //* (Description)
-//*   Sample measurement layer class used by EXVTXHit.
+//*   Sample measurement layer class used by ILDPlanarHit.
 //* (Requires)
 //*     ILDVMeasLayer
 //* (Provides)
 //*     class ILDPlanarMeasLayer
-//* (Update Recored)
-//*   2003/09/30  Y.Nakashima       Original version.
 //*
-//*   2011/06/17  D.Kamai           Modified to handle ladder structure.
 //*************************************************************************
 //
 #include <iostream>
@@ -37,7 +34,7 @@ ILDPlanarMeasLayer::ILDPlanarMeasLayer(TMaterial &min,
 				       const TVector3  &center,
 				       const TVector3  &normal,
 				       Double_t   Bz,
-				       Double_t SortingPolicy,
+				       Double_t   SortingPolicy,
 				       Double_t   xiwidth,
 				       Double_t   zetawidth,
 				       Double_t   xioffset,
@@ -52,6 +49,19 @@ ILDPlanarMeasLayer::ILDPlanarMeasLayer(TMaterial &min,
     fXioffset(xioffset)
 
 {
+
+	streamlog_out(DEBUG0) << "ILDPlanarMeasLayer created" 
+	<< " Layer R = " << this->GetXc().Mag() 
+	<< " phi = " << this->GetXc().Phi() 
+	<< " xiwidth = " << xiwidth 
+	<< " zetawidth = " << zetawidth 
+	<< " xioffset = " << xioffset 
+	<< " is_active = " << is_active 
+	<< " layerID = " << layerID 
+	<< " name = " << this->GetName()  
+	<< std::endl ;
+
+
 }
 
 ILDPlanarMeasLayer::~ILDPlanarMeasLayer()
