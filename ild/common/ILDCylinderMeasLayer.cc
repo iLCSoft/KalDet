@@ -168,7 +168,6 @@ ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit
 			<< " onSurface = " << hit_on_surface
 			<< std::endl ;  
 
-  return new ILDCylinderHit( *this , x, dx, this->GetBz()) ; 
-
+  return hit_on_surface ? new ILDCylinderHit( *this , x, dx, this->GetBz()) : NULL; 
 }
 

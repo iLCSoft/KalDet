@@ -155,16 +155,20 @@ Bool_t ILDPlanarMeasLayer::IsOnSurface(const TVector3 &xx) const
 //  std::cout << "distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl; 
   
   bool onSurface = false ;
-
+  
   if( (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() < 1e-4){
     if( xi <= GetXioffset() + GetXiwidth()/2  && xi >= GetXioffset() - GetXiwidth()/2  && TMath::Abs(zeta) <= GetZetawidth()/2){
-      //      std::cout << "on surface  " << std::endl;   
       onSurface = true;
     }
     else{
-      //      std::cout << "on surface  but fails limits" << std::endl;   
+//      streamlog_out(DEBUG0) << "ILDPlanarMeasLayer::IsOnSurface: Point not within boundary x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
+//      streamlog_out(DEBUG0) << "xi = " << xi << " xi_min = " << GetXioffset() + GetXiwidth()/2 << " xi_min = " << GetXioffset() - GetXiwidth()/2 << " zeta = " << zeta << " zeta_min = " << -GetZetawidth()/2 << " zeta_max " << GetZetawidth()/2 << std::endl;     
       onSurface = false;
     }
+  }
+  else{
+//    streamlog_out(DEBUG0) << "ILDPlanarMeasLayer::IsOnSurface: Point not on surface x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
+//    streamlog_out(DEBUG0) << "Distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl;
   }
 
   return onSurface;
@@ -207,7 +211,7 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
 			<< " onSurface = " << hit_on_surface
 			<< std::endl ;
 
-  return new ILDPlanarHit( *this , x, dx, this->GetBz()) ; 
+  return hit_on_surface ? new ILDPlanarHit( *this , x, dx, this->GetBz()) : NULL; 
 
 
 }
