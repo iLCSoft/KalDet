@@ -142,7 +142,7 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _SITgeo[layer].dphi = 2*M_PI / _SITgeo[layer].nLadders; 
     _SITgeo[layer].senRMin = pSITLayerLayout.getSensitiveDistance(layer); 
     _SITgeo[layer].supRMin = pSITLayerLayout.getLadderDistance(layer); 
-    _SITgeo[layer].length = pSITLayerLayout.getSensitiveLength(layer); 
+    _SITgeo[layer].length = pSITLayerLayout.getSensitiveLength(layer)*2.0; // note: gear for historical reasons uses the halflength 
     _SITgeo[layer].width = pSITLayerLayout.getSensitiveWidth(layer); 
     _SITgeo[layer].offset = pSITLayerLayout.getSensitiveOffset(layer); 
     _SITgeo[layer].senThickness = pSITLayerLayout.getSensitiveThickness(layer); 
