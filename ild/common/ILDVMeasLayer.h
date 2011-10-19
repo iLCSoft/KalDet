@@ -31,12 +31,12 @@ namespace EVENT{
 
 class ILDVMeasLayer : public TVMeasLayer {
 public:
-
+  
   static Bool_t kActive;
   static Bool_t kDummy;
-
+  
   // Ctors and Dtor
- 
+  
   virtual ~ILDVMeasLayer();
   
   inline int getLayerID() const { return _layerID ; } 
@@ -44,25 +44,25 @@ public:
   inline TString GetMLName() const { return _name;    }
   
   inline Double_t GetBz() const { return _Bz; } 
-
+  
   virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const = 0 ;
-
- protected:
+  
+protected:
   
   ILDVMeasLayer(TMaterial &min,
-		TMaterial &mout,
-		Double_t  Bz,
-		Bool_t    is_active = ILDVMeasLayer::kActive,
-		int layerID = -1 , 
-		const Char_t    *name = "ILDMeasL");
-
+                TMaterial &mout,
+                Double_t  Bz,
+                Bool_t    is_active = ILDVMeasLayer::kActive,
+                int layerID = -1 , 
+                const Char_t    *name = "ILDMeasL");
+  
   Double_t _Bz ;       // Magnitude of B-Field in Z
   int _layerID ;
   TString  _name;      // layer name
   
- private:
-
-
+private:
+  
+  
 };
 
 #endif

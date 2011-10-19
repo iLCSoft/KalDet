@@ -9,15 +9,15 @@
 
 
 class ILDPlanarHit : public ILDVTrackHit {
-
+  
 public:
   
   
   ILDPlanarHit(const TVMeasLayer &ms,
-	       Double_t       *x,
-	       Double_t       *dx,
-	       Double_t        bfield) ;
-
+               Double_t       *x,
+               Double_t       *dx,
+               Double_t        bfield) ;
+  
   
   virtual ~ILDPlanarHit();
   
@@ -26,7 +26,7 @@ public:
   
   
 private:
-
-
+  
+  
 };
 #endif

@@ -13,20 +13,20 @@ namespace gear{
 
 
 class ILDVXDKalDetector : public TVKalDetector {
-    
- public:
-
+  
+public:
+  
   ILDVXDKalDetector( const gear::GearMgr& gearMgr );
-
+  
   ~ILDVXDKalDetector();
   
- private:
-
+private:
+  
   void setupGearGeom( const gear::GearMgr& gearMgr ) ;
-
+  
   int _nLayers ;
   double _bZ ;
-
+  
   struct VXD_Layer {
     int nLadders;
     double phi0;
@@ -40,7 +40,7 @@ class ILDVXDKalDetector : public TVKalDetector {
     double supThickness;
   };
   std::vector<VXD_Layer> _VXDgeo;
-
+  
 };
 
 

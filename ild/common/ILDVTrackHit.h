@@ -22,17 +22,17 @@
 
 
 class ILDVTrackHit : public TVTrackHit {
-
+  
 public:
   
   ILDVTrackHit(const TVMeasLayer &ms, Double_t *x, Double_t *dx, 
-	       Double_t bfield , Int_t dim) ; 
-
+               Double_t bfield , Int_t dim) ; 
+  
   virtual ~ILDVTrackHit();
-
-
+  
+  
 private:
-
-
+  
+  
 };
 #endif

@@ -13,18 +13,18 @@ class ILDCylinderMeasLayer;
 
 class ILDSupportKalDetector : public TVKalDetector {
 public:
-
+  
   /** Initialize the support structures from GEAR */
   ILDSupportKalDetector( const gear::GearMgr& gearMgr );
   
   ~ILDSupportKalDetector();
-
+  
   ILDCylinderMeasLayer* getIPLayer() { return _ipLayer; }
-	
- private:
-
-	ILDCylinderMeasLayer* _ipLayer;
-	
+  
+private:
+  
+  ILDCylinderMeasLayer* _ipLayer;
+  
 };
 
 #endif

@@ -12,19 +12,19 @@ namespace gear{
 
 class ILDFTDKalDetector : public TVKalDetector {
 public:
-
+  
   /** Initialize the FTD from GEAR */
   ILDFTDKalDetector( const gear::GearMgr& gearMgr );
   
-  ~ILDFTDKalDetector() {} ;
+  ~ILDFTDKalDetector() {} 
   
- private:
-
+private:
+  
   void setupGearGeom( const gear::GearMgr& gearMgr ) ;
-
+  
   int _nDisks ;
   double _bZ ;
-
+  
   struct FTD_Disk {
     int nPetals;
     double phi0;
@@ -38,10 +38,10 @@ public:
     double supThickness;
     double senZPos;
     double supZPos;
-
+    
   };
   std::vector<FTD_Disk> _FTDgeo;
-
+  
 };
 
 #endif

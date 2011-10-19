@@ -11,43 +11,43 @@ class MaterialDataBaseException: public std::exception
 {
   virtual const char* what() const throw()
   {
-    return "MaterialDataBaseException occurred";
-    }
+  return "MaterialDataBaseException occurred";
+  }
 } ;
 
 
 class MaterialDataBase 
 {
-
-  public:
-
+  
+public:
+  
   static MaterialDataBase& Instance()
   {
-    static MaterialDataBase singleton;
-
-    if( ! _isInitialised ){
-      singleton.initialise() ;
-    }
-
-    return singleton;
-
+  static MaterialDataBase singleton;
+  
+  if( ! _isInitialised ){
+    singleton.initialise() ;
   }
   
-    // Other non-static member functions
+  return singleton;
   
- public:
+  }
+  
+  // Other non-static member functions
+  
+public:
   
   ~MaterialDataBase();   
-
-  TMaterial* getMaterial(std::string mat_name) ;  
-
   
- private:
-
- MaterialDataBase() { _material_map.clear() ;} ;                               // Private constructor
-
+  TMaterial* getMaterial(std::string mat_name) ;  
+  
+  
+private:
+  
+  MaterialDataBase() { _material_map.clear() ;}                               // Private constructor
+  
   void initialise() ;
-
+  
   MaterialDataBase(const MaterialDataBase&) ;                 // Prevent copy-construction
   MaterialDataBase& operator=(const MaterialDataBase&) ;      // Prevent assignment
   

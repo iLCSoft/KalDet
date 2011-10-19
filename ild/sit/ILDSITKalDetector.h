@@ -13,20 +13,20 @@ namespace gear{
 
 
 class ILDSITKalDetector : public TVKalDetector {
-    
- public:
-
+  
+public:
+  
   ILDSITKalDetector( const gear::GearMgr& gearMgr );
-
+  
   ~ILDSITKalDetector();
   
- private:
-
+private:
+  
   void setupGearGeom( const gear::GearMgr& gearMgr ) ;
-
+  
   int _nLayers ;
   double _bZ ;
-
+  
   struct SIT_Layer {
     int nLadders;
     double phi0;
@@ -40,7 +40,7 @@ class ILDSITKalDetector : public TVKalDetector {
     double supThickness;
   };
   std::vector<SIT_Layer> _SITgeo;
-
+  
 };
 
 
