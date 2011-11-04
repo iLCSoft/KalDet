@@ -87,27 +87,50 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
       
       int layerID = encoder.lowWord() ;
       
-      
-      double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps ;
-      double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps ;
-      double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps ;
-      double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+3) * eps ;
-      
       streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with layerID = "
       << layerID
       << std::endl ;
       
-      // air - sensitive boundary
-      Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy)) ;
+      // check if the sensitive is inside or outside for the support 
+      if( sensitive_distance < ladder_distance  ) {
+
+        double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps ;
+        double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps ;
+        double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps ;
+        double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+3) * eps ;
+        
+        // air - sensitive boundary
+        Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy)) ;
+        
+        // measurement plane defined as the middle of the sensitive volume 
+        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID, "SIT" )) ;
+        
+        // sensitive - support boundary 
+        Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ; 
+        
+        // support - air boundary
+        Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, dummy )) ; 
+      }
+      else {
+
+        double sup_front_sorting_policy         = ladder_distance     + (4 * ladder+0) * eps ;
+        double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+1) * eps ;
+        double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+2) * eps ;
+        double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+3) * eps ;
+        
+        // air - support boundary
+        Add(new ILDParallelPlanarMeasLayer(air, carbon, ladder_distance, currPhi, _bZ, sup_front_sorting_policy, width, length, offset, dummy)) ;
+        
+        // support boundary - sensitive
+        Add(new ILDParallelPlanarMeasLayer(carbon, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy )) ; 
+        
+        // measurement plane defined as the middle of the sensitive volume 
+        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID, "SIT" )) ;
+        
+        // support - air boundary
+        Add(new ILDParallelPlanarMeasLayer(silicon, air, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ;  
+      }
       
-      // measurement plane defined as the middle of the sensitive volume 
-      Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, layerID, "SIT" )) ;
-      
-      // sensitive - support boundary 
-      Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ; 
-      
-      // support - air boundary
-      Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, dummy )) ; 
       
     }	 
     
@@ -133,7 +156,7 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   
   //SJA:FIXME: for now the support is taken as the same size the sensitive
   //           if this is not done then the exposed areas of the support would leave a carbon - air boundary,
-  //           which if traversed in the reverse direction to the next boundary then the track be propagated through carbon
+  //           which if traversed in the reverse direction to the next boundary then the track would be propagated through carbon
   //           for a significant distance 
   
   for( int layer=0; layer < _nLayers; ++layer){
