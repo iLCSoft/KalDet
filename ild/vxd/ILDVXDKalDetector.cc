@@ -61,9 +61,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
     double length = _VXDgeo[layer].length;
     double offset = _VXDgeo[layer].offset;
     
-    double pos_xi_nonoverlap_width = sensitive_distance*tan( M_PI / nLadders);
-    double ladder_xi_min = offset - width/2.0 ;
-    double ladder_xi_max = offset + width/2.0 ;
+    double pos_xi_nonoverlap_width = (2.0 * (( width / 2.0 ) - fabs(offset))); 
     
     double currPhi;
     double dphi = _VXDgeo[layer].dphi ;
@@ -100,21 +98,22 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
           
           // non overlapping region
           // air - sensitive boundary
-          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, dummy )) ;
+          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, dummy )) ;
           
           // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, active, layerID, "VXD" )) ;          
+          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, active, layerID, "VXD" )) ;          
           
           // sensitive - support boundary 
-          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, dummy )) ; 
+          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, dummy )) ; 
           
           // support - air boundary
-          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, pos_xi_nonoverlap_width - ladder_xi_min, length, (pos_xi_nonoverlap_width + ladder_xi_min)/2, dummy )) ;           
+          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, dummy )) ;           
           
           
           // overlapping region
-          double overlap_region_width  = width + ladder_xi_min - pos_xi_nonoverlap_width ;
-          double overlap_region_offset = (ladder_xi_max + pos_xi_nonoverlap_width)/2 ;
+          double overlap_region_width  = width - pos_xi_nonoverlap_width ;
+          double overlap_region_offset = -(overlap_region_width/2.0) - (pos_xi_nonoverlap_width)/2.0 ;
+
           
           // overlap sorting policy uses nLadders as the overlapping "ladder" is the order i.e. there will now be nLadders+1 
           double overlap_front_sorting_policy                = sensitive_distance + (4* nLadders+0) * eps;
