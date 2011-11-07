@@ -77,7 +77,7 @@ _sortingPolicy(sortingPolicy),_nsegments(nsegments),_trap_rmin(trap_rmin),_trap_
   double phi_max = std::max( ((0.5 * _trap_outer_base_length) / h ) , ((0.5 * _trap_inner_base_length) / _trap_rmin));
 
   if( phi_max > _segment_dphi ) {
-    streamlog_out(ERROR) << "ILDSegmentedDiscMeasLayer::ILDSegmentedDiscMeasLayer trapezoids overlaps exit(1)" <<std::endl; 
+    streamlog_out(ERROR) << "ILDSegmentedDiscMeasLayer::ILDSegmentedDiscMeasLayer trapezoids overlaps: exit(1) called from " << __FILE__ << "   line " << __LINE__ << std::endl; 
     exit(1);
   }
   
@@ -175,6 +175,7 @@ Bool_t ILDSegmentedDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
 
       double dist_along_centre_line = xx.Perp()*cos(local_phi);
       
+      // check if the point projected onto the centre line is within the limits of the trapezoid
       if( dist_along_centre_line > _trap_rmin && dist_along_centre_line < _trap_rmin + _trap_height){
         
         double adj = dist_along_centre_line - _trap_rmin ;
@@ -184,7 +185,8 @@ Bool_t ILDSegmentedDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
         double opp = dist_from_centre_line - 0.5*_trap_inner_base_length;
         
         double tan_delta_angle = opp/adj; 
-        
+      
+        // check if the point is within the angular limits of the trapezoid
         if (tan_delta_angle < _trap_tan_beta) {
           
           onSurface = true ;
