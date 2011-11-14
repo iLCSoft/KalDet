@@ -16,9 +16,9 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
   
   
-  TVector3 xx_n;
-  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
-  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;   
+//  TVector3 xx_n;
+//  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
+//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;   
   
   // This assumes nonzero B field.
   //
