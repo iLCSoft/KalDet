@@ -1,6 +1,7 @@
 
 #include "ILDPlanarHit.h"
 #include "ILDPlanarMeasLayer.h"
+#include "ILDSegmentedDiscMeasLayer.h"
 #include "ILDDiscMeasLayer.h"
 #include "TMath.h"
 
@@ -10,35 +11,27 @@
 using namespace std;
 
 
-//_____________________________________________________________________
-//  ----------------------------------
-//  Ctors and Dtor
-//  ----------------------------------
-
-
-ILDPlanarHit::ILDPlanarHit(const TVMeasLayer &ms,
-                           Double_t       *x,
-                           Double_t       *dx, 
-                           Double_t        bfield)
-: ILDVTrackHit(ms, x, dx, bfield, 2)
-{
-}
-
-ILDPlanarHit::~ILDPlanarHit()
-{
-}
 
 //_____________________________________________________________________
 //  ----------------------------------
 //  Implementation of public methods  
 //  ----------------------------------
 
+/** Global to Local coordinates */
+
 TKalMatrix ILDPlanarHit::XvToMv(const TVector3 &xv, Double_t /*t0*/) const
 {
+  
+  // SJA:FIXME the dynamic_cast should be checked in the constructor and then a static cast could be used 
   
   if ( dynamic_cast<const ILDPlanarMeasLayer*>(&(this->GetMeasLayer())) ) {
     
     return static_cast<const ILDPlanarMeasLayer &>(this->GetMeasLayer()).XvToMv(xv); 
+    
+  }
+  else if ( dynamic_cast<const ILDSegmentedDiscMeasLayer*>(&(this->GetMeasLayer())) ) {
+    
+    return static_cast<const ILDSegmentedDiscMeasLayer &>(this->GetMeasLayer()).XvToMv(xv); 
     
   }
   else if ( dynamic_cast<const ILDDiscMeasLayer*>(&(this->GetMeasLayer())) ) {
@@ -54,6 +47,9 @@ TKalMatrix ILDPlanarHit::XvToMv(const TVector3 &xv, Double_t /*t0*/) const
   
   
 }
+
+
+/** Print Debug information */
 
 void ILDPlanarHit::DebugPrint(Option_t *) const
 {

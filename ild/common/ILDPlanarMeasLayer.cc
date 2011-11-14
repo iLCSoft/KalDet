@@ -39,9 +39,9 @@ ILDPlanarMeasLayer::ILDPlanarMeasLayer(TMaterial &min,
                                        Double_t   zetawidth,
                                        Double_t   xioffset,
                                        Bool_t     is_active,
-                                       Int_t      layerID,
+                                       Int_t      CellID,
                                        const Char_t    *name)
-: ILDVMeasLayer(min, mout, Bz, is_active, layerID, name),
+: ILDVMeasLayer(min, mout, Bz, is_active, CellID, name),
 TPlane(center, normal),
 fSortingPolicy(SortingPolicy),
 fXiwidth(xiwidth),
@@ -57,7 +57,7 @@ fXioffset(xioffset)
   << " zetawidth = " << zetawidth 
   << " xioffset = " << xioffset 
   << " is_active = " << is_active 
-  << " layerID = " << layerID 
+  << " CellID = " << CellID 
   << " name = " << this->GetName()  
   << std::endl ;
   
@@ -71,7 +71,7 @@ ILDPlanarMeasLayer::~ILDPlanarMeasLayer()
 TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVector3 &xv) const
 {
   // Calculate hit coordinate information:
-  //	mv(0,0) = xi 
+  //    mv(0,0) = xi 
   //     (1,0) = zeta
   
   TKalMatrix mv(kMdim,1);
@@ -145,35 +145,35 @@ Bool_t ILDPlanarMeasLayer::IsOnSurface(const TVector3 &xx) const
       onSurface = true;
     }
     else{
-      streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not within boundary x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
-      streamlog_out(DEBUG4) << "xi = " << xi << " xi_max = " << GetXioffset() + GetXiwidth()/2 << " xi_min = " << GetXioffset() - GetXiwidth()/2 << " zeta = " << zeta << " zeta_min = " << -GetZetawidth()/2 << " zeta_max " << GetZetawidth()/2 << " Xioffset = " << GetXioffset() << std::endl;     
-      onSurface = false;
-      streamlog_out(DEBUG4) << " xi <= GetXioffset() + GetXiwidth()/2 = " << (xi <= GetXioffset() + GetXiwidth()/2) << std::endl ;
-      streamlog_out(DEBUG4) << " xi >= GetXioffset() - GetXiwidth()/2 = " << (xi >= GetXioffset() - GetXiwidth()/2) << std::endl;
-      streamlog_out(DEBUG4) << " TMath::Abs(zeta) <= GetZetawidth()/2 = " << (TMath::Abs(zeta) <= GetZetawidth()/2) << std::endl;
+//      streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not within boundary x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
+//      streamlog_out(DEBUG4) << "xi = " << xi << " xi_max = " << GetXioffset() + GetXiwidth()/2 << " xi_min = " << GetXioffset() - GetXiwidth()/2 << " zeta = " << zeta << " zeta_min = " << -GetZetawidth()/2 << " zeta_max " << GetZetawidth()/2 << " Xioffset = " << GetXioffset() << std::endl;     
+//      onSurface = false;
+//      streamlog_out(DEBUG4) << " xi <= GetXioffset() + GetXiwidth()/2 = " << (xi <= GetXioffset() + GetXiwidth()/2) << std::endl ;
+//      streamlog_out(DEBUG4) << " xi >= GetXioffset() - GetXiwidth()/2 = " << (xi >= GetXioffset() - GetXiwidth()/2) << std::endl;
+//      streamlog_out(DEBUG4) << " TMath::Abs(zeta) <= GetZetawidth()/2 = " << (TMath::Abs(zeta) <= GetZetawidth()/2) << std::endl;
     }
   }
   else{
-    streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not on surface x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
-    streamlog_out(DEBUG4) << "Distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl;
+//    streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not on surface x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
+//    streamlog_out(DEBUG4) << "Distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl;
   }
   
   if( onSurface == false ) {
-    streamlog_out(DEBUG) << "GetNormal().X() " <<  GetNormal().X() << std::endl;  
-    streamlog_out(DEBUG4) << "GetNormal().Y() " <<  GetNormal().Y() << std::endl;  
-    streamlog_out(DEBUG4) << "GetNormal().Perp() " << GetNormal().Perp() << std::endl;  
-    streamlog_out(DEBUG4) << "GetNormal().X()/GetNormal().Perp() " << GetNormal().X()/GetNormal().Perp() << std::endl;  
-    streamlog_out(DEBUG4) << "GetNormal().Y()/GetNormal().Perp() " << GetNormal().Y()/GetNormal().Perp() << std::endl;  
-    streamlog_out(DEBUG4) << "xx.X()-GetXc().X() " <<  xx.X()-GetXc().X() << std::endl;  
-    streamlog_out(DEBUG4) << "xx.Y()-GetXc().Y() " <<  xx.Y()-GetXc().Y() << std::endl;  
-    
-    streamlog_out(DEBUG4) << "zeta " << zeta << std::endl;  
-    streamlog_out(DEBUG4) << "xi "   << xi   << std::endl;  
-    streamlog_out(DEBUG4) << "zeta half width " << GetZetawidth()/2 << std::endl;  
-    streamlog_out(DEBUG4) << "xi half width " << GetXiwidth()/2 << std::endl;  
-    streamlog_out(DEBUG4) << "offset  " << GetXioffset() << std::endl;  
-    
-    streamlog_out(DEBUG4) << "distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl; 
+//    streamlog_out(DEBUG) << "GetNormal().X() " <<  GetNormal().X() << std::endl;  
+//    streamlog_out(DEBUG4) << "GetNormal().Y() " <<  GetNormal().Y() << std::endl;  
+//    streamlog_out(DEBUG4) << "GetNormal().Perp() " << GetNormal().Perp() << std::endl;  
+//    streamlog_out(DEBUG4) << "GetNormal().X()/GetNormal().Perp() " << GetNormal().X()/GetNormal().Perp() << std::endl;  
+//    streamlog_out(DEBUG4) << "GetNormal().Y()/GetNormal().Perp() " << GetNormal().Y()/GetNormal().Perp() << std::endl;  
+//    streamlog_out(DEBUG4) << "xx.X()-GetXc().X() " <<  xx.X()-GetXc().X() << std::endl;  
+//    streamlog_out(DEBUG4) << "xx.Y()-GetXc().Y() " <<  xx.Y()-GetXc().Y() << std::endl;  
+//    
+//    streamlog_out(DEBUG4) << "zeta " << zeta << std::endl;  
+//    streamlog_out(DEBUG4) << "xi "   << xi   << std::endl;  
+//    streamlog_out(DEBUG4) << "zeta half width " << GetZetawidth()/2 << std::endl;  
+//    streamlog_out(DEBUG4) << "xi half width " << GetXiwidth()/2 << std::endl;  
+//    streamlog_out(DEBUG4) << "offset  " << GetXioffset() << std::endl;  
+//    
+//    streamlog_out(DEBUG4) << "distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl; 
 
   }
   
@@ -190,7 +190,7 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   
   const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
   
-  // convert to layer coordinates 	
+  // convert to layer coordinates       
   TKalMatrix h    = this->XvToMv(hit);
   
   Double_t  x[2] ;

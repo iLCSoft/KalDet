@@ -1,16 +1,4 @@
-//*************************************************************************
-//* ===================
-//*  ILDDiscMeaslayer Class
-//* ===================
-//*
-//* (Description)
-//*   Measurement layer class used for FTD simple discs
-//* (Requires)
-//*     ILDVMeasLayer
-//* (Provides)
-//*     class ILDDiscMeaslayer
-//*************************************************************************
-//
+
 #include <iostream>
 
 #include "ILDDiscMeasLayer.h"
@@ -28,23 +16,6 @@
 
 #include "streamlog/streamlog.h"
 
-ILDDiscMeasLayer::ILDDiscMeasLayer(TMaterial &min,
-                                   TMaterial &mout,
-                                   const TVector3  &center,
-                                   const TVector3  &normal,
-                                   double   Bz,
-                                   double   SortingPolicy,
-                                   double   rMin,
-                                   double   rMax,
-                                   Bool_t     is_active,
-                                   Int_t      layerID,
-                                   const Char_t    *name)
-: ILDVMeasLayer(min, mout, Bz, is_active, layerID, name),
-TPlane(center, normal),
-_sortingPolicy(SortingPolicy), _rMin(rMin), _rMax(rMax)
-{
-  
-}
 
 TKalMatrix ILDDiscMeasLayer::XvToMv(const TVector3 &xv) const
 {
@@ -61,11 +32,6 @@ TKalMatrix ILDDiscMeasLayer::XvToMv(const TVector3 &xv) const
   
 }
 
-TKalMatrix ILDDiscMeasLayer::XvToMv(const TVTrackHit &,
-                                    const TVector3   &xv) const
-{
-  return XvToMv(xv);
-}
 
 TVector3 ILDDiscMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
@@ -127,9 +93,9 @@ Bool_t ILDDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
     double r2 = mv(0,0) * mv(0,0) + mv(1,0) * mv(1,0) ;
     
     if(  r2 <= _rMax*_rMax && r2 >= _rMin*_rMin )
-      { 
-        onSurface = true ;
-      }    
+        { 
+          onSurface = true ;
+        }    
   }
   
   return onSurface;
@@ -145,7 +111,7 @@ ILDVTrackHit* ILDDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) co
   
   const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
   
-  // convert to layer coordinates 	
+  // convert to layer coordinates       
   TKalMatrix h    = this->XvToMv(hit);
   
   double  x[2] ;

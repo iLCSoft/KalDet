@@ -1,25 +1,12 @@
 #ifndef __ILDSEGMENTEDDISCMEASLAYER_H__
 #define __ILDSEGMENTEDDISCMEASLAYER_H__
 
-//
-//  ILDSegmentedDiscMeasLayer.h
-//  KalDet
-//
-//  Created by Steve Aplin on 11/5/11.
-//*************************************************************************
-//* ===================
-//*  ILDSegmentedDiscMeasLayer Class
-//* ===================
-//*
-//* (Description)
-//*   Segemented Disk Planar measurement layer class used with ILDPLanarTrackHit.
-//*   Segments are isosolese trapezoids whose axis of symmetry points to the origin
-//* (Requires)
-//*   ILDVMeasLayer
-//* (Provides)
-//*     class ILDSegmentedDiscMeasLayer
-//*
-//*************************************************************************
+/** ILDSegmentedDiscMeasLayer: User defined Segemented Disk Planar KalTest measurement layer class used with ILDPLanarTrackHit. Segments are isosolese trapezoids whose axis of symmetry points to the origin 
+ * WARNING: ONLY IMPLEMENTED FOR X AND Y COORDINATES AT FIXED Z
+ *
+ * @author S.Aplin DESY
+ */
+
 
 
 #include "TVector3.h"
@@ -29,6 +16,8 @@
 #include "KalTrackDim.h"
 #include "TMath.h"
 #include <sstream>
+
+#include <vector>
 
 class TVTrackHit;
 
@@ -48,28 +37,51 @@ public:
                             double   trap_innerBaseLength,
                             double   trap_outerBaseLength,
                             bool     is_active,
-                            int      layerID = -1,
+                            std::vector<int>      CellIDs,
+                            const Char_t    *name = "ILDDiscMeasL");
+  
+  ILDSegmentedDiscMeasLayer(TMaterial &min,
+                            TMaterial &mout,
+                            double   Bz,
+                            double   SortingPolicy,
+                            int      nsegments,
+                            double   zpos,
+                            double   phi0, // defined by the axis of symmerty of the first petal
+                            double   trap_rmin,
+                            double   trap_height,
+                            double   trap_innerBaseLength,
+                            double   trap_outerBaseLength,
+                            bool     is_active,
                             const Char_t    *name = "ILDDiscMeasL");
   
   
   // Parrent's pure virtuals that must be implemented
   
+  /** Global to Local coordinates */
   virtual TKalMatrix XvToMv    (const TVTrackHit &ht,
-                                const TVector3   &xv) const;
+                                const TVector3   &xv) const
+  { return this->XvToMv(xv); }
   
+  
+  /** Global to Local coordinates */
   virtual TKalMatrix XvToMv    (const TVector3   &xv) const;
   
+  /** Local to Global coordinates */  
   virtual TVector3   HitToXv   (const TVTrackHit &ht) const;
   
+  /** Calculate Projector Matrix */
   virtual void       CalcDhDa  (const TVTrackHit &ht,
                                 const TVector3   &xv,
                                 const TKalMatrix &dxphiada,
                                 TKalMatrix &H)  const;
   
+  /** Convert LCIO Tracker Hit to an ILDPLanarTrackHit  */
   virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const ;
-  
+
+  /** Check if global point is on surface  */
   inline virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
   
+  /** Get sorting policy for this plane  */
   double GetSortingPolicy() const { return _sortingPolicy; }
   
 private:

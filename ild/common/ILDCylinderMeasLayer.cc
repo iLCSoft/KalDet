@@ -1,18 +1,8 @@
-//*************************************************************************
-//* ======================
-//*  ILDCylinderMeasLayer Class
-//* ======================
-//*
-//* (Description)
-//*   User defined measurement layer class
-//* (Requires)
-//*     ILDVMeasLayer
-//* (Provides)
-//*     class ILDCylinderMeasLayer
-//* (Update Recored)
-//*
-//*************************************************************************
-//
+/** User defined KalTest measurement layer class 
+ *
+ * @author S.Aplin DESY
+ */
+
 
 #include "TKalTrack.h" 
 
@@ -29,23 +19,8 @@
 #include "TMath.h"
 #include <cmath>
 
-ILDCylinderMeasLayer::ILDCylinderMeasLayer(TMaterial &min,
-                                           TMaterial &mout,
-                                           Double_t   r0,
-                                           Double_t   lhalf,
-                                           Double_t   Bz,
-                                           Bool_t is_active,
-                                           Int_t      layerID,
-                                           const Char_t    *name) 
-: ILDVMeasLayer(min, mout, Bz, is_active, layerID, name),
-TCylinder(r0, lhalf)
-{
-}
 
-
-ILDCylinderMeasLayer::~ILDCylinderMeasLayer()
-{
-}
+/** Global to Local coordinates */
 
 TKalMatrix ILDCylinderMeasLayer::XvToMv(const TVector3 &xv) const
 {
@@ -74,11 +49,8 @@ TKalMatrix ILDCylinderMeasLayer::XvToMv(const TVector3 &xv) const
   return mv;
 }
 
-TKalMatrix ILDCylinderMeasLayer::XvToMv(const TVTrackHit &vht, // Hit is not used here
-                                        const TVector3   &xv) const
-{
-  return XvToMv(xv);
-}
+
+/** Local to Global coordinates */
 
 TVector3 ILDCylinderMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
@@ -94,13 +66,14 @@ TVector3 ILDCylinderMeasLayer::HitToXv(const TVTrackHit &vht) const
   return TVector3(x, y, z);
 }
 
+
+/** Calculate Projector Matrix */
+
 void ILDCylinderMeasLayer::CalcDhDa(const TVTrackHit &vht, // tracker hit not used here
                                     const TVector3   &xxv,
                                     const TKalMatrix &dxphiada,
                                     TKalMatrix &H) const
 {
-  
-  //  const ILDCylinderHit &ht = dynamic_cast<const ILDCylinderHit &>(vht);
   
   // Calculate
   //    H = (@h/@a) = (@phi/@a, @z/@a)^t
@@ -135,12 +108,15 @@ void ILDCylinderMeasLayer::CalcDhDa(const TVTrackHit &vht, // tracker hit not us
   
 }
 
+
+/** Convert LCIO Tracker Hit to an ILDCylinderHit  */
+
 ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
   
   const TVector3 hit( trkhit->getPosition()[0], trkhit->getPosition()[1], trkhit->getPosition()[2]) ;
   
-  // convert to layer coordinates 	
+  // convert to layer coordinates       
   TKalMatrix h    = this->XvToMv(hit);
   
   Double_t  x[2] ;
@@ -169,5 +145,6 @@ ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit
   << std::endl ;  
   
   return hit_on_surface ? new ILDCylinderHit( *this , x, dx, this->GetBz()) : NULL; 
+  
 }
 

@@ -40,7 +40,7 @@ public:
                      Double_t   zetawidth,
                      Double_t   xioffset,
                      Bool_t     is_active,
-                     Int_t      layerID = -1,
+                     Int_t      CellID = -1,
                      const Char_t    *name = "ILDPlanarMeasL");
   
   virtual ~ILDPlanarMeasLayer();

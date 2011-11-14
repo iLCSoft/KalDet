@@ -1,6 +1,11 @@
 #ifndef __ILDFTDDISCBASEDDETECTOR__
 #define __ILDFTDDISCBASEDDETECTOR__
 
+/** Disk based version of the FTD alla LOI
+*
+* @author S.Aplin DESY
+*/
+
 #include "kaltest/TVKalDetector.h"
 
 class TNode;
@@ -16,7 +21,6 @@ public:
   /** Initialize the FTD from GEAR */
   ILDFTDDiscBasedKalDetector( const gear::GearMgr& gearMgr );
   
-  ~ILDFTDDiscBasedKalDetector() {} 
   
 private:
   

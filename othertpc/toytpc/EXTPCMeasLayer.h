@@ -29,7 +29,7 @@ public:
 
    EXTPCMeasLayer(TMaterial &min,
                   TMaterial &mout,
-		  Double_t   y0,
+                  Double_t   y0,
                   Double_t   lhalf,
                   Double_t   sigmax0,
                   Double_t   sigmax1,
@@ -85,7 +85,7 @@ private:
    Int_t    fModule;    // module number
    Int_t    fLayer;     // layer number
 
-   ClassDef(EXTPCMeasLayer,1) 	// Sample measurement layer class
+   ClassDef(EXTPCMeasLayer,1)   // Sample measurement layer class
 };
 
 #endif

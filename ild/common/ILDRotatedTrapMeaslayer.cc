@@ -1,16 +1,3 @@
-//*************************************************************************
-//* ===================
-//*  ILDRotatedTrapMeaslayer Class
-//* ===================
-//*
-//* (Description)
-//*   Measurement layer class used for FTD rotated petals
-//* (Requires)
-//*     ILDVMeasLayer
-//* (Provides)
-//*     class ILDRotatedTrapMeaslayer
-//*************************************************************************
-//
 #include <iostream>
 
 #include "ILDRotatedTrapMeaslayer.h"
@@ -40,9 +27,9 @@ ILDRotatedTrapMeaslayer::ILDRotatedTrapMeaslayer(TMaterial &min,
                                                  Double_t   alpha,
                                                  Int_t      half_petal,
                                                  Bool_t     is_active,
-                                                 Int_t      layerID,
+                                                 Int_t      CellID,
                                                  const Char_t    *name)
-: ILDVMeasLayer(min, mout, Bz, is_active, layerID, name),
+: ILDVMeasLayer(min, mout, Bz, is_active, CellID, name),
 TPlane(center, normal),
 _sortingPolicy(SortingPolicy), _innerBaseLength(innerBaseLength), _outerBaseLength(outerBaseLength), _halfPetal(half_petal)
 {
@@ -84,11 +71,6 @@ TKalMatrix ILDRotatedTrapMeaslayer::XvToMv(const TVector3 &xv) const
   
 }
 
-TKalMatrix ILDRotatedTrapMeaslayer::XvToMv(const TVTrackHit &,
-                                           const TVector3   &xv) const
-{
-  return XvToMv(xv);
-}
 
 TVector3 ILDRotatedTrapMeaslayer::HitToXv(const TVTrackHit &vht) const
 {
@@ -149,18 +131,18 @@ Bool_t ILDRotatedTrapMeaslayer::IsOnSurface(const TVector3 &xx) const
     if(  mv(1,0) <= _outerR   &&  mv(1,0) >= _innerR 
        && 
        TMath::Abs(mv(0,0)) <=   mv(1,0) * _tanBeta  )
-      { 
-        
-        // meaning of _halfPetal:
-        //                  0 complete trapezoid
-        //                 +1 positive half only, i.e. the side of the petal in which the transverse coordinate, mv(0,0), is positive 
-        //                 -1 negative half only, i.e. the side of the petal in which the transverse coordinate, mv(0,0), is negative
-        
-        if( _halfPetal == 0 || ( _halfPetal * mv(0,0) ) >= 0) { // check if the point lies in the correct half
-          onSurface = true ;
+        { 
+          
+          // meaning of _halfPetal:
+          //                  0 complete trapezoid
+          //                 +1 positive half only, i.e. the side of the petal in which the transverse coordinate, mv(0,0), is positive 
+          //                 -1 negative half only, i.e. the side of the petal in which the transverse coordinate, mv(0,0), is negative
+          
+          if( _halfPetal == 0 || ( _halfPetal * mv(0,0) ) >= 0) { // check if the point lies in the correct half
+            onSurface = true ;
+          }
+          
         }
-        
-      }
     
     else{
       onSurface = false;
@@ -181,7 +163,7 @@ ILDVTrackHit* ILDRotatedTrapMeaslayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trk
   
   const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
   
-  // convert to layer coordinates 	
+  // convert to layer coordinates       
   TKalMatrix h    = this->XvToMv(hit);
   
   Double_t  x[2] ;

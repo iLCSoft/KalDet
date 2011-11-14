@@ -1,44 +1,49 @@
 #ifndef MaterialDataBase_h
 #define MaterialDataBase_h
 
+/** MaterialDataBase: Class to hold and manage collection of materials  
+ *
+ * @author S.Aplin DESY
+ */
+
 #include <string>
 #include <map>
 #include <exception>
 
 class TMaterial;
 
-class MaterialDataBaseException: public std::exception
-{
-  virtual const char* what() const throw()
-  {
-  return "MaterialDataBaseException occurred";
+class MaterialDataBaseException: public std::exception {
+  virtual const char* what() const throw() {
+    return "MaterialDataBaseException occurred";
   }
 } ;
 
 
-class MaterialDataBase 
-{
+class MaterialDataBase {
   
 public:
   
-  static MaterialDataBase& Instance()
-  {
-  static MaterialDataBase singleton;
-  
-  if( ! _isInitialised ){
-    singleton.initialise() ;
-  }
-  
-  return singleton;
-  
+  /** Accessor Method */
+  static MaterialDataBase& Instance() {
+    
+    static MaterialDataBase singleton;
+    
+    if( ! _isInitialised ){
+      singleton.initialise() ;
+    }
+    
+    return singleton;
+    
   }
   
   // Other non-static member functions
   
 public:
   
+  /** Destructor */
   ~MaterialDataBase();   
   
+  /** Get Material via name */
   TMaterial* getMaterial(std::string mat_name) ;  
   
   
@@ -54,7 +59,7 @@ private:
   void addMaterial(TMaterial* mat, std::string name); 
   void createMaterials();
   
-  // private memeber variables
+  // private member variables
   std::map<std::string,TMaterial* > _material_map;
   
   static bool _isInitialised;

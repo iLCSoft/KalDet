@@ -1,6 +1,11 @@
 #ifndef __ILDSUPPORTDETECTOR__
 #define __ILDSUPPORTDETECTOR__
 
+/** Support Material to be used for ILD DBD studies 
+ *
+ * @author S.Aplin DESY
+ */
+
 #include "kaltest/TVKalDetector.h"
 
 class TNode;
@@ -17,8 +22,7 @@ public:
   /** Initialize the support structures from GEAR */
   ILDSupportKalDetector( const gear::GearMgr& gearMgr );
   
-  ~ILDSupportKalDetector();
-  
+  /** Returns the special layer inside the Beam Pipe used for propagation to the IP */
   ILDCylinderMeasLayer* getIPLayer() { return _ipLayer; }
   
 private:

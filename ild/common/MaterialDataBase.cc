@@ -9,7 +9,6 @@
 
 bool MaterialDataBase::_isInitialised = false ;
 
-
 MaterialDataBase::~MaterialDataBase(){
   
   std::map<std::string,TMaterial* >::iterator it = _material_map.begin();
@@ -17,11 +16,10 @@ MaterialDataBase::~MaterialDataBase(){
   
   for( /**/; it!=_material_map.end(); ++it) 
     
-    if( std::find( deleted_objects.begin(), deleted_objects.end(), (*it).second ) != deleted_objects.end() )
-      {
+    if( std::find( deleted_objects.begin(), deleted_objects.end(), (*it).second ) != deleted_objects.end() ) {
       delete (*it).second ;
       deleted_objects.push_back((*it).second) ;
-      }
+    }
 }
 
 TMaterial* MaterialDataBase::getMaterial(std::string mat_name){
@@ -47,11 +45,15 @@ void MaterialDataBase::initialise(){
 
 void MaterialDataBase::addMaterial(TMaterial* mat, std::string name) {
   std::map<std::string, TMaterial*>::iterator it = _material_map.find(name) ; 
+
   MaterialDataBaseException exp;
-  if ( it != _material_map.end() ) 
-    { throw exp; } 
-  else 
-    { _material_map[name] = mat  ; }
+
+  if ( it != _material_map.end() ) { 
+    throw exp; 
+  } 
+  else { 
+    _material_map[name] = mat  ; 
+  }
 }
 
 

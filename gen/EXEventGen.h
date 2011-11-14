@@ -14,9 +14,9 @@ public:
    THelicalTrack GenerateHelix(Double_t pt,
                                Double_t cosmin,
                                Double_t cosmax,
-			       Double_t phimin=0.,
-			       Double_t phimax=2*TMath::Pi(),
-			       TVector3 xv0=TVector3(0.,0.,0.));
+                               Double_t phimin=0.,
+                               Double_t phimax=2*TMath::Pi(),
+                               TVector3 xv0=TVector3(0.,0.,0.));
    void          Swim(THelicalTrack &heltrk);
 
    static void     SetT0(Double_t t0) { fgT0 = t0;   }

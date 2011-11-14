@@ -40,12 +40,12 @@ TVKalDetector(10)
   
   // add beam pipe
   Add( new ILDCylinderMeasLayer(beam, aluminium , rtub, halfZ, bz, dummy ) );
-  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ beampipe ] at R = " << rtub
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub
   << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
   << std::endl ;  
   
   Add( new ILDCylinderMeasLayer(aluminium , air, rtub+thickness, halfZ, bz, dummy ) );
-  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ beampipe ] at R = " << rtub+thickness
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub+thickness
   << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
   << std::endl ;  
   
@@ -56,16 +56,12 @@ TVKalDetector(10)
   _ipLayer = new ILDCylinderMeasLayer(beam, beam , rvacuum , halfZ, bz, dummy );
   
   Add( _ipLayer );
-  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ beampipe ] at R = " << rtub
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub
   << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
   << std::endl ;  
   
   
   
   SetOwner();
-}
-
-ILDSupportKalDetector::~ILDSupportKalDetector()
-{
 }
 

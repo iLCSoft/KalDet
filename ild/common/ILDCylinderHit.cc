@@ -1,18 +1,4 @@
-//*************************************************************************
-//* ================
-//*  ILDCylinderHit Class
-//* ================
-//*
-//* (Description)
-//*   User defined hit class
-//*   provides coordinate vector as defined by the MeasLayer
-//* (Requires)
-//*     TVTrackHit
-//* (Provides)
-//*     class ILDCylinderHit
-//*
-//*************************************************************************
-//
+
 #include "ILDCylinderHit.h"
 #include "ILDCylinderMeasLayer.h"
 #include "TMath.h"
@@ -28,34 +14,24 @@ using std::ios;
 using std::resetiosflags;
 
 //_________________________________________________________________________
-//  --------------
-//  Ctors and Dtor
-//  --------------
-//
-
-ILDCylinderHit::ILDCylinderHit(const TVMeasLayer &ms, Double_t *x, Double_t *dx, 
-                               Double_t bfield ) 
-: ILDVTrackHit(ms, x, dx, bfield, 2) 
-{
-  
-  //SJA:FIXME is there any way to check the size of the Double_t supplied?
-  
-}
-
-
-ILDCylinderHit::~ILDCylinderHit()
-{
-}
-
-//_________________________________________________________________________
 //  --------------------------------
 //  Implementation of public methods
 //  --------------------------------
 //
+
+
+/** Global to Local coordinates */
+
 TKalMatrix ILDCylinderHit::XvToMv(const TVector3 &xv, Double_t t0) const
 {
+  
+  // SJA:FIXME the dynamic_cast should be checked in the constructor and then a static cast could be used 
+  
+  
   const ILDCylinderMeasLayer &ms
-  = dynamic_cast<const ILDCylinderMeasLayer &>(GetMeasLayer());
+  = dynamic_cast<const ILDCylinderMeasLayer &>(this->GetMeasLayer());
+  
+  
   TKalMatrix h    = ms.XvToMv(*this, xv); 
   Double_t   r    = ms.GetR();
   Double_t   phih = h(0, 0) / r;
@@ -72,6 +48,8 @@ TKalMatrix ILDCylinderHit::XvToMv(const TVector3 &xv, Double_t t0) const
   
   return h;
 }
+
+/** Print Debug information */
 
 void ILDCylinderHit::DebugPrint(Option_t *) const
 {

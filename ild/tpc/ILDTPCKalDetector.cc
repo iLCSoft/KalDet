@@ -62,12 +62,12 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   
   // add inner field cage
   Add( new ILDCylinderMeasLayer(air, aluminium , rtub, lhalf, bz, dummy ) );
-  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ inner field cage ] at R = " << rtub
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub
   << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
   << std::endl ;  
   
   Add( new ILDCylinderMeasLayer(aluminium , tpcgas, rtub+inthick, lhalf, bz, dummy ) );
-  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ inner field cage ] at R = " << rtub+inthick
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub+inthick
   << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
   << std::endl ;  
   
@@ -83,9 +83,9 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
     encoder[ILDCellID0::subdet] = ILDDetID::TPC ;
     encoder[ILDCellID0::layer] = layer ;
     
-    int layerID = encoder.lowWord() ;
+    int CellID = encoder.lowWord() ;
     
-    ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, layerID, "TPC") ;
+    ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, CellID, "TPC") ;
     
     Add( tpcL ) ;  
     
@@ -94,7 +94,7 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
     if( layer % nth_layers == 0 ){
       
       streamlog_out( DEBUG0 )   << " *** for TPC Gas printing only every " << nth_layers << "th layer"  << std::endl ; 
-      streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [" << layerID <<  "] at R = " << r
+      streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [" << CellID <<  "] at R = " << r
       << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
       << std::endl ;  
     }
@@ -103,12 +103,12 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   
   // add outer field cage
   Add( new ILDCylinderMeasLayer(tpcgas, aluminium, outerr-outthick, lhalf, bz, dummy) ) ;
-  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ outer field cage ] at R = " << outerr-outthick
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr-outthick
   << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
   << std::endl ;  
   
   Add( new ILDCylinderMeasLayer(aluminium, air, outerr, lhalf, bz, dummy) ) ;
-  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using layerID: [ outer field cage ] at R = " << outerr
+  streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr
   << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
   << std::endl ;  
   
@@ -116,7 +116,4 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   SetOwner();
 }
 
-ILDTPCKalDetector::~ILDTPCKalDetector()
-{
-}
 

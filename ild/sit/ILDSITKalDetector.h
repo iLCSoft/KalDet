@@ -1,6 +1,11 @@
 #ifndef __ILDSITKALDETECTOR__
 #define __ILDSITKALDETECTOR__
 
+/** Ladder based SIT to be used for ILD DBD studies 
+ *
+ * @author S.Aplin DESY
+ */
+
 #include "kaltest/TVKalDetector.h"
 
 #include "TMath.h"
@@ -16,9 +21,9 @@ class ILDSITKalDetector : public TVKalDetector {
   
 public:
   
+  /** Initialize the SIT from GEAR */
   ILDSITKalDetector( const gear::GearMgr& gearMgr );
   
-  ~ILDSITKalDetector();
   
 private:
   

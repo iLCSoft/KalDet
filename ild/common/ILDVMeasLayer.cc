@@ -1,6 +1,11 @@
 
 #include "ILDVMeasLayer.h"
 
+#include <UTIL/BitField64.h>
+#include <UTIL/ILDConf.h>
+
+#include "streamlog/streamlog.h"
+
 Bool_t   ILDVMeasLayer::kActive = kTRUE;
 Bool_t   ILDVMeasLayer::kDummy = kFALSE;
 
@@ -9,16 +14,51 @@ Bool_t   ILDVMeasLayer::kDummy = kFALSE;
 ILDVMeasLayer::ILDVMeasLayer(TMaterial &min,
                              TMaterial &mout,
                              Double_t   Bz,
-                             Bool_t     isactive,
-                             int        layerID ,
+                             Bool_t     is_active,
+                             int        cellID ,
                              const Char_t    *name)  
-: TVMeasLayer(min, mout, isactive),
+: TVMeasLayer(min, mout, is_active),
 _Bz(Bz),
-_layerID( layerID ), 
-_name(name)
+_name(name),
+_isMultiLayer(false)
 {
+  _cellIDs.push_back(cellID);
+
+  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  encoder.setValue(cellID);
+  encoder[ILDCellID0::module] = 0;
+  encoder[ILDCellID0::sensor] = 0;
+
+  _layerID = encoder.lowWord();
+  
 }
 
-ILDVMeasLayer::~ILDVMeasLayer()
+
+ILDVMeasLayer::ILDVMeasLayer(TMaterial &min,
+                             TMaterial &mout,
+                             Double_t  Bz,
+                             const std::vector<int>& cellIDs,
+                             Bool_t    is_active,
+                             const Char_t    *name)
+: TVMeasLayer(min, mout, is_active),
+_Bz(Bz),
+_cellIDs(cellIDs),
+_name(name),
+_isMultiLayer(true)
 {
+  
+  if (cellIDs.size() == 0 ) {
+    streamlog_out(ERROR) << __FILE__ << " line " << __LINE__ << " size of cellIDs == 0" << std::endl;
+  }
+
+  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  encoder.setValue(cellIDs.at(0));
+  encoder[ILDCellID0::module] = 0;
+  encoder[ILDCellID0::sensor] = 0;
+
+  _layerID = encoder.lowWord();
+  
 }
+
+
+

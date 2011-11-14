@@ -1,33 +1,8 @@
-//
-//  ILDParallelPlanarMeasLayer.cc
-//  KalDet
-//
-//  Created by Steve Aplin on 9/20/11.
-//  
-//
 
 #include "ILDParallelPlanarMeasLayer.h"
 #include "TVTrack.h"
 
 #include "streamlog/streamlog.h"
-
-ILDParallelPlanarMeasLayer::ILDParallelPlanarMeasLayer(TMaterial &min,
-                                                       TMaterial &mout,
-                                                       Double_t   r,
-                                                       Double_t   phi,
-                                                       Double_t   Bz,
-                                                       Double_t   SortingPolicy,
-                                                       Double_t   xiwidth,
-                                                       Double_t   zetawidth,
-                                                       Double_t   xioffset,
-                                                       Bool_t     is_active,
-                                                       Int_t      layerID,
-                                                       const Char_t    *name)
-:
-ILDPlanarMeasLayer(min,mout,TVector3(r*cos(phi),r*sin(phi),0),TVector3(cos(phi),sin(phi),0),Bz,SortingPolicy,xiwidth,zetawidth,xioffset,is_active,layerID,name), _r(r),_phi(phi),_cos_phi(cos(_phi)),_sin_phi(sin(_phi))
-{
-  
-}
 
 
 Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
@@ -41,9 +16,9 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
   
   
-  //	TVector3 xx_n;
-  //	int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
-  //	streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << std::endl;   
+  TVector3 xx_n;
+  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
+  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;   
   
   // This assumes nonzero B field.
   //
@@ -96,8 +71,8 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   const double y2 = this->GetXc().y() - 0.5*this->GetXiwidth()*cos(this->GetXc().Phi()) + this->GetXioffset() * cos(this->GetXc().Phi());
   
   //  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Xc = " << this->GetXc().x() << " Yc = " << this->GetXc().y() << " Rc = " << this->GetXc().Perp() << " Phi = " << this->GetXc().Phi() << std::endl;
-  //	streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: x1 = " << x1 << " y1 = "  << y1 << " R " << TVector3(x1,y1,0).Perp() << " phi = " << TVector3(x1,y1,0).Phi() << std::endl ; 
-  //	streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: x2 = " << x2 << " y2 = "  << y2 << " R " << TVector3(x2,y2,0).Perp() << " phi = " << TVector3(x2,y2,0).Phi() << std::endl ; 
+  //    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: x1 = " << x1 << " y1 = "  << y1 << " R " << TVector3(x1,y1,0).Perp() << " phi = " << TVector3(x1,y1,0).Phi() << std::endl ; 
+  //    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: x2 = " << x2 << " y2 = "  << y2 << " R " << TVector3(x2,y2,0).Perp() << " phi = " << TVector3(x2,y2,0).Phi() << std::endl ; 
   
   const double dx = x2 - x1 ;
   const double dy = y2 - y1 ;
@@ -138,17 +113,17 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   // Line segment doesn't intersect and is on outside of the circle 
   if ( ( u1 <= 0 && u2 <= 0 ) || ( u1 >= 1 && u2 >= 1 ) ) {
     
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Line segment doesn't intersect and is outside the circle " << std::endl;
-    //		const double x_ins1 = x1 + u1 * (dx) ;
-    //		const double y_ins1 = y1 + u1 * (dy) ;
-    //		
-    //		const double x_ins2 = x1 + u2 * (dx) ;
-    //		const double y_ins2 = y1 + u2 * (dy) ;
-    //		
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution x:y = " << x_ins1 << " : " << y_ins1 << std::endl ;
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution x:y = " << x_ins2 << " : " << y_ins2 << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Line segment doesn't intersect and is outside the circle " << std::endl;
+    //          const double x_ins1 = x1 + u1 * (dx) ;
+    //          const double y_ins1 = y1 + u1 * (dy) ;
+    //          
+    //          const double x_ins2 = x1 + u2 * (dx) ;
+    //          const double y_ins2 = y1 + u2 * (dy) ;
+    //          
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution x:y = " << x_ins1 << " : " << y_ins1 << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution x:y = " << x_ins2 << " : " << y_ins2 << std::endl ;
     
     return 0 ;
   }
@@ -158,17 +133,17 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   else if ( ( u1 <= 0 && u2 >= 1 ) || ( u1 >= 1 && u2 <= 0 ) ) {
     
     //    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Line segment doesn't intersect and is inside the circle " << std::endl;
-    //		
-    //		const double x_ins1 = x1 + u1 * (dx) ;
-    //		const double y_ins1 = y1 + u1 * (dy) ;
-    //		
-    //		const double x_ins2 = x1 + u2 * (dx) ;
-    //		const double y_ins2 = y1 + u2 * (dy) ;
-    //		
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution x:y = " << x_ins1 << " : " << y_ins1 << std::endl ;
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution x:y = " << x_ins2 << " : " << y_ins2 << std::endl ;
+    //          
+    //          const double x_ins1 = x1 + u1 * (dx) ;
+    //          const double y_ins1 = y1 + u1 * (dy) ;
+    //          
+    //          const double x_ins2 = x1 + u2 * (dx) ;
+    //          const double y_ins2 = y1 + u2 * (dy) ;
+    //          
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution x:y = " << x_ins1 << " : " << y_ins1 << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution x:y = " << x_ins2 << " : " << y_ins2 << std::endl ;
     
     
     return 0 ;
@@ -178,23 +153,23 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   // Line segment intersects at one point
   else if ( ( u1 > 0 && u1 < 1 && (u2 <= 0 || u2 >= 1) ) || ( u2 > 0 && u2 < 1 && ( u1 <= 0 || u1 >= 1 )) ) {
     
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Only one possible solution" << std::endl;
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: Only one possible solution" << std::endl;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
     
     if ( u1 > 0 && u1 < 1 ) { // use u1 
       
       x_ins = x1 + u1 * (dx) ;
       y_ins = y1 + u1 * (dy) ;
       
-      //			streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution x:y:z = " << x_ins << " : " << y_ins ;
+      //                        streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution x:y:z = " << x_ins << " : " << y_ins ;
     }
     else{ // use u2
       
       x_ins = x1 + u2 * (dx) ;
       y_ins = y1 + u2 * (dy) ;
       
-      //			streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution x:y:z = " << x_ins << " : " << y_ins ;
+      //                        streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution x:y:z = " << x_ins << " : " << y_ins ;
     }
     
     const double delta_x = x_ins - x_pca ;
@@ -203,14 +178,14 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
     const double sin_delta_phi =       omega*delta_x*sin_phi0 - omega*delta_y*cos_phi0 ;
     const double cos_delta_phi = 1.0 - omega*delta_x*cos_phi0 - omega*delta_y*sin_phi0 ;
     
-    //		const double sin_delta_phi =     - omega*delta_x*cos_phi0 - omega*delta_y*sin_phi0 ;
+    //          const double sin_delta_phi =     - omega*delta_x*cos_phi0 - omega*delta_y*sin_phi0 ;
     //    const double cos_delta_phi = 1.0 - omega*delta_x*sin_phi0 + omega*delta_y*cos_phi0 ;
     
     s_ins = atan2(-sin_delta_phi,cos_delta_phi) / omega ;
     
     //SJA:FIXME: do we need to consider the mode here ...
     
-    //		streamlog_out(DEBUG0) << " : " << z_pca + s_ins * tanl << std::endl ;
+    //          streamlog_out(DEBUG0) << " : " << z_pca + s_ins * tanl << std::endl ;
     
   }
   
@@ -224,10 +199,10 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
     const double x_ins2 = x1 + u2 * (dx) ;
     const double y_ins2 = y1 + u2 * (dy) ;
     
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution x:y = " << x_ins1 << " : " << y_ins1 << std::endl ;
-    //		streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution x:y = " << x_ins2 << " : " << y_ins2 << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution u = " << u1 << " : " << u1 * dx << " " << u1 * dy << std::endl ;  
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution u = " << u2 << " : " << u2 * dx << " " << u2 * dy << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 1st solution x:y = " << x_ins1 << " : " << y_ins1 << std::endl ;
+    //          streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: 2nd solution x:y = " << x_ins2 << " : " << y_ins2 << std::endl ;
     
     // now calculate the path lengths 
     double s_1 = 0.0 ;
@@ -236,7 +211,7 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
     const double delta_x1 = x_ins1 - x_pca ;
     const double delta_y1 = y_ins1 - y_pca ;
     
-    //		const double sin_delta_phi1 =     - omega*delta_x1*cos_phi0 - omega*delta_y1*sin_phi0 ;
+    //          const double sin_delta_phi1 =     - omega*delta_x1*cos_phi0 - omega*delta_y1*sin_phi0 ;
     //    const double cos_delta_phi1 = 1.0 - omega*delta_x1*sin_phi0 + omega*delta_y1*cos_phi0 ;
     
     const double sin_delta_phi1 =       omega*delta_x1*sin_phi0 - omega*delta_y1*cos_phi0 ;
@@ -248,7 +223,7 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
     const double delta_x2 = x_ins2 - x_pca ;
     const double delta_y2 = y_ins2 - y_pca ;
     
-    //		const double sin_delta_phi2 =     - omega*delta_x2*cos_phi0 - omega*delta_y2*sin_phi0 ;
+    //          const double sin_delta_phi2 =     - omega*delta_x2*cos_phi0 - omega*delta_y2*sin_phi0 ;
     //    const double cos_delta_phi2 = 1.0 - omega*delta_x2*sin_phi0 + omega*delta_y2*cos_phi0 ;
     
     const double sin_delta_phi2 =       omega*delta_x2*sin_phi0 - omega*delta_y2*cos_phi0 ;
@@ -259,13 +234,13 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
     
     if( mode == 0 ) { // take closest intersection
       if( TMath::Abs(s_1) < TMath::Abs(s_2) ) {
-        //				streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution " << std::endl;
+        //                              streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution " << std::endl;
         x_ins = x_ins1;
         y_ins = y_ins1;
         s_ins = s_1;
       }
       else {
-        //				streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution " << std::endl;
+        //                              streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution " << std::endl;
         x_ins = x_ins2;
         y_ins = y_ins2;
         s_ins = s_2;
@@ -279,13 +254,13 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
       
       if( mode == 1 ){ // take the intersection with smallest s
         if( s_1 < s_2 ) {
-          //					streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution " << std::endl;
+          //                                    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution " << std::endl;
           x_ins = x_ins1;
           y_ins = y_ins1;
           s_ins = s_1;
         }
         else {
-          //					streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution " << std::endl;
+          //                                    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution " << std::endl;
           x_ins = x_ins2;
           y_ins = y_ins2;
           s_ins = s_2;
@@ -293,13 +268,13 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
       } 
       else if( mode == -1 ) {  // else take the intersection with largest s 
         if( s_1 > s_2 ){
-          //					streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution " << std::endl;
+          //                                    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 1st solution " << std::endl;
           x_ins = x_ins1;
           y_ins = y_ins1;
           s_ins = s_1;
         }
         else{
-          //					streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution " << std::endl;
+          //                                    streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: take 2nd solution " << std::endl;
           x_ins = x_ins2;
           y_ins = y_ins2;
           s_ins = s_2;
@@ -309,6 +284,8 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   }
   
   xx.SetXYZ(x_ins, y_ins, z_pca + s_ins * tanl);
+  
+  phi = s_ins / r ;
   
   return (IsOnSurface(xx) ? 1 : 0);
   

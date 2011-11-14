@@ -56,11 +56,11 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
     encoder[ILDCellID0::module] = 0 ;
     encoder[ILDCellID0::sensor] = 0 ;
     
-    int CELL_ID_FWD = encoder.lowWord() ;
+    int CellID_FWD = encoder.lowWord() ;
     
     encoder[ILDCellID0::side] = -1 ;
     
-    int CELL_ID_BWD = encoder.lowWord() ;
+    int CellID_BWD = encoder.lowWord() ;
     
     // note the z position given in gear is actually the mid point (z) of the sensitive i.e. the z of the measurement plane
     TVector3 sen_front_face_centre_fwd( 0.0, 0.0, zPos - senThickness*0.5); // for +z  
@@ -80,17 +80,13 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
     TVector3 normal_fwd(sen_front_face_centre_fwd) ;    
     normal_fwd.SetMag(1.0) ;    
     
-    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_fwd, normal_fwd, _bZ, zPos,
-                             rInner, rOuter, dummy ) );
+    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_fwd, normal_fwd, _bZ, sen_front_face_centre_fwd.Z(), rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_fwd, normal_fwd, _bZ, zPos,
-                             rInner, rOuter, active, CELL_ID_FWD ) );
+    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_fwd, normal_fwd, _bZ, measurement_plane_centre_fwd.Z(), rInner, rOuter, active, CellID_FWD ) );
     
-    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_fwd, normal_fwd, _bZ, zPos,
-                             rInner, rOuter, dummy ) );
+    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_fwd, normal_fwd, _bZ, sen_rear_face_centre_fwd.Z(), rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_fwd, normal_fwd, _bZ, zPos,
-                             rInner, rOuter, dummy ) );
+    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_fwd, normal_fwd, _bZ, sup_rear_face_centre_fwd.Z(), rInner, rOuter, dummy ) );
     
     
     // note the z position given in gear is actually the mid point (z) of the sensitive i.e. the z of the measurement plane
@@ -113,17 +109,13 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
     
     
     
-    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_bwd, normal_bwd, _bZ, zPos+eps,
-                             rInner, rOuter, dummy ) );
+    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_bwd, normal_bwd, _bZ, fabs(sen_front_face_centre_bwd.Z())+eps, rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_bwd, normal_bwd, _bZ, zPos+eps,
-                             rInner, rOuter, active, CELL_ID_BWD ) );
+    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_bwd, normal_bwd, _bZ, fabs(measurement_plane_centre_bwd.Z())+eps, rInner, rOuter, active, CellID_BWD ) );
     
-    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_bwd, normal_bwd, _bZ, zPos+eps,
-                             rInner, rOuter, dummy ) );
+    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_bwd, normal_bwd, _bZ, fabs(sen_rear_face_centre_bwd.Z())+eps, rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_bwd, normal_bwd, _bZ, zPos+eps,
-                             rInner, rOuter, dummy ) );
+    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_bwd, normal_bwd, _bZ, fabs(sup_rear_face_centre_bwd.Z())+eps, rInner, rOuter, dummy ) );
     
     
   }

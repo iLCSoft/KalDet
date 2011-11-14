@@ -1,19 +1,10 @@
 #ifndef __ILDPLANARMEASLAYER__
 #define __ILDPLANARMEASLAYER__
-//*************************************************************************
-//* ===================
-//*  ILDRotatedTrapMeaslayer Class
-//* ===================
-//*
-//* (Description)
-//*   Rotated Trapezoid Planar measurement layer class used with ILDPLanarTrackHit.
-//* (Requires)
-//*   ILDVMeasLayer
-//* (Provides)
-//*     class ILDRotatedTrapMeaslayer
-//*
-//*************************************************************************
-//
+/** ILDRotatedTrapMeaslayer: User defined Rotated Trapezoid Planar KalTest measurement layer class used with ILDPLanarTrackHit.
+ *
+ * @author S.Aplin DESY
+ */
+
 #include "TVector3.h"
 #include "TKalMatrix.h"
 #include "TPlane.h"
@@ -24,9 +15,10 @@
 class TVTrackHit;
 
 class ILDRotatedTrapMeaslayer : public ILDVMeasLayer, public TPlane {
-public:
-  // Ctors and Dtor
   
+public:
+  
+  /** Constructor Taking inner and outer materials, centre and normal of the plane, B-Field, sorting policy, height, inner base length, outer base length, tilt angle around axis of symmetry, represents full or half petal, whether the layer is sensitive, Cell ID, and an optional name */
   ILDRotatedTrapMeaslayer(TMaterial &min,
                           TMaterial &mout,
                           const TVector3  &center,
@@ -39,28 +31,36 @@ public:
                           Double_t   alpha,
                           Int_t      half_petal,
                           Bool_t     is_active,
-                          Int_t      layerID = -1,
+                          Int_t      CellID = -1,
                           const Char_t    *name = "ILDRotatedTrapMeasL");
   
   
   // Parrent's pure virtuals that must be implemented
   
+  /** Global to Local coordinates */
   virtual TKalMatrix XvToMv    (const TVTrackHit &ht,
-                                const TVector3   &xv) const;
+                                const TVector3   &xv) const 
+  { return this->XvToMv(xv); } 
   
+  /** Global to Local coordinates */
   virtual TKalMatrix XvToMv    (const TVector3   &xv) const;
   
+  /** Local to Global coordinates */
   virtual TVector3   HitToXv   (const TVTrackHit &ht) const;
   
+  /** Calculate Projector Matrix */  
   virtual void       CalcDhDa  (const TVTrackHit &ht,
                                 const TVector3   &xv,
                                 const TKalMatrix &dxphiada,
                                 TKalMatrix &H)  const;
   
+  /** Convert LCIO Tracker Hit to an ILDPLanarTrackHit  */
   virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const ;
   
+  /** Check if global point is on surface  */
   inline virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
   
+  /** Get sorting policy for this plane  */
   Double_t GetSortingPolicy() const { return _sortingPolicy; }
   
 private:

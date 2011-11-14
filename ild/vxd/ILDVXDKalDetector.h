@@ -1,6 +1,11 @@
 #ifndef __ILDVXDKALDETECTOR__
 #define __ILDVXDKALDETECTOR__
 
+/** Ladder based VXD to be used for ILD DBD studies 
+ *
+ * @author S.Aplin DESY
+ */
+
 #include "kaltest/TVKalDetector.h"
 
 #include "TMath.h"
@@ -18,7 +23,6 @@ public:
   
   ILDVXDKalDetector( const gear::GearMgr& gearMgr );
   
-  ~ILDVXDKalDetector();
   
 private:
   
