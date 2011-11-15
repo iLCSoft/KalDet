@@ -133,7 +133,7 @@ TVector3 ILDSegmentedDiscMeasLayer::HitToXv(const TVTrackHit &vht) const
   double x =   mv(0,0) ;
   double y =   mv(1,0) ;
   
-  double z = GetXc().Z() ;
+  double z = this->GetXc().Z() ;
   
   return TVector3(x,y,z);
 }
@@ -168,6 +168,88 @@ void ILDSegmentedDiscMeasLayer::CalcDhDa(const TVTrackHit &vht,
   
 }
 
+
+Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
+                                                    TVector3 &xx,
+                                                    Double_t &phi,
+                                                    Int_t     mode,
+                                                    Double_t  eps) const{
+
+  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith" << std::endl;
+  
+  // check that direction has one of the correct values
+  if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
+  
+//  
+//  TVector3 xx_n;
+//  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;   
+  
+  // get helix parameters
+  Double_t dr     = hel.GetDrho();
+  Double_t phi0   = hel.GetPhi0(); //
+  Double_t kappa  = hel.GetKappa();
+  Double_t rho    = hel.GetRho();
+  Double_t omega  = 1.0 / rho;
+  Double_t r      = TMath::Abs(rho);
+  Double_t z0     = hel.GetDz();
+  Double_t tanl   = hel.GetTanLambda();
+  
+  TVector3 ref_point = hel.GetPivot();
+  
+  //
+  // Check if charge is nonzero.
+  //
+  
+  Int_t    chg = (Int_t)TMath::Sign(1.1,kappa);
+  if (!chg) {
+    streamlog_out(ERROR) << ">>>> Error >>>> ILDParallelPlanarMeasLayer::CalcXingPointWith" << std::endl
+    << "      Kappa = 0 is invalid for a helix "          << std::endl;
+    return -1;
+  }
+  
+  const double sin_phi0 = sin(phi0); 
+  const double cos_phi0 = cos(phi0); 
+  
+  const double x_pca = ref_point.x() + dr * cos_phi0 ; 
+  const double y_pca = ref_point.y() + dr * sin_phi0 ; 
+  const double z_pca = ref_point.z() + z0 ;
+  
+  const double z = this->GetXc().Z() ;
+  // get path length to crossing point 
+
+  const double s = ( z - z_pca ) / tanl ;
+  
+  const double delta_phi_half = (omega*s)/2.0 ;
+  
+  double x;
+  double y;
+  
+  if( fabs(s) > FLT_MIN ){ // protect against starting on the plane
+    x = x_pca - s * ( sin(delta_phi_half) / delta_phi_half ) *  sin( phi0 - delta_phi_half ) ;
+    y = y_pca + s * ( sin(delta_phi_half) / delta_phi_half ) *  cos( phi0 - delta_phi_half ) ;
+  }
+  else{
+    x = x_pca;
+    y = y_pca;
+  }
+  
+  
+  // check if intersection with plane is within boundaries
+  
+  xx.SetXYZ(x, y, z);
+  
+
+  phi = s / r ;
+ 
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith                    :  x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << std::endl; 
+//  
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith :  xdiff = " << xx.x() - xx_n.x() << " ydiff = "<< xx.y() - xx_n.y() << " zdiff = " << xx.z() - xx_n.z() << std::endl;
+  
+  return (IsOnSurface(xx) ? 1 : 0);
+  
+  
+}
 
 Bool_t ILDSegmentedDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
 {

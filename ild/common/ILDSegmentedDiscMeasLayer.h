@@ -78,6 +78,23 @@ public:
   /** Convert LCIO Tracker Hit to an ILDPLanarTrackHit  */
   virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const ;
 
+  /** overloaded version of CalcXingPointWith using closed solution*/
+  virtual Int_t    CalcXingPointWith(const TVTrack  &hel,
+                                     TVector3 &xx,
+                                     Double_t &phi,
+                                     Int_t     mode,
+                                     Double_t  eps = 1.e-8) const;
+  
+  /** overloaded version of CalcXingPointWith using closed solution*/
+  virtual Int_t    CalcXingPointWith(const TVTrack  &hel,
+                                     TVector3 &xx,
+                                     Double_t &phi,
+                                     Double_t  eps = 1.e-8) const{
+    
+    return CalcXingPointWith(hel,xx,phi,0,eps);
+    
+  }
+  
   /** Check if global point is on surface  */
   inline virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
   
