@@ -175,7 +175,7 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
                                                     Int_t     mode,
                                                     Double_t  eps) const{
 
-  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith" << std::endl;
+  //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith" << std::endl;
   
   // check that direction has one of the correct values
   if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
