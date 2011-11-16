@@ -97,20 +97,23 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   
   // create segmented disk 
   
+  int zsign = zpos > 0 ? +1 : -1 ;
+  
   // front face of sensitive  
-  double z = zpos - 0.5*(senThickness) ;  
-  //  double z = zpos ;
+  double z = zpos - zsign*0.5*(senThickness) ;  
   double sort_policy = fabs(z) ;
-  int zsign = z > 0 ? +1 : -1 ;
   
   // if this is the negative z disk add epsilon to the policy
   if( z < 0 ) sort_policy += 1.0e-06 ; 
+
+  streamlog_out(DEBUG) << "z = " << z << " zsign*0.5*senThickness = " << zsign*0.5*senThickness << " zsign = " << zsign << std::endl;
   
   streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add front face of sensitive at " << z << std::endl;
   Add( new ILDSegmentedDiscMeasLayer(air, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy) );
   
   
   // measurement plane
+
   z += zsign*0.5*senThickness;  
   sort_policy = z ;
   if( z < 0 ) sort_policy += 1.0e-06 ;
@@ -183,6 +186,24 @@ void ILDFTDKalDetector::build_staggered_design() {
     }
     
     sepration = fabs( senZPos_odd_front - supZPos_odd_front ) - ( 0.5*senThickness + 0.5*supThickness ) ;
+    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
+      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
+      << sepration << " microns. exit(1) called" 
+      << std::endl ;
+      exit(1);
+    }
+
+    
+    sepration = fabs( senZPos_even_back - supZPos_even_back ) - ( 0.5*senThickness + 0.5*supThickness ) ;
+    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
+      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
+      << sepration << " microns. exit(1) called" 
+      << std::endl ;
+      exit(1);
+    }
+    
+    
+    sepration = fabs( senZPos_odd_back - supZPos_odd_back ) - ( 0.5*senThickness + 0.5*supThickness ) ;
     if( sepration > 1.0e-04 /* 0.1 microns */ ) {
       streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
       << sepration << " microns. exit(1) called" 
