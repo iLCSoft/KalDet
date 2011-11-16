@@ -80,7 +80,7 @@ private:
     
   };
   
-  void build_turbine_design();
+  void build_tilted_design();
   void build_staggered_design();
   
   //void create_petal(TVector3 measurement_plane_centre, FTD_Petal petal, int CellID);

@@ -37,7 +37,7 @@ TVKalDetector(300), _nDisks(0), _is_staggered_design(true) // SJA:FIXME initial 
   }
   else{
     streamlog_out(DEBUG1) << "ILDFTDKalDetector use tilted design " << std::endl ;
-    this->build_turbine_design(); 
+    this->build_tilted_design(); 
   }
   
   SetOwner();
@@ -265,7 +265,7 @@ void ILDFTDKalDetector::build_staggered_design() {
 }
 
 
-void ILDFTDKalDetector::build_turbine_design() {
+void ILDFTDKalDetector::build_tilted_design() {
   
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air") ;
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon") ;
