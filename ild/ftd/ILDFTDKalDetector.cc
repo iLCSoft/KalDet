@@ -105,8 +105,6 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   
   // if this is the negative z disk add epsilon to the policy
   if( z < 0 ) sort_policy += 1.0e-06 ; 
-
-  streamlog_out(DEBUG) << "z = " << z << " zsign*0.5*senThickness = " << zsign*0.5*senThickness << " zsign = " << zsign << std::endl;
   
   streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add front face of sensitive at " << z << std::endl;
   Add( new ILDSegmentedDiscMeasLayer(air, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy) );
@@ -115,7 +113,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   // measurement plane
 
   z += zsign*0.5*senThickness;  
-  sort_policy = z ;
+  sort_policy = fabs(z) ;
   if( z < 0 ) sort_policy += 1.0e-06 ;
   streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " number of module_ids = " << module_ids.size() << std::endl;
   Add( new ILDSegmentedDiscMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, active, module_ids));
@@ -123,7 +121,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   
   // interface between sensitive and support
   z += zsign*0.5*senThickness;   
-  sort_policy = z ;
+  sort_policy = fabs(z) ;
   if( z < 0 ) sort_policy += 1.0e-06 ;
   
   streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add interface between sensitive and support at " << z << std::endl;
@@ -132,7 +130,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   
   // rear face of support
   z += zsign*supThickness;   
-  sort_policy = z ;
+  sort_policy = fabs(z) ;
   if( z < 0 ) sort_policy += 1.0e-06 ;
   
   streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of support at " << z << std::endl;
