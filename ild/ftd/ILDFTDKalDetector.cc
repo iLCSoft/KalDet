@@ -62,33 +62,33 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   double rInner = _FTDgeo[idisk].rInner ;
   
   
-  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   encoder.reset() ;  // reset to 0
   
-  encoder[ILDCellID0::subdet] = ILDDetID::FTD ;
-  encoder[ILDCellID0::side] = zpos > 0 ? 1 : -1 ;
-  encoder[ILDCellID0::layer]  = idisk ;
+  encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
+  encoder[lcio::ILDCellID0::side] = zpos > 0 ? 1 : -1 ;
+  encoder[lcio::ILDCellID0::layer]  = idisk ;
   
   int start_index = even_petals ? 0 : 1 ;
   std::vector<int> module_ids;
   
   for (int i=0; i<nsegments; ++i) {
-    encoder[ILDCellID0::module] = start_index + i*2 ;
+    encoder[lcio::ILDCellID0::module] = start_index + i*2 ;
     
     if (front) {
-      encoder[ILDCellID0::sensor] = 1 ;
+      encoder[lcio::ILDCellID0::sensor] = 1 ;
     }
     else{
-      encoder[ILDCellID0::sensor] = 3 ;
+      encoder[lcio::ILDCellID0::sensor] = 3 ;
     }
     
     module_ids.push_back(encoder.lowWord());
     
     if (front) {
-      encoder[ILDCellID0::sensor] = 2 ;
+      encoder[lcio::ILDCellID0::sensor] = 2 ;
     }
     else{
-      encoder[ILDCellID0::sensor] = 4 ;
+      encoder[lcio::ILDCellID0::sensor] = 4 ;
     }
     
     module_ids.push_back(encoder.lowWord());
@@ -147,7 +147,7 @@ void ILDFTDKalDetector::build_staggered_design() {
   
   std::string name = "FTD" ;
   
-  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   
   double z_of_last_disc = 0.0 ;
   
@@ -295,7 +295,7 @@ void ILDFTDKalDetector::build_tilted_design() {
   
   std::string name = "FTD" ;
   
-  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   
   
   double z_of_last_disc = 0.0 ;
@@ -334,15 +334,15 @@ void ILDFTDKalDetector::build_tilted_design() {
       
       encoder.reset() ;  // reset to 0
       
-      encoder[ILDCellID0::subdet] = ILDDetID::FTD ;
-      encoder[ILDCellID0::side] = 1 ;
-      encoder[ILDCellID0::layer]  = idisk ;
-      encoder[ILDCellID0::module] = ipet ;
-      encoder[ILDCellID0::sensor] = 0 ;
+      encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
+      encoder[lcio::ILDCellID0::side] = 1 ;
+      encoder[lcio::ILDCellID0::layer]  = idisk ;
+      encoder[lcio::ILDCellID0::module] = ipet ;
+      encoder[lcio::ILDCellID0::sensor] = 0 ;
       
       int CellID_FWD = encoder.lowWord() ;
       
-      encoder[ILDCellID0::side] = -1 ;
+      encoder[lcio::ILDCellID0::side] = -1 ;
       
       int CellID_BWD = encoder.lowWord() ;
       

@@ -38,7 +38,7 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
   
   std::string name = "FTD" ;
   
-  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   
   for (int idisk = 0; idisk < _nDisks; ++idisk) {
     
@@ -50,15 +50,15 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
     double supThickness = _FTDgeo[idisk].supThickness ;
     double zPos = _FTDgeo[idisk].zPos;
     
-    encoder[ILDCellID0::subdet] = ILDDetID::FTD ;
-    encoder[ILDCellID0::side] = 1 ;
-    encoder[ILDCellID0::layer]  = idisk ;
-    encoder[ILDCellID0::module] = 0 ;
-    encoder[ILDCellID0::sensor] = 0 ;
+    encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
+    encoder[lcio::ILDCellID0::side] = 1 ;
+    encoder[lcio::ILDCellID0::layer]  = idisk ;
+    encoder[lcio::ILDCellID0::module] = 0 ;
+    encoder[lcio::ILDCellID0::sensor] = 0 ;
     
     int CellID_FWD = encoder.lowWord() ;
     
-    encoder[ILDCellID0::side] = -1 ;
+    encoder[lcio::ILDCellID0::side] = -1 ;
     
     int CellID_BWD = encoder.lowWord() ;
     
@@ -133,11 +133,11 @@ void ILDFTDDiscBasedKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   
   _bZ = gearMgr.getBField().at( gear::Vector3D( 0.,0.,0.)  ).z() ;
   
-  const DoubleVec& FTD_si  =  pFTD.getDoubleVals("FTDDiskSiThickness" )  ;
-  const DoubleVec& FTD_sp  =  pFTD.getDoubleVals("FTDDiskSupportThickness" )  ;
-  const DoubleVec& FTD_ri  =  pFTD.getDoubleVals("FTDInnerRadius" )  ;
-  const DoubleVec& FTD_ro  =  pFTD.getDoubleVals("FTDOuterRadius" )  ;
-  const DoubleVec& FTD_z   =  pFTD.getDoubleVals("FTDZCoordinate" )  ;
+  const EVENT::DoubleVec& FTD_si  =  pFTD.getDoubleVals("FTDDiskSiThickness" )  ;
+  const EVENT::DoubleVec& FTD_sp  =  pFTD.getDoubleVals("FTDDiskSupportThickness" )  ;
+  const EVENT::DoubleVec& FTD_ri  =  pFTD.getDoubleVals("FTDInnerRadius" )  ;
+  const EVENT::DoubleVec& FTD_ro  =  pFTD.getDoubleVals("FTDOuterRadius" )  ;
+  const EVENT::DoubleVec& FTD_z   =  pFTD.getDoubleVals("FTDZCoordinate" )  ;
   
   _nDisks = FTD_si.size() ; 
   _FTDgeo.resize(_nDisks);

@@ -45,7 +45,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
   
   static const double eps = 1e-6; 
   
-  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   
   for (int layer=0; layer<_nLayers; ++layer) {
     
@@ -79,11 +79,11 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
       
       encoder.reset() ;  // reset to 0
       
-      encoder[ILDCellID0::subdet] = ILDDetID::SIT ;
-      encoder[ILDCellID0::side] = 0 ;
-      encoder[ILDCellID0::layer]  = layer ;
-      encoder[ILDCellID0::module] = ladder ;
-      encoder[ILDCellID0::sensor] = 0 ;
+      encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::SIT ;
+      encoder[lcio::ILDCellID0::side] = 0 ;
+      encoder[lcio::ILDCellID0::layer]  = layer ;
+      encoder[lcio::ILDCellID0::module] = ladder ;
+      encoder[lcio::ILDCellID0::sensor] = 0 ;
       
       int CellID = encoder.lowWord() ;
       

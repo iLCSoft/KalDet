@@ -24,10 +24,10 @@ _isMultiLayer(false)
 {
   _cellIDs.push_back(cellID);
 
-  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   encoder.setValue(cellID);
-  encoder[ILDCellID0::module] = 0;
-  encoder[ILDCellID0::sensor] = 0;
+  encoder[lcio::ILDCellID0::module] = 0;
+  encoder[lcio::ILDCellID0::sensor] = 0;
 
   _layerID = encoder.lowWord();
   
@@ -51,10 +51,10 @@ _isMultiLayer(true)
     streamlog_out(ERROR) << __FILE__ << " line " << __LINE__ << " size of cellIDs == 0" << std::endl;
   }
 
-  UTIL::BitField64 encoder( ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   encoder.setValue(cellIDs.at(0));
-  encoder[ILDCellID0::module] = 0;
-  encoder[ILDCellID0::sensor] = 0;
+  encoder[lcio::ILDCellID0::module] = 0;
+  encoder[lcio::ILDCellID0::sensor] = 0;
 
   _layerID = encoder.lowWord();
   
