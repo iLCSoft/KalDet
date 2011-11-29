@@ -90,6 +90,8 @@ TKalMatrix ILDPolygonBarrelMeasLayer::XvToMv(const TVector3 &xv) const
 TVector3 ILDPolygonBarrelMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
   
+  //SJA:FIXME: in order to use real local coordinates we would have to get the CELLID from the ILDPlanarHit, this would tell us in which segment the hit was in 
+  
   streamlog_out(ERROR) << "ILDPolygonBarrelMeasLayer::HitToXv Not implemented: exit(1) called from " << __FILE__ << "   line " << __LINE__ << std::endl; 
   exit(1);
 

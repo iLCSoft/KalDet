@@ -130,6 +130,8 @@ TVector3 ILDSegmentedDiscMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
   const ILDPlanarHit &mv = dynamic_cast<const ILDPlanarHit &>(vht);
   
+  //SJA:FIXME: in order to use real local coordinates we would have to get the CELLID from the ILDPlanarHit, this would tell us in which segment the hit was in 
+  
   double x =   mv(0,0) ;
   double y =   mv(1,0) ;
   
