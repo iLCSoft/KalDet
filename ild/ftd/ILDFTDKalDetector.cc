@@ -133,8 +133,8 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   sort_policy = fabs(z) ;
   if( z < 0 ) sort_policy += 1.0e-06 ;
   
-  streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of support at " << z << std::endl;
-  Add( new ILDSegmentedDiscMeasLayer(silicon, carbon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy));
+  streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of support at " << z << std::endl;
+  Add( new ILDSegmentedDiscMeasLayer(carbon, air, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy));
   
   
 }
