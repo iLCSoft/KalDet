@@ -123,6 +123,17 @@ void MaterialDataBase::createMaterials(){
   TMaterial &tpcgas = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
   this->addMaterial(&tpcgas, name);
   
+  // TPC Field Cage
+  A       = air.GetA()*0.97 + aluminium.GetA()*0.03 ; // SJA:FIXME just use this simple approximation for now
+  Z       = air.GetZ()*0.97 + aluminium.GetZ()*0.03 ; // SJA:FIXME just use this simple approximation for now 
+  density = 0.0738148 ;
+  radlen  =  489.736;
+  name    = "tpcfieldcage" ;
+  
+  TMaterial &tpcfieldcage = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
+  this->addMaterial(&tpcfieldcage, name);
+
+  
   
 }
 

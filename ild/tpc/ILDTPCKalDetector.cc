@@ -51,9 +51,10 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   static const Double_t inthick   =  tpcParams.getDoubleVal("tpcInnerWallThickness")  ;   // thickness of inner shell
   static const Double_t outthick  =  tpcParams.getDoubleVal("tpcOuterWallThickness")  ;   // thickness of outer shell
   
-  TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
-  TMaterial & tpcgas    = *MaterialDataBase::Instance().getMaterial("tpcgas");
-  TMaterial & aluminium = *MaterialDataBase::Instance().getMaterial("aluminium");
+  TMaterial & air          = *MaterialDataBase::Instance().getMaterial("air");
+  TMaterial & tpcgas       = *MaterialDataBase::Instance().getMaterial("tpcgas");
+  //  TMaterial & aluminium    = *MaterialDataBase::Instance().getMaterial("aluminium");
+  TMaterial & tpcfieldcage = *MaterialDataBase::Instance().getMaterial("tpcfieldcage");
   
   Bool_t active = true;
   Bool_t dummy  = false;
@@ -61,15 +62,18 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   std::string name = "TPC";
   
   // add inner field cage
-  Add( new ILDCylinderMeasLayer(air, aluminium , rtub, lhalf, bz, dummy ) );
+  Add( new ILDCylinderMeasLayer(air, tpcfieldcage , rtub, lhalf, bz, dummy ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub
-  << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
+  << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  tpcfieldcage.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(aluminium , tpcgas, rtub+inthick, lhalf, bz, dummy ) );
+  Add( new ILDCylinderMeasLayer(tpcfieldcage , tpcgas, rtub+inthick, lhalf, bz, dummy ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub+inthick
-  << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
+  << " X0_in = " << tpcfieldcage.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
   << std::endl ;  
+  
+  
+  streamlog_out( DEBUG0 )   << " *** Inner Field Cage =  " << int( (inthick/(tpcfieldcage.GetRadLength()*10.0) /*cm*/ )*1000) / 10.0  << "% of a radiation length " << std::endl ;  
   
   // create measurement layers
   Double_t r = rmin;
@@ -98,19 +102,25 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
       << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
       << std::endl ;  
     }
+    
     r += rstep;
+
   }
   
   // add outer field cage
-  Add( new ILDCylinderMeasLayer(tpcgas, aluminium, outerr-outthick, lhalf, bz, dummy) ) ;
+  Add( new ILDCylinderMeasLayer(tpcgas, tpcfieldcage, outerr-outthick, lhalf, bz, dummy) ) ;
+
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr-outthick
-  << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
+  << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcfieldcage.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(aluminium, air, outerr, lhalf, bz, dummy) ) ;
+  Add( new ILDCylinderMeasLayer(tpcfieldcage, air, outerr, lhalf, bz, dummy) ) ;
+
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr
-  << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
+  << " X0_in = " << tpcfieldcage.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
   << std::endl ;  
+  
+  streamlog_out( DEBUG0 )   << " *** Outer Field Cage =  " << int( (outthick/(tpcfieldcage.GetRadLength()*10.0) /*cm*/ )*1000) / 10.0  << "% of a radiation length " << std::endl ; 
   
   
   SetOwner();
