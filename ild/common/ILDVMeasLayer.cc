@@ -17,9 +17,8 @@ ILDVMeasLayer::ILDVMeasLayer(TMaterial &min,
                              Bool_t     is_active,
                              int        cellID ,
                              const Char_t    *name)  
-: TVMeasLayer(min, mout, is_active),
+: TVMeasLayer(min, mout, is_active, name),
 _Bz(Bz),
-_name(name),
 _isMultiLayer(false)
 {
   _cellIDs.push_back(cellID);
@@ -40,10 +39,9 @@ ILDVMeasLayer::ILDVMeasLayer(TMaterial &min,
                              const std::vector<int>& cellIDs,
                              Bool_t    is_active,
                              const Char_t    *name)
-: TVMeasLayer(min, mout, is_active),
+: TVMeasLayer(min, mout, is_active, name),
 _Bz(Bz),
 _cellIDs(cellIDs),
-_name(name),
 _isMultiLayer(true)
 {
   

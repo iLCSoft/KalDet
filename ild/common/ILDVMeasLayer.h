@@ -38,10 +38,7 @@ public:
   
   /** Get the number of Cell ID associated with this measurement layer */
   inline unsigned int getNCellIDs() const { return _cellIDs.size() ; }
-  
-  /** Get the Measurement Layers Name */
-  inline TString GetMLName() const { return _name;    }
-  
+    
   /** Get the Magnetic field at the measurement surface */
   inline Double_t GetBz() const { return _Bz; } 
   
@@ -73,7 +70,6 @@ protected:
   int _layerID ;
   std::vector<int> _cellIDs ;
 
-  TString  _name;      // layer name
   bool _isMultiLayer;
   
 private:

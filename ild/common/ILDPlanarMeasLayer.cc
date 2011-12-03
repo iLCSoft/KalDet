@@ -58,7 +58,7 @@ fXioffset(xioffset)
   << " xioffset = " << xioffset 
   << " is_active = " << is_active 
   << " CellID = " << CellID 
-  << " name = " << this->GetName()  
+  << " name = " << this->ILDVMeasLayer::GetName()  
   << std::endl ;
   
   
