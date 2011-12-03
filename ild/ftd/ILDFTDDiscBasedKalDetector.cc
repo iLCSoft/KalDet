@@ -38,11 +38,15 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
   
   std::string name = "FTD" ;
   
+  double eps1 = 1.0e-04 ; // disk  
+  double eps3 = 1.0e-06 ; // layer in disk 
+  double eps4 = 1.0e-08 ; // forward or backwards
+
+  
   UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   
   for (int idisk = 0; idisk < _nDisks; ++idisk) {
     
-    static const  Double_t eps = 1e-6;
     
     double rOuter = _FTDgeo[idisk].rOuter ;
     double rInner = _FTDgeo[idisk].rInner ;
@@ -80,13 +84,21 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
     TVector3 normal_fwd(sen_front_face_centre_fwd) ;    
     normal_fwd.SetMag(1.0) ;    
     
-    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_fwd, normal_fwd, _bZ, sen_front_face_centre_fwd.Z(), rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_fwd, normal_fwd, _bZ, measurement_plane_centre_fwd.Z(), rInner, rOuter, active, CellID_FWD ) );
+    double sort_policy = rOuter + eps1 * idisk ;
     
-    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_fwd, normal_fwd, _bZ, sen_rear_face_centre_fwd.Z(), rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_fwd, normal_fwd, _bZ, sup_rear_face_centre_fwd.Z(), rInner, rOuter, dummy ) );
+    sort_policy += eps3 * 1;
+    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_fwd, normal_fwd, _bZ, sort_policy, rInner, rOuter, dummy ) );
+    
+    sort_policy += eps3 * 2;
+    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_fwd, normal_fwd, _bZ, sort_policy, rInner, rOuter, active, CellID_FWD ) );
+
+    sort_policy += eps3 * 3;
+    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_fwd, normal_fwd, _bZ, sort_policy, rInner, rOuter, dummy ) );
+
+    sort_policy += eps3 * 4;
+    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_fwd, normal_fwd, _bZ, sort_policy, rInner, rOuter, dummy ) );
     
     
     // note the z position given in gear is actually the mid point (z) of the sensitive i.e. the z of the measurement plane
@@ -108,14 +120,19 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
     normal_bwd.SetMag(1.0) ;
     
     
+    sort_policy += eps4 ; // for backward 
     
-    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_bwd, normal_bwd, _bZ, fabs(sen_front_face_centre_bwd.Z())+eps, rInner, rOuter, dummy ) );
+    sort_policy += eps3 * 1;
+    Add(new ILDDiscMeasLayer( air, silicon, sen_front_face_centre_bwd, normal_bwd, _bZ, sort_policy, rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_bwd, normal_bwd, _bZ, fabs(measurement_plane_centre_bwd.Z())+eps, rInner, rOuter, active, CellID_BWD ) );
+    sort_policy += eps3 * 2;
+    Add(new ILDDiscMeasLayer( silicon, silicon, measurement_plane_centre_bwd, normal_bwd, _bZ, sort_policy, rInner, rOuter, active, CellID_BWD ) );
     
-    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_bwd, normal_bwd, _bZ, fabs(sen_rear_face_centre_bwd.Z())+eps, rInner, rOuter, dummy ) );
+    sort_policy += eps3 * 3;
+    Add(new ILDDiscMeasLayer( silicon, carbon, sen_rear_face_centre_bwd, normal_bwd, _bZ, sort_policy, rInner, rOuter, dummy ) );
     
-    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_bwd, normal_bwd, _bZ, fabs(sup_rear_face_centre_bwd.Z())+eps, rInner, rOuter, dummy ) );
+    sort_policy += eps3 * 4;
+    Add(new ILDDiscMeasLayer( carbon, air, sup_rear_face_centre_bwd, normal_bwd, _bZ, sort_policy, rInner, rOuter, dummy ) );
     
     
   }
