@@ -62,12 +62,12 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   std::string name = "TPC";
   
   // add inner field cage
-  Add( new ILDCylinderMeasLayer(air, tpcfieldcage , rtub, lhalf, bz, dummy ) );
+  Add( new ILDCylinderMeasLayer(air, tpcfieldcage , rtub, lhalf, bz, dummy,-1,"TPCInnerFCInr" ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub
   << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  tpcfieldcage.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(tpcfieldcage , tpcgas, rtub+inthick, lhalf, bz, dummy ) );
+  Add( new ILDCylinderMeasLayer(tpcfieldcage , tpcgas, rtub+inthick, lhalf, bz, dummy,-1,"TPCInnerFCOtr" ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub+inthick
   << " X0_in = " << tpcfieldcage.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
   << std::endl ;  
@@ -89,7 +89,7 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
     
     int CellID = encoder.lowWord() ;
     
-    ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, CellID, "TPC") ;
+    ILDCylinderMeasLayer* tpcL =  new ILDCylinderMeasLayer(tpcgas, tpcgas, r, lhalf, bz, active, CellID, "TPCMeasLayer") ;
     
     Add( tpcL ) ;  
     
@@ -108,13 +108,13 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   }
   
   // add outer field cage
-  Add( new ILDCylinderMeasLayer(tpcgas, tpcfieldcage, outerr-outthick, lhalf, bz, dummy) ) ;
+  Add( new ILDCylinderMeasLayer(tpcgas, tpcfieldcage, outerr-outthick, lhalf, bz, dummy,-1,"TPCOuterFCInr") ) ;
 
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr-outthick
   << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcfieldcage.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(tpcfieldcage, air, outerr, lhalf, bz, dummy) ) ;
+  Add( new ILDCylinderMeasLayer(tpcfieldcage, air, outerr, lhalf, bz, dummy,-1,"TPCOuterFCOtr") ) ;
 
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr
   << " X0_in = " << tpcfieldcage.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    

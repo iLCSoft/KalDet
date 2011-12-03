@@ -34,7 +34,6 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
   TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon");
   
-  
   this->setupGearGeom(gearMgr) ;
   
   //--The Ladder structure (realistic ladder)--
@@ -100,16 +99,16 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
         double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+3) * eps ;
         
         // air - sensitive boundary
-        Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy)) ;
+        Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy,-1,"SITSenFront")) ;
         
         // measurement plane defined as the middle of the sensitive volume 
-        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, CellID, "SIT" )) ;
+        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, CellID, "SITMeaslayer" )) ;
         
         // sensitive - support boundary 
-        Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ; 
+        Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy,-1,"SITSenSupportIntf" )) ; 
         
         // support - air boundary
-        Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, dummy )) ; 
+        Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, dummy,-1,"SITSupRear" )) ; 
       }
       else {
         
@@ -119,16 +118,16 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
         double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+3) * eps ;
         
         // air - support boundary
-        Add(new ILDParallelPlanarMeasLayer(air, carbon, ladder_distance, currPhi, _bZ, sup_front_sorting_policy, width, length, offset, dummy)) ;
+        Add(new ILDParallelPlanarMeasLayer(air, carbon, ladder_distance, currPhi, _bZ, sup_front_sorting_policy, width, length, offset, dummy,-1,"SITSupFront")) ;
         
         // support boundary - sensitive
-        Add(new ILDParallelPlanarMeasLayer(carbon, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy )) ; 
+        Add(new ILDParallelPlanarMeasLayer(carbon, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy,-1,"SITSenSupportIntf" )) ; 
         
         // measurement plane defined as the middle of the sensitive volume 
-        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, CellID, "SIT" )) ;
+        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, CellID, "SITMeaslayer" )) ;
         
         // support - air boundary
-        Add(new ILDParallelPlanarMeasLayer(silicon, air, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy )) ;  
+        Add(new ILDParallelPlanarMeasLayer(silicon, air, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy,-1,"SITSenRear" )) ;  
       }
       
       

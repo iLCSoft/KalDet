@@ -45,12 +45,12 @@ TVKalDetector(10)
   std::string name = "Support";
   
   // add beam pipe
-  Add( new ILDCylinderMeasLayer(beam, aluminium , rtub, halfZ, bz, dummy ) );
+  Add( new ILDCylinderMeasLayer(beam, aluminium , rtub, halfZ, bz, dummy,-1,"BeamPipeInr" ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub
   << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(aluminium , air, rtub+thickness, halfZ, bz, dummy ) );
+  Add( new ILDCylinderMeasLayer(aluminium , air, rtub+thickness, halfZ, bz, dummy,-1,"BeamPipeOtr"  ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub+thickness
   << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
   << std::endl ;  
@@ -59,7 +59,7 @@ TVKalDetector(10)
   // add vacuum layer 1mm inside the beam pipe to assist propagation to the IP
   const Double_t rvacuum = rtub - 1.0; 
   
-  _ipLayer = new ILDCylinderMeasLayer(beam, beam , rvacuum , halfZ, bz, dummy );
+  _ipLayer = new ILDCylinderMeasLayer(beam, beam , rvacuum , halfZ, bz, dummy,-1,"IPLayer" );
   
   Add( _ipLayer );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub
