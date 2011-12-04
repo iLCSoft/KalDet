@@ -40,13 +40,21 @@ public:
   inline unsigned int getNCellIDs() const { return _cellIDs.size() ; }
     
   /** Get the Magnetic field at the measurement surface */
-  inline Double_t GetBz() const { return _Bz; } 
+  inline Double_t GetBz() const { return _Bz; }
   
   /** Convert LCIO Tracker Hit to an ILDPLanarTrackHit  */
   virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const = 0 ;
   
   /** Check whether the measurement layer represents a series of detector elements */
-  bool isMultilayer() { return _isMultiLayer; } 
+  bool isMultilayer() const { return _isMultiLayer; } 
+  
+  /** Get the intersection and the CellID, needed for multilayers */
+  virtual int getIntersectionAndCellID(const TVTrack  &hel,
+                               TVector3 &xx,
+                               Double_t &phi,
+                               Int_t    &CellID,
+                               Int_t     mode,
+                               Double_t  eps = 1.e-8) const = 0 ; 
   
 protected:
   

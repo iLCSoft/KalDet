@@ -63,6 +63,21 @@ public:
   /** Get sorting policy for this plane  */
   Double_t GetSortingPolicy() const { return _sortingPolicy; }
   
+  /** Get the intersection and the CellID, needed for multilayers */
+  virtual int getIntersectionAndCellID(const TVTrack  &hel,
+                                       TVector3 &xx,
+                                       Double_t &phi,
+                                       Int_t    &CellID,
+                                       Int_t     mode,
+                                       Double_t  eps = 1.e-8) const {
+    
+    CellID = this->getCellIDs()[0]; // not multilayer
+    return this->CalcXingPointWith(hel,xx,phi,0,eps);
+    
+  }
+
+  
+  
 private:
   Double_t _sortingPolicy ;
   Double_t _signZ ;

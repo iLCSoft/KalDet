@@ -2,6 +2,9 @@
 #include "ILDSegmentedDiscMeasLayer.h"
 #include "ILDPlanarHit.h"
 
+#include <UTIL/BitField64.h>
+#include <UTIL/ILDConf.h>
+
 #include "TVTrack.h"
 #include "TVector3.h"
 #include "TMath.h"
@@ -347,6 +350,46 @@ ILDVTrackHit* ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* t
   return hit_on_surface ? new ILDPlanarHit( *this , x, dx, this->GetBz()) : NULL; 
   
 }
+
+
+/** Get the intersection and the CellID, needed for multilayers */
+int ILDSegmentedDiscMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
+                                     TVector3 &xx,
+                                     Double_t &phi,
+                                     Int_t    &CellID,
+                                     Int_t     mode,
+                                     Double_t  eps) const {
+  
+  
+  int error_code = this->CalcXingPointWith(hel, xx, phi, mode, eps);
+  
+  if ( error_code != 0 ) {
+    return error_code;
+  }
+  
+  unsigned int segment = this->get_segment_index( xx.Phi() );
+  
+  lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
+  bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
+
+  bf[lcio::ILDCellID0::module] = segment;
+  CellID = bf.lowWord();
+  
+//  // now set the Cell ID using the sensor index 
+//  std::cout << "ILDSegmentedDiscMeasLayer::getIntersectionAndCellID NOTIMPLEMENTED " << __FILE__ << std::endl;  
+//  exit(1);
+
+  return error_code;
+  
+}
+
+unsigned int ILDSegmentedDiscMeasLayer::get_segment_index(double phi) const {
+  
+  phi = angular_range_2PI(phi-_start_phi);
+  return (floor(phi/_segment_dphi));
+  
+}
+
 
 double ILDSegmentedDiscMeasLayer::angular_range_2PI( double phi ) const {
   

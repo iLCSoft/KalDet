@@ -2,6 +2,8 @@
 #include "ILDPolygonBarrelMeasLayer.h"
 #include "ILDPlanarHit.h"
 
+#include <UTIL/BitField64.h>
+#include <UTIL/ILDConf.h>
 
 #include "TVTrack.h"
 #include "TVector3.h"
@@ -65,13 +67,6 @@ _r0(r0),_lhalf(lhalf),_nsides(nsides),_zpos(zpos),_phi0(phi0)
   
   _enclosing_cylinder = new  TCylinder(_rmax, lhalf, 0., 0., 0.);
   
-  // now check for constistency
-
-
-//  if( true ) {
-//    streamlog_out(ERROR) << "ILDPolygonBarrelMeasLayer::ILDPolygonBarrelMeasLayer trapezoids overlaps: exit(1) called from " << __FILE__ << "   line " << __LINE__ << std::endl; 
-//    exit(1);
-//  }
   
 }
 
@@ -105,6 +100,8 @@ void ILDPolygonBarrelMeasLayer::CalcDhDa(const TVTrackHit &vht,
                                          TKalMatrix &H)  const
 {
 
+    //SJA:FIXME: in order to use real local coordinates we would have to get the CELLID from the ILDPlanarHit, this would tell us in which segment the hit was in 
+  
   streamlog_out(ERROR) << "ILDPolygonBarrelMeasLayer::CalcDhDa Not implemented: exit(1) called from " << __FILE__ << "   line " << __LINE__ << std::endl; 
   exit(1);
   
@@ -166,9 +163,41 @@ TMatrixD ILDPolygonBarrelMeasLayer::CalcDSDx(const TVector3 &xx) const {
   
 }
 
-int ILDPolygonBarrelMeasLayer::get_plane_index(double phi) const {
+/** Get the intersection and the CellID, needed for multilayers */
+int ILDPolygonBarrelMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
+                                                        TVector3 &xx,
+                                                        Double_t &phi,
+                                                        Int_t    &CellID,
+                                                        Int_t     mode,
+                                                        Double_t  eps) const {
+  
+  
+  int error_code = this->CalcXingPointWith(hel, xx, phi, mode, eps);
+  
+  if ( error_code != 0 ) {
+    return error_code;
+  }
+  
+  unsigned int plane = this->get_plane_index( xx.Phi() );
+  
+  lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
+  bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
+  
+  bf[lcio::ILDCellID0::module] = plane;
+  CellID = bf.lowWord();
+  
+  //  // now set the Cell ID using the sensor index 
+  //  std::cout << "ILDSegmentedDiscMeasLayer::getIntersectionAndCellID NOTIMPLEMENTED " << __FILE__ << std::endl;  
+  //  exit(1);
+  
+  return error_code;
+  
+}
 
-  phi = angular_range_2PI(phi);
+
+unsigned int ILDPolygonBarrelMeasLayer::get_plane_index(double phi) const {
+
+  phi = angular_range_2PI(phi-_start_phi);
   return (floor(phi/_segment_dphi));
   
 }

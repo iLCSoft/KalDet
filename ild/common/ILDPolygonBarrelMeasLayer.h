@@ -86,8 +86,18 @@ public:
                                      Double_t  eps = 1.e-8) const{
     
     return CalcXingPointWith(hel,xx,phi,0,eps);
-    
+  
   }
+  
+
+  /** Get the intersection and the CellID, needed for multilayers */
+  virtual int getIntersectionAndCellID(const TVTrack  &hel,
+                                       TVector3 &xx,
+                                       Double_t &phi,
+                                       Int_t    &CellID,
+                                       Int_t     mode,
+                                       Double_t  eps = 1.e-8) const ;
+
   
   bool IsOutside(const TVector3 &xx) const;
   
@@ -105,7 +115,7 @@ private:
   
   double angular_range_2PI( double phi ) const;
   
-  int    get_plane_index(double phi) const;
+  unsigned int    get_plane_index(double phi) const;
   
   double _sortingPolicy;
 

@@ -16,6 +16,7 @@
 #include "KalTrackDim.h"
 #include "TMath.h"
 #include <sstream>
+#include <iostream>
 
 #include <vector>
 
@@ -95,6 +96,18 @@ public:
     
   }
   
+  
+  
+  /** Get the intersection and the CellID, needed for multilayers */
+  virtual int getIntersectionAndCellID(const TVTrack  &hel,
+                                       TVector3 &xx,
+                                       Double_t &phi,
+                                       Int_t    &CellID,
+                                       Int_t     mode,
+                                       Double_t  eps = 1.e-8) const ;
+
+  
+  
   /** Check if global point is on surface  */
   inline virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
   
@@ -104,6 +117,7 @@ public:
 private:
   
   double angular_range_2PI( double phi ) const;
+  unsigned int    get_segment_index(double phi) const;
   
   double _sortingPolicy;
   int    _nsegments;
