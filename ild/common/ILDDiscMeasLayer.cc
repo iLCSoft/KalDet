@@ -14,7 +14,7 @@
 
 #include <EVENT/TrackerHitPlane.h>
 
-#include "gearimpl/vector3D.h"
+#include "gearimpl/Vector3D.h"
 
 #include "streamlog/streamlog.h"
 
