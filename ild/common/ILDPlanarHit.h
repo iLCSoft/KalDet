@@ -10,8 +10,6 @@
 
 #include "ILDVTrackHit.h"
 
-#include "ILDPlanarMeasLayer.h"
-
 
 class ILDPlanarHit : public ILDVTrackHit {
   

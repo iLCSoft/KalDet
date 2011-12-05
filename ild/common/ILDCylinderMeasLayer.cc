@@ -6,10 +6,8 @@
 
 #include "TKalTrack.h" 
 
-#include "ILDVTrackHit.h"
 #include "ILDCylinderMeasLayer.h"
 #include "ILDCylinderHit.h"
-
 
 #include <lcio.h>
 #include <EVENT/TrackerHit.h>
@@ -54,10 +52,9 @@ TKalMatrix ILDCylinderMeasLayer::XvToMv(const TVector3 &xv) const
 
 TVector3 ILDCylinderMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
-  const ILDCylinderHit &ht = dynamic_cast<const ILDCylinderHit &>(vht) ;
   
-  Double_t phi = ht(0, 0) / GetR() ;
-  Double_t z   = ht(1, 0);
+  Double_t phi = vht(0, 0) / GetR() ;
+  Double_t z   = vht(1, 0);
   
   // account for cylinder not centered at x=0.0, y=0.0
   Double_t x   = GetR() * TMath::Cos(phi) + GetXc().X();

@@ -22,29 +22,7 @@ using namespace std;
 TKalMatrix ILDPlanarHit::XvToMv(const TVector3 &xv, Double_t /*t0*/) const
 {
   
-  // SJA:FIXME the dynamic_cast should be checked in the constructor and then a static cast could be used 
-  
-  if ( dynamic_cast<const ILDPlanarMeasLayer*>(&(this->GetMeasLayer())) ) {
-    
-    return static_cast<const ILDPlanarMeasLayer &>(this->GetMeasLayer()).XvToMv(xv); 
-    
-  }
-  else if ( dynamic_cast<const ILDSegmentedDiscMeasLayer*>(&(this->GetMeasLayer())) ) {
-    
-    return static_cast<const ILDSegmentedDiscMeasLayer &>(this->GetMeasLayer()).XvToMv(xv); 
-    
-  }
-  else if ( dynamic_cast<const ILDDiscMeasLayer*>(&(this->GetMeasLayer())) ) {
-    
-    return static_cast<const ILDDiscMeasLayer &>(this->GetMeasLayer()).XvToMv(xv); 
-    
-  }
-  else {
-    cerr << "<<<<<<<<< ILDPlanarHit::XvToMv: dynamic_cast failed for measurement layer exit(1) >>>>>>>" << std::endl;
-    exit(1) ;
-  }
-  
-  
+  return this->GetMeasLayer().XvToMv(*(this),xv);
   
 }
 

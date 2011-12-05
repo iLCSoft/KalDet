@@ -74,12 +74,12 @@ TKalMatrix ILDRotatedTrapMeaslayer::XvToMv(const TVector3 &xv) const
 
 TVector3 ILDRotatedTrapMeaslayer::HitToXv(const TVTrackHit &vht) const
 {
-  const ILDPlanarHit &mv = dynamic_cast<const ILDPlanarHit &>(vht);
+  //  const ILDPlanarHit &mv = dynamic_cast<const ILDPlanarHit &>(vht);
   
-  Double_t x =   mv(1,0) * _cosPhi  - _signZ * _cosAlpha * mv(0,0) * _sinPhi  ;
-  Double_t y =   mv(1,0) * _sinPhi  + _signZ * _cosAlpha * mv(0,0) * _cosPhi  ;
+  Double_t x =   vht(1,0) * _cosPhi  - _signZ * _cosAlpha * vht(0,0) * _sinPhi  ;
+  Double_t y =   vht(1,0) * _sinPhi  + _signZ * _cosAlpha * vht(0,0) * _cosPhi  ;
   
-  Double_t z = GetXc().Z() + _signZ * mv(0,0) * _sinAlpha;
+  Double_t z = GetXc().Z() + _signZ * vht(0,0) * _sinAlpha;
   
   return TVector3(x,y,z);
 }

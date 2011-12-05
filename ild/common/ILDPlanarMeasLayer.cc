@@ -90,11 +90,12 @@ TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVTrackHit &,
 
 TVector3 ILDPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
-  const ILDPlanarHit &ht = dynamic_cast<const ILDPlanarHit &>(vht);
+ 
+  //const ILDPlanarHit &ht = dynamic_cast<const ILDPlanarHit &>(vht);
   
-  Double_t z =  ht(1,0);
-  Double_t x = -ht(0,0)*GetNormal().Y()/GetNormal().Perp() + GetXc().X();
-  Double_t y =  ht(0,0)*GetNormal().X()/GetNormal().Perp() + GetXc().Y();
+  Double_t z =  vht(1,0);
+  Double_t x = -vht(0,0)*GetNormal().Y()/GetNormal().Perp() + GetXc().X();
+  Double_t y =  vht(0,0)*GetNormal().X()/GetNormal().Perp() + GetXc().Y();
   
   return TVector3(x,y,z);
 }

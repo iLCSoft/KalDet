@@ -35,10 +35,10 @@ TKalMatrix ILDDiscMeasLayer::XvToMv(const TVector3 &xv) const
 
 TVector3 ILDDiscMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
-  const ILDPlanarHit &mv = dynamic_cast<const ILDPlanarHit &>(vht);
+  //  const ILDPlanarHit &mv = dynamic_cast<const ILDPlanarHit &>(vht);
   
-  double x =   mv(0,0) ;
-  double y =   mv(1,0) ;
+  double x =   vht(0,0) ;
+  double y =   vht(1,0) ;
   
   double z = GetXc().Z() ;
   

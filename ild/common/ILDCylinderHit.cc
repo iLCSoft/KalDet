@@ -25,28 +25,8 @@ using std::resetiosflags;
 TKalMatrix ILDCylinderHit::XvToMv(const TVector3 &xv, Double_t t0) const
 {
   
-  // SJA:FIXME the dynamic_cast should be checked in the constructor and then a static cast could be used 
+  return this->GetMeasLayer().XvToMv(*(this), xv);
   
-  
-  const ILDCylinderMeasLayer &ms
-  = dynamic_cast<const ILDCylinderMeasLayer &>(this->GetMeasLayer());
-  
-  
-  TKalMatrix h    = ms.XvToMv(*this, xv); 
-  Double_t   r    = ms.GetR();
-  Double_t   phih = h(0, 0) / r;
-  Double_t   phim = (*this)(0, 0) / r;
-  Double_t   dphi = phih - phim;
-  
-  static Double_t kPi    = TMath::Pi();
-  static Double_t kTwoPi = 2 * kPi;
-  
-  while (dphi < -kPi) dphi += kTwoPi;
-  while (dphi >  kPi) dphi -= kTwoPi;
-  
-  h(0, 0)  = r * (phim + dphi);
-  
-  return h;
 }
 
 /** Print Debug information */

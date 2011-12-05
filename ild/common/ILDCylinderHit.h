@@ -8,7 +8,6 @@
 
 #include "kaltest/KalTrackDim.h"
 #include "ILDVTrackHit.h"
-#include "ILDCylinderMeasLayer.h"
 
 
 class ILDCylinderHit : public ILDVTrackHit {
