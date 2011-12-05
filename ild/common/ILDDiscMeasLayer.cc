@@ -14,6 +14,8 @@
 
 #include <EVENT/TrackerHitPlane.h>
 
+#include "gearimpl/vector3D.h"
+
 #include "streamlog/streamlog.h"
 
 
@@ -108,6 +110,25 @@ ILDVTrackHit* ILDDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) co
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
   
   if( plane_hit == NULL )  return NULL; // SJA:FIXME: should be replaced with an exception  
+  
+  gear::Vector3D U(1.0,plane_hit->getU()[1],plane_hit->getU()[0],gear::Vector3D::spherical);
+  gear::Vector3D V(1.0,plane_hit->getV()[1],plane_hit->getV()[0],gear::Vector3D::spherical);
+  gear::Vector3D X(1.0,0.0,0.0);
+  gear::Vector3D Y(0.0,1.0,0.0);
+  
+  const float eps = 1.0e-07;
+  // U must be the global X axis 
+  if( fabs(1.0 - U.dot(X)) > eps ) {
+    streamlog_out(ERROR) << "ILDDiscMeasLayer: TrackerHitPlane measurment vectors U is not equal to the global X axis. \n\n exit(1) called from file " << __FILE__ << " and line " << __LINE__ << std::endl;
+    exit(1);
+  }
+  
+  // V must be the global X axis 
+  if( fabs(1.0 - V.dot(Y)) > eps ) {
+    streamlog_out(ERROR) << "ILDDiscMeasLayer: TrackerHitPlane measurment vectors V is not equal to the global Y axis. \n\n exit(1) called from file " << __FILE__ << " and line " << __LINE__ << std::endl;
+    exit(1);
+  }
+  
   
   const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
   

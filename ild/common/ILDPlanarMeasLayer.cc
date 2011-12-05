@@ -13,6 +13,7 @@
 //*************************************************************************
 //
 #include <iostream>
+#include <cmath>
 
 #include "ILDPlanarMeasLayer.h"
 #include "ILDPlanarHit.h"
@@ -24,6 +25,8 @@
 #include "TBRIK.h"
 #include "TNode.h"
 #include "TString.h"
+
+#include "gearimpl/Vector3D.h"
 
 #include <EVENT/TrackerHitPlane.h>
 
@@ -188,7 +191,24 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
   
   if( plane_hit == NULL )  return NULL; // SJA:FIXME: should be replaced with an exception  
+
+  gear::Vector3D U(1.0,plane_hit->getU()[1],plane_hit->getU()[0],gear::Vector3D::spherical);
+  gear::Vector3D V(1.0,plane_hit->getV()[1],plane_hit->getV()[0],gear::Vector3D::spherical);
+  gear::Vector3D Z(0.0,0.0,1.0);
   
+  const float eps = 1.0e-07;
+  // U must be the global z axis 
+  if( fabs(1.0 - V.dot(Z)) > eps ) {
+    streamlog_out(ERROR) << "ILDPlanarMeasLayer: TrackerHitPlane measurment vectors V is not equal to the global Z axis. \n\n exit(1) called from file " << __FILE__ << " and line " << __LINE__ << std::endl;
+    exit(1);
+  }
+  
+  if( fabs(U.dot(Z)) > eps ) {
+    streamlog_out(ERROR) << "ILDPlanarMeasLayer: TrackerHitPlane measurment vectors U is not in the global X-Y plane. \n\n exit(1) called from file " << __FILE__ << " and line " << __LINE__ << std::endl;
+    exit(1);
+  }
+
+  // remember here the "position" of the hit in fact defines the origin of the plane it defines so u and v are per definition 0. 
   const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
   
   // convert to layer coordinates       
