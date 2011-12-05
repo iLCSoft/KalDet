@@ -64,7 +64,7 @@ public:
   }
   
   
-private:
+protected:
   
   Double_t _r;
   Double_t _phi;

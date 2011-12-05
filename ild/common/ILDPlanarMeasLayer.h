@@ -69,7 +69,7 @@ public:
   Double_t GetZetawidth() const { return fZetawidth; }
   Double_t GetXioffset() const { return fXioffset; }
   
-private:
+protected:
   Double_t fSortingPolicy;
   Double_t fXiwidth;
   Double_t fZetawidth;
