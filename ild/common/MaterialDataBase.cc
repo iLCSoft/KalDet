@@ -106,12 +106,22 @@ void MaterialDataBase::createMaterials(){
   A       = 26.9815 ;
   Z       = 13.0 ;
   density = 2.699 ; // g/cm^3
-  radlen  = 24.01 ;   // cm 
+  radlen  = 8.9 ;   // cm 
   name    = "aluminium" ;
   
   TMaterial &aluminium = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.) ;
   this->addMaterial(&aluminium, name);
+
+  // Beryllium
+  A       = 9.012 ;
+  Z       = 4.0 ;
+  density = 1.85 ; // g/cm^3
+  radlen  = 35.28 ;   // cm 
+  name    = "beryllium" ;
   
+  TMaterial &beryllium = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.) ;
+  this->addMaterial(&beryllium, name);
+
   
   // TPC Gas
   A       = 39.948*0.9+(12.011*0.2+1.00794*0.8)*0.1;

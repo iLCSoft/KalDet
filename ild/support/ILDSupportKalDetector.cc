@@ -38,21 +38,22 @@ TVKalDetector(10)
   
   TMaterial & beam      = *MaterialDataBase::Instance().getMaterial("beam");
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
-  TMaterial & aluminium = *MaterialDataBase::Instance().getMaterial("aluminium");
+  //  TMaterial & aluminium = *MaterialDataBase::Instance().getMaterial("aluminium");
+  TMaterial & beryllium = *MaterialDataBase::Instance().getMaterial("beryllium");
   
   Bool_t dummy  = false;
   
   std::string name = "Support";
   
   // add beam pipe
-  Add( new ILDCylinderMeasLayer(beam, aluminium , rtub, halfZ, bz, dummy,-1,"BeamPipeInr" ) );
+  Add( new ILDCylinderMeasLayer(beam, beryllium , rtub, halfZ, bz, dummy,-1,"BeamPipeInr" ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub
-  << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
+  << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  beryllium.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(aluminium , air, rtub+thickness, halfZ, bz, dummy,-1,"BeamPipeOtr"  ) );
+  Add( new ILDCylinderMeasLayer(beryllium , air, rtub+thickness, halfZ, bz, dummy,-1,"BeamPipeOtr"  ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub+thickness
-  << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
+  << " X0_in = " << beryllium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
   << std::endl ;  
   
   
@@ -63,7 +64,7 @@ TVKalDetector(10)
   
   Add( _ipLayer );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ beampipe ] at R = " << rtub
-  << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()    
+  << " X0_in = " << beam.GetRadLength() << "  X0_out = " <<  beam.GetRadLength()    
   << std::endl ;  
   
   
