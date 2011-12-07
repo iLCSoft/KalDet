@@ -77,6 +77,26 @@ make install
 
 
  --------
+| v01-03 |  
+ -------- 
+
+    ILD: 
+ 	- Multilayer measurement layers added, which allow a single kaltest layer to represent numbers detector layers. 
+	- Added names to support measurement layers
+	- ILDParallelStripPlanarMeasLayer and ILDPlanarStripHit First shot at 1-D strip hits. 
+	  Only measurements purely in the transverse plane are implemeted so far.
+	- ILDVMeasLayer Name attribute moved up to TVMeasLayer in KalTest, added new method getIntersectionAndCellID. 
+          This enables multilayers to efficiently return the crossing point and cellID of the intersected sub layer.
+        - ILDSupportKalDetector added calo face to support detector, added beryllium and corrected rad length of aluminium
+	- ILDVXDKalDetector corrected calculation of overlap region
+	- ILDSITKalDetector added support for double layer SIT with layers facing away from the IP
+	- ILDTPCKalDetector corrected TPC field cage for new TPC10.cc from Mokka
+	- ILDFTDKalDetector corrected sign issue and corrected sortpolicy, fixed bug in material, carbon vs air, corrected measurement layer order
+	- ILDSegmentedDiscMeasLayer Added segmented disc needed for FTD
+        - Removed unnecessary casting
+
+
+ --------
 | v01-02 |  
  -------- 
 
