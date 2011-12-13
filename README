@@ -75,6 +75,13 @@ make install
 
 =====================================================================================
 
+ --------
+| v01-04 |  
+ -------- 
+
+
+ 	-  added pointer to EVENT::TrackerHit in ILDVTrackHit to for better navigation between kaldet and lcio
+	-  corrected ecal barrel length in support detector
 
  --------
 | v01-03 |  
