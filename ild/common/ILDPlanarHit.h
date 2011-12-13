@@ -19,8 +19,9 @@ public:
   ILDPlanarHit(const TVMeasLayer &ms,
                Double_t       *x,
                Double_t       *dx,
-               Double_t        bfield) 
-  : ILDVTrackHit(ms, x, dx, bfield, 2)
+               Double_t        bfield,
+               EVENT::TrackerHit* trkhit) 
+  : ILDVTrackHit(ms, x, dx, bfield, 2,trkhit)
   { /* no op */ } 
   
   // TVTrackHit's pure virtuals that must be implemented

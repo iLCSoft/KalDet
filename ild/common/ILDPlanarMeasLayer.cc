@@ -239,7 +239,7 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   << " onSurface = " << hit_on_surface
   << std::endl ;
   
-  return hit_on_surface ? new ILDPlanarHit( *this , x, dx, this->GetBz()) : NULL; 
+  return hit_on_surface ? new ILDPlanarHit( *this , x, dx, this->GetBz(), trkhit) : NULL; 
   
   
 }
