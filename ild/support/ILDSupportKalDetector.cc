@@ -101,8 +101,9 @@ TVKalDetector(10)
 
     double segment_dphi = 2.0*M_PI / 8; 
     double phi = i*segment_dphi+phi0;
-    double width = 2*(r_min_ecal_bar*tan(segment_dphi*0.5));
-    Add ( new ILDParallelPlanarMeasLayer(air,air,r_min_ecal_bar,phi,bz,r_min_ecal_bar+i*1.0e-06,width,z_max_ecal_bar,0.0,true,encoder.lowWord(),"ECalBarrelFace"));    
+    double width = 2.0*(r_min_ecal_bar*tan(segment_dphi*0.5));
+    double length = 2.0*z_max_ecal_bar;
+    Add ( new ILDParallelPlanarMeasLayer(air,air,r_min_ecal_bar,phi,bz,r_min_ecal_bar+i*1.0e-06,width,length,0.0,true,encoder.lowWord(),"ECalBarrelFace"));    
     
   }
   
