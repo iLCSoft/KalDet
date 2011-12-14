@@ -118,7 +118,7 @@ ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
   << std::endl ;
   
   
-  return hit_on_surface ? new ILDPlanarStripHit( *this , x, dx, this->GetBz()) : NULL; 
+  return hit_on_surface ? new ILDPlanarStripHit( *this , x, dx, this->GetBz(),trkhit) : NULL; 
   
   
 }
