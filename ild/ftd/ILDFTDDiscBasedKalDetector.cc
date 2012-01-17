@@ -11,7 +11,6 @@
 #include "gearimpl/Util.h"
 #include "gear/FTDLayerLayout.h"
 
-#include "ILDPlanarHit.h"
 #include "ILDDiscMeasLayer.h"
 
 #include <UTIL/BitField64.h>
