@@ -11,6 +11,7 @@
 
 #include <lcio.h>
 #include <EVENT/TrackerHit.h>
+#include <EVENT/TrackerHitZCylinder.h>
 
 #include "streamlog/streamlog.h"
 
@@ -110,8 +111,13 @@ void ILDCylinderMeasLayer::CalcDhDa(const TVTrackHit &vht, // tracker hit not us
 
 ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
-  
+  if ( ! trkhit) {
+    streamlog_out(ERROR) << "ILDCylinderMeasLayer::ConvertLCIOTrkHit trkhit pointer is NULL" << std::endl;
+    return NULL;
+  }
+
   const TVector3 hit( trkhit->getPosition()[0], trkhit->getPosition()[1], trkhit->getPosition()[2]) ;
+  //SJA:FIXME: this assumes that the cylinder is centred at 0,0
   
   // convert to layer coordinates       
   TKalMatrix h    = this->XvToMv(hit);
@@ -122,10 +128,21 @@ ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit
   x[0] = h(0, 0);
   x[1] = h(1, 0);
   
-  // convert errors
-  dx[0] = sqrt(trkhit->getCovMatrix()[0] + trkhit->getCovMatrix()[2]) ;
-  dx[1] = sqrt(trkhit->getCovMatrix()[5]) ; 
   
+  EVENT::TrackerHitZCylinder* cylinder_hit = dynamic_cast<EVENT::TrackerHitZCylinder*>( trkhit ) ;
+  
+  if(cylinder_hit){
+    // convert errors
+    dx[0] = cylinder_hit->getdRPhi();
+    dx[1] = cylinder_hit->getdZ();
+  }
+  else {
+    // convert errors
+    dx[0] = sqrt(trkhit->getCovMatrix()[0] + trkhit->getCovMatrix()[2]) ;
+    dx[1] = sqrt(trkhit->getCovMatrix()[5]) ; 
+  }
+  
+    
   bool hit_on_surface = IsOnSurface(hit);
   
   streamlog_out(DEBUG0) << "ILDCylinderMeasLayer::ConvertLCIOTrkHit ILDCylinderHit created" 
