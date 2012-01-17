@@ -60,6 +60,14 @@ public:
                                 const TKalMatrix &dxphiada,
                                 TKalMatrix &H)  const;
   
+  
+  virtual Int_t CalcXingPointWith(const TVTrack  &hel,
+                                  TVector3 &xx,
+                                  Double_t &phi,
+                                  Int_t     mode,
+                                  Double_t  eps) const;
+    
+  
   /** Convert LCIO Tracker Hit to an ILDPLanarTrackHit  */
   virtual ILDVTrackHit* ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const ;
   

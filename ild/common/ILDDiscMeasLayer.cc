@@ -77,13 +77,81 @@ void ILDDiscMeasLayer::CalcDhDa(const TVTrackHit &vht,
   
 }
 
+Int_t ILDDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
+                                          TVector3 &xx,
+                                          Double_t &phi,
+                                          Int_t     mode,
+                                          Double_t  eps) const{
+    
+  // check that direction has one of the correct values
+  if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
+  
+  // get helix parameters
+  Double_t dr     = hel.GetDrho();
+  Double_t phi0   = hel.GetPhi0(); //
+  Double_t kappa  = hel.GetKappa();
+  Double_t rho    = hel.GetRho();
+  Double_t omega  = 1.0 / rho;
+  Double_t r      = TMath::Abs(rho);
+  Double_t z0     = hel.GetDz();
+  Double_t tanl   = hel.GetTanLambda();
+  
+  TVector3 ref_point = hel.GetPivot();
+  
+  
+  //
+  // Check if charge is nonzero.
+  //
+  
+  Int_t    chg = (Int_t)TMath::Sign(1.1,kappa);
+  if (!chg) {
+    streamlog_out(ERROR) << ">>>> Error >>>> ILDParallelPlanarMeasLayer::CalcXingPointWith" << std::endl
+    << "      Kappa = 0 is invalid for a helix "          << std::endl;
+    return -1;
+  }
+  
+  const double sin_phi0 = sin(phi0); 
+  const double cos_phi0 = cos(phi0); 
+  
+  const double x_pca = ref_point.x() + dr * cos_phi0 ; 
+  const double y_pca = ref_point.y() + dr * sin_phi0 ; 
+  const double z_pca = ref_point.z() + z0 ;
+  
+  const double z = this->GetXc().Z() ;
+  // get path length to crossing point 
+  
+  const double s = ( z - z_pca ) / tanl ;
+  
+  const double delta_phi_half = (omega*s)/2.0 ;
+  
+  double x;
+  double y;
+  
+  if( fabs(s) > FLT_MIN ){ // protect against starting on the plane
+    x = x_pca - s * ( sin(delta_phi_half) / delta_phi_half ) *  sin( phi0 - delta_phi_half ) ;
+    y = y_pca + s * ( sin(delta_phi_half) / delta_phi_half ) *  cos( phi0 - delta_phi_half ) ;
+  }
+  else{
+    x = x_pca;
+    y = y_pca;
+  }
+  
+  
+  // check if intersection with plane is within boundaries
+  
+  xx.SetXYZ(x, y, z);
+  
+  
+  phi = -s / r ;
+  
+  return (IsOnSurface(xx) ? 1 : 0);  
+  
+}
 
 
 Bool_t ILDDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
 {
-  
-  //  std::cout << "IsOnSurface " << std::endl;  
-  
+    
   bool onSurface = false ;
   
   TKalMatrix mv = XvToMv(xx);
