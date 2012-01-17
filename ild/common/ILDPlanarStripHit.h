@@ -15,7 +15,7 @@ class ILDPlanarStripHit : public ILDVTrackHit {
   
 public:
   
-  /** Constructor Taking u and v coordinates and associated measurement layer, with bfield */
+  /** Constructor Taking a single coordinate and associated measurement layer, with bfield */
   ILDPlanarStripHit(const TVMeasLayer &ms,
                Double_t       *x,
                Double_t       *dx,

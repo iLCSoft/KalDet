@@ -28,7 +28,7 @@ TKalMatrix ILDPlanarStripHit::XvToMv(const TVector3 &xv, Double_t /*t0*/) const
 
   h_return(0,0) = h(0,0); 
   
-  return h;
+  return h_return;
   
   
 }
