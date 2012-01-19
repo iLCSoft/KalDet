@@ -76,6 +76,16 @@ make install
 =====================================================================================
 
  --------
+| v01-05 |  
+ -------- 
+
+ 	- ild
+	  - Simple cylinder based SIT design added for loi data
+	  - ILDCylinderMeasLayer, added overriding IsOnSurface method to permit control of the tolerance for the surface comparison.
+	    Added use of TrackerHitZCylinder from LCIO.
+	  - ILDDiscMeasLayer, added dedicated CalcXingPointWith method to override the one from TPlane which is based on newtonian method.
+
+ --------
 | v01-04 |  
  -------- 
 
