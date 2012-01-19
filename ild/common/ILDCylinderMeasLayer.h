@@ -8,6 +8,7 @@
 
 
 #include "ILDVMeasLayer.h"
+#include "iostream"
 
 class ILDCylinderMeasLayer : public ILDVMeasLayer, public TCylinder {
   
@@ -26,6 +27,19 @@ public:
   TCylinder(r0, lhalf)
   { /* no op */ }
   
+
+  Bool_t IsOnSurface(const TVector3 &xx) const {
+
+    bool z = (xx.Z() >= GetZmin() && xx.Z() <= GetZmax());
+    bool r = std::fabs( (xx-this->GetXc()).Perp() - this->GetR() ) < 1.e-4;
+
+//    std::cout << "ILDCylinderMeasLayer IsOnSurface for " << this->TVMeasLayer::GetName() << " R =  " << this->GetR() << "  GetZmin() = " << GetZmin() << " GetZmax() = " << GetZmax()  
+//    << " dr = " << std::fabs( (xx-this->GetXc()).Perp() - this->GetR() )
+//    << std::endl;
+    
+    return r && z;
+  }
+
   
 
   // Parent's pure virtuals that must be implemented
