@@ -7,6 +7,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <cstdlib>
 
 #include "gear/GEAR.h"
 #include "gear/BField.h"
