@@ -617,39 +617,67 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _FTDgeo[disk].senThickness =  ftdlayers.getSensitiveThickness(disk) ;
     _FTDgeo[disk].supThickness =  ftdlayers.getSupportThickness(disk) ;
     
-    _FTDgeo[disk].senZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
-    _FTDgeo[disk].senZPos_even_petal2 = ftdlayers.getSensitiveZposition(disk, 0, 2) ; 
-    _FTDgeo[disk].senZPos_even_petal3 = ftdlayers.getSensitiveZposition(disk, 0, 3) ; 
-    _FTDgeo[disk].senZPos_even_petal4 = ftdlayers.getSensitiveZposition(disk, 0, 4) ; 
     
-    // currently the design assumes that the petal on the same side are at the same z
-    assert(_FTDgeo[disk].senZPos_even_petal1==_FTDgeo[disk].senZPos_even_petal2);
-    assert(_FTDgeo[disk].senZPos_even_petal3==_FTDgeo[disk].senZPos_even_petal4);
+//     _FTDgeo[disk].senZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
+//     _FTDgeo[disk].senZPos_even_petal2 = ftdlayers.getSensitiveZposition(disk, 0, 2) ; 
+//     _FTDgeo[disk].senZPos_even_petal3 = ftdlayers.getSensitiveZposition(disk, 0, 3) ; 
+//     _FTDgeo[disk].senZPos_even_petal4 = ftdlayers.getSensitiveZposition(disk, 0, 4) ; 
+//     
+//     // currently the design assumes that the petal on the same side are at the same z
+//     assert(_FTDgeo[disk].senZPos_even_petal1==_FTDgeo[disk].senZPos_even_petal2);
+//     assert(_FTDgeo[disk].senZPos_even_petal3==_FTDgeo[disk].senZPos_even_petal4);
+//     
+//     _FTDgeo[disk].senZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
+//     _FTDgeo[disk].senZPos_odd_petal2 = ftdlayers.getSensitiveZposition(disk, 1, 2) ; 
+//     _FTDgeo[disk].senZPos_odd_petal3 = ftdlayers.getSensitiveZposition(disk, 1, 3) ; 
+//     _FTDgeo[disk].senZPos_odd_petal4 = ftdlayers.getSensitiveZposition(disk, 1, 4) ; 
+//     
+//     // currently the design assumes that the petal on the same side are at the same z
+//     assert(_FTDgeo[disk].senZPos_odd_petal1==_FTDgeo[disk].senZPos_odd_petal2);
+//     assert(_FTDgeo[disk].senZPos_odd_petal3==_FTDgeo[disk].senZPos_odd_petal4);
+//     
+//     _FTDgeo[disk].supZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
+//     _FTDgeo[disk].supZPos_even_petal2 = ftdlayers.getSensitiveZposition(disk, 0, 2) ; 
+//     _FTDgeo[disk].supZPos_even_petal3 = ftdlayers.getSensitiveZposition(disk, 0, 3) ; 
+//     _FTDgeo[disk].supZPos_even_petal4 = ftdlayers.getSensitiveZposition(disk, 0, 4) ; 
+//     
+//     assert(_FTDgeo[disk].supZPos_even_petal1==_FTDgeo[disk].supZPos_even_petal2);
+//     assert(_FTDgeo[disk].supZPos_even_petal3==_FTDgeo[disk].supZPos_even_petal4);
+//     
+//     _FTDgeo[disk].supZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
+//     _FTDgeo[disk].supZPos_odd_petal2 = ftdlayers.getSensitiveZposition(disk, 1, 2) ; 
+//     _FTDgeo[disk].supZPos_odd_petal3 = ftdlayers.getSensitiveZposition(disk, 1, 3) ; 
+//     _FTDgeo[disk].supZPos_odd_petal4 = ftdlayers.getSensitiveZposition(disk, 1, 4) ; 
+//     
+//     assert(_FTDgeo[disk].supZPos_odd_petal1==_FTDgeo[disk].supZPos_odd_petal2);
+//     assert(_FTDgeo[disk].supZPos_odd_petal3==_FTDgeo[disk].supZPos_odd_petal4);
+    
+    ///////////////////////////////////////////////////////////////////////////////
+    double thickness= _FTDgeo[disk].senThickness + _FTDgeo[disk].supThickness;
+    
+    _FTDgeo[disk].senZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
+    _FTDgeo[disk].senZPos_even_petal2 = _FTDgeo[disk].senZPos_even_petal1;
+    _FTDgeo[disk].senZPos_even_petal3 = _FTDgeo[disk].senZPos_even_petal1 + thickness;
+    _FTDgeo[disk].senZPos_even_petal4 = _FTDgeo[disk].senZPos_even_petal3;
     
     _FTDgeo[disk].senZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
-    _FTDgeo[disk].senZPos_odd_petal2 = ftdlayers.getSensitiveZposition(disk, 1, 2) ; 
-    _FTDgeo[disk].senZPos_odd_petal3 = ftdlayers.getSensitiveZposition(disk, 1, 3) ; 
-    _FTDgeo[disk].senZPos_odd_petal4 = ftdlayers.getSensitiveZposition(disk, 1, 4) ; 
+    _FTDgeo[disk].senZPos_odd_petal2 = _FTDgeo[disk].senZPos_odd_petal1;
+    _FTDgeo[disk].senZPos_odd_petal3 = _FTDgeo[disk].senZPos_odd_petal1 + thickness;
+    _FTDgeo[disk].senZPos_odd_petal4 = _FTDgeo[disk].senZPos_odd_petal3;
     
-    // currently the design assumes that the petal on the same side are at the same z
-    assert(_FTDgeo[disk].senZPos_odd_petal1==_FTDgeo[disk].senZPos_odd_petal2);
-    assert(_FTDgeo[disk].senZPos_odd_petal3==_FTDgeo[disk].senZPos_odd_petal4);
-    
+
     _FTDgeo[disk].supZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
-    _FTDgeo[disk].supZPos_even_petal2 = ftdlayers.getSensitiveZposition(disk, 0, 2) ; 
-    _FTDgeo[disk].supZPos_even_petal3 = ftdlayers.getSensitiveZposition(disk, 0, 3) ; 
-    _FTDgeo[disk].supZPos_even_petal4 = ftdlayers.getSensitiveZposition(disk, 0, 4) ; 
-    
-    assert(_FTDgeo[disk].supZPos_even_petal1==_FTDgeo[disk].supZPos_even_petal2);
-    assert(_FTDgeo[disk].supZPos_even_petal3==_FTDgeo[disk].supZPos_even_petal4);
+    _FTDgeo[disk].supZPos_even_petal2 = _FTDgeo[disk].senZPos_even_petal1;
+    _FTDgeo[disk].supZPos_even_petal3 = _FTDgeo[disk].senZPos_even_petal1 + thickness;
+    _FTDgeo[disk].supZPos_even_petal4 = _FTDgeo[disk].senZPos_even_petal3;
     
     _FTDgeo[disk].supZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
-    _FTDgeo[disk].supZPos_odd_petal2 = ftdlayers.getSensitiveZposition(disk, 1, 2) ; 
-    _FTDgeo[disk].supZPos_odd_petal3 = ftdlayers.getSensitiveZposition(disk, 1, 3) ; 
-    _FTDgeo[disk].supZPos_odd_petal4 = ftdlayers.getSensitiveZposition(disk, 1, 4) ; 
+    _FTDgeo[disk].supZPos_odd_petal2 = _FTDgeo[disk].senZPos_odd_petal1;
+    _FTDgeo[disk].supZPos_odd_petal3 = _FTDgeo[disk].senZPos_odd_petal1 + thickness;
+    _FTDgeo[disk].supZPos_odd_petal4 = _FTDgeo[disk].senZPos_odd_petal3;
     
-    assert(_FTDgeo[disk].supZPos_odd_petal1==_FTDgeo[disk].supZPos_odd_petal2);
-    assert(_FTDgeo[disk].supZPos_odd_petal3==_FTDgeo[disk].supZPos_odd_petal4);
+    
+    ///////////////////////////////////////////////////////////////////////////////
     
     
     
