@@ -27,6 +27,7 @@ INCLUDE( ilcsoft_default_settings )
 
  
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
+FIND_PACKAGE( GEAR REQUIRED COMPONENTS gearsurf ) 
 #FIND_PACKAGE( MarlinUtil 1.4 REQUIRED )
 FIND_PACKAGE( KalTest 1.2 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
@@ -40,7 +41,9 @@ FOREACH( pkg Marlin ROOT KalTest )
 
 ENDFOREACH()
 
+MESSAGE( "ASDFASFSDFSADFASFSDF!!!!!!!" ${GEAR_COMPONENT_LIBRARIES} )
 
+LINK_LIBRARIES( ${GEAR_COMPONENT_LIBRARIES} )
 
 ### LIBRARY AND TOOLS #######################################################
 
