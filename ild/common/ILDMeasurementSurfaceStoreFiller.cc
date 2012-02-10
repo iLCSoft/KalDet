@@ -18,12 +18,12 @@
 #include "gear/gearsurf/BoundaryRectangle.h"
 #include "gear/gearsurf/BoundaryTrapezoid.h"
 
-void ILDMeasurementSurfaceStoreFiller::get_gear_parameters() {
+void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& gear_mgr) {
 
-  _paramVXD = &(_gear_mgr->getVXDParameters());
-  _paramSIT = &(_gear_mgr->getSITParameters());
-  _paramSET = &(_gear_mgr->getSETParameters());
-  _paramFTD = &(_gear_mgr->getFTDParameters());
+  _paramVXD = &(gear_mgr.getVXDParameters());
+  _paramSIT = &(gear_mgr.getSITParameters());
+  _paramSET = &(gear_mgr.getSETParameters());
+  _paramFTD = &(gear_mgr.getFTDParameters());
   
   // set the strip angle values, that are at the moment not in gear, so it's hardcoded here
 #ifdef HARDCODEDGEAR
@@ -32,10 +32,12 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters() {
   for( unsigned i=0; i<nVTXLayers; i++) _VTXStripAngles.push_back( 0. );
   
   unsigned nSITLayers = _paramSIT->getZPlanarLayerLayout().getNLayers();
-  for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
+  //  for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
+  for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( 0.0 ); 
   
   unsigned nSETLayers = _paramSET->getZPlanarLayerLayout().getNLayers();
-  for( unsigned i=0; i<nSETLayers; i++) _SETStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
+  //  for( unsigned i=0; i<nSETLayers; i++) _SETStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
+  for( unsigned i=0; i<nSETLayers; i++) _SETStripAngles.push_back( 0.0 );
   
   const gear::FTDLayerLayout& ftdLayers = _paramFTD->getFTDLayerLayout() ;
   unsigned nFTDLayers = ftdLayers.getNLayers();
@@ -52,8 +54,10 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters() {
       
       for( unsigned sensor=1; sensor <= nSensors; sensor++ ){
         
-        if ( sensor <= nSensors/2 ) angles.push_back( 5.* M_PI/180. );   // the first half of the sensors is in front with one angle,
-        else                        angles.push_back( -5.* M_PI/180. );  // the other is in the back with the opposite angle 
+//        if ( sensor <= nSensors/2 ) angles.push_back( 5.* M_PI/180. );   // the first half of the sensors is in front with one angle,
+//        else                        angles.push_back( -5.* M_PI/180. );  // the other is in the back with the opposite angle 
+        
+        angles.push_back(0.0);
         
       }
       
@@ -74,7 +78,7 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters() {
 
 
 
-void ILDMeasurementSurfaceStoreFiller::fill_store( std::vector<MeasurementSurface*>& surface_list ) const {
+void ILDMeasurementSurfaceStoreFiller::getMeasurementSurfaces( std::vector<MeasurementSurface*>& surface_list ) const {
   
   
   this->storeZPlanar( _paramVXD , UTIL::ILDDetID::VXD, surface_list );
@@ -128,7 +132,7 @@ void ILDMeasurementSurfaceStoreFiller::storeZPlanar( const gear::ZPlanarParamete
       cellID[ lcio::ILDCellID0::module ] = ladderNumber ;
       cellID[ lcio::ILDCellID0::sensor ] = 0 ;
       int cellID0 = cellID.lowWord();
-      
+    
       
       // Let's start with the translation T: the new center of coordinates:
       // The center of the first ladder (when we ignore an offset and phi0 for now) is (R,0,0)

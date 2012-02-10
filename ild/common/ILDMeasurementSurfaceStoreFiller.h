@@ -1,7 +1,7 @@
 #ifndef ILDMEASUREMENTSURFACESTOREFILLER_H
 #define ILDMEASUREMENTSURFACESTOREFILLER_H
 
-#include "gear/gearsurf/MeasurementSurfaceStore.h"
+#include "gearsurf/MeasurementSurfaceStore.h"
 
 #include <vector>
 
@@ -11,21 +11,21 @@ namespace gear{
   class FTDParameters;
 }
 
-using namespace GearSurfaces;
+using namespace gear;
 
-class ILDMeasurementSurfaceStoreFiller : protected MeasurementSurfaceStoreFiller{
+class ILDMeasurementSurfaceStoreFiller : public MeasurementSurfaceStoreFiller{
   
   public:
   
-  ILDMeasurementSurfaceStoreFiller(gear::GearMgr* gear_mgr) : _gear_mgr(gear_mgr) {
+  ILDMeasurementSurfaceStoreFiller(const gear::GearMgr& gear_mgr) {
 
-    get_gear_parameters();
+    this->get_gear_parameters(gear_mgr);
     
   }
+    
+  void getMeasurementSurfaces( std::vector<MeasurementSurface*>& surface_list ) const;
   
-  protected:
-  
-  void fill_store( std::vector<MeasurementSurface*>& surface_list ) const;
+  std::string getName() const { return "ILDMeasurementSurfaceStoreFiller" ; } ;    
   
   private:
   
@@ -38,9 +38,8 @@ class ILDMeasurementSurfaceStoreFiller : protected MeasurementSurfaceStoreFiller
   
   void storeFTD( const gear::FTDParameters* param, std::vector<MeasurementSurface*>& surface_list ) const;
   
-  gear::GearMgr* _gear_mgr;
-  
-  void get_gear_parameters();
+   
+  void get_gear_parameters(const gear::GearMgr& gear_mgr);
   
 #define HARDCODEDGEAR 1
 #ifdef HARDCODEDGEAR
