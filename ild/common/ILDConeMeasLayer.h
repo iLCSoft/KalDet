@@ -17,7 +17,7 @@
 #include "KalTrackDim.h"
 #include "ILDVMeasLayer.h"
 #include "iostream"
-#include "marlin/VerbosityLevels.h"
+#include "streamlog/streamlog.h"
 #include "UTIL/ILDConf.h"
 
 class ILDConeMeasLayer : public ILDVMeasLayer, public TCutCone {

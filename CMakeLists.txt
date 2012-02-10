@@ -18,31 +18,27 @@ SET( KalDet_VERSION_PATCH 0 )
 cmake_policy(SET CMP0008 NEW)
 
 
-### DEPENDENCIES ############################################################
+### DEPENDENCIES ###########################################################
 
-FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES REQUIRED )
+FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES streamlog REQUIRED )
 
 # load default settings from ILCSOFT_CMAKE_MODULES
 INCLUDE( ilcsoft_default_settings )
 
  
-FIND_PACKAGE( Marlin 1.0 REQUIRED )
-#FIND_PACKAGE( MarlinUtil 1.4 REQUIRED )
+FIND_PACKAGE( LCIO REQUIRED )
+FIND_PACKAGE( GEAR REQUIRED )
 FIND_PACKAGE( KalTest 1.2 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
-FOREACH( pkg Marlin ROOT KalTest )
+SET( KalDet_DEPENDS_INCLUDE_DIRS ${LCIO_INCLUDE_DIRS} ${GEAR_INCLUDE_DIRS} ${KalTest_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} ${streamlog_INCLUDE_DIRS})
+SET( KalDet_DEPENDS_LIBRARY_DIRS ${LCIO_LIBRARY_DIRS} ${GEAR_LIBRARY_DIRS} ${KalTest_LIBRARY_DIRS} ${ROOT_LIBRARY_DIRS} ${streamlog_LIBRARY_DIRS})
+SET( KalDet_DEPENDS_LIBRARIES    ${LCIO_LIBRARIES}    ${GEAR_LIBRARIES}    ${KalTest_LIBRARIES}    ${ROOT_LIBRARIES}    ${streamlog_LIBRARIES} )
 
-    IF( ${pkg}_FOUND )
-        INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
-        LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
-    ENDIF()
+INCLUDE_DIRECTORIES( ${KalDet_DEPENDS_INCLUDE_DIRS} )
+LINK_LIBRARIES( ${KalDet_DEPENDS_LIBRARIES} )
 
-ENDFOREACH()
-
-
-
-### LIBRARY AND TOOLS #######################################################
+### LIBRARY AND TOOLS ######################################################
 
 
 # require proper c++
