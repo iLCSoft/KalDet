@@ -18,7 +18,7 @@ SET( KalDet_VERSION_PATCH 0 )
 cmake_policy(SET CMP0008 NEW)
 
 
-### DEPENDENCIES ############################################################
+### DEPENDENCIES ###########################################################
 
 FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES streamlog REQUIRED )
 
@@ -38,7 +38,7 @@ SET( KalDet_DEPENDS_LIBRARIES    ${LCIO_LIBRARIES}    ${GEAR_LIBRARIES}    ${Kal
 INCLUDE_DIRECTORIES( ${KalDet_DEPENDS_INCLUDE_DIRS} )
 LINK_LIBRARIES( ${KalDet_DEPENDS_LIBRARIES} )
 
-### LIBRARY AND TOOLS #######################################################
+### LIBRARY AND TOOLS ######################################################
 
 
 # require proper c++
