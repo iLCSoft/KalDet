@@ -4,7 +4,7 @@
 /** Petal based FTD to be used for ILD DBD studies 
  * WARNING: Still very experimental
  *
- * @author S.Aplin DESY
+ * @author S.Aplin DESY, Robin Glattauer HEPHY
  */
 
 #include "kaltest/TVKalDetector.h"
@@ -56,35 +56,23 @@ private:
     double senThickness;
     double supThickness;
     
-    double senZPos_even_petal1;
-    double senZPos_even_petal2;
-    double senZPos_even_petal3;
-    double senZPos_even_petal4;
+    double senZPos_even_front;
+    double senZPos_odd_front;
     
-    double supZPos_even_petal1;
-    double supZPos_even_petal2;
-    double supZPos_even_petal3;
-    double supZPos_even_petal4;
-    
-    double senZPos_odd_petal1;
-    double senZPos_odd_petal2;
-    double senZPos_odd_petal3;
-    double senZPos_odd_petal4;
-    
-    double supZPos_odd_petal1;
-    double supZPos_odd_petal2;
-    double supZPos_odd_petal3;
-    double supZPos_odd_petal4;
-    
+    bool isDoubleSided;
+    int nSensors;
     
     
   };
   
-  void build_tilted_design();
+ 
   void build_staggered_design();
   
   //void create_petal(TVector3 measurement_plane_centre, FTD_Petal petal, int CellID);
-  void create_segmented_disk_layers(int idisk, int nsegments, bool even_petals, double phi0, double zpos, bool front);
+  /**
+   * @param zpos the z position of the front measurement surface (middle of front sensitive)
+   */
+  void create_segmented_disk_layers(int idisk, int nsegments, bool even_petals, double phi0, double zpos );
   
   
   void setupGearGeom( const gear::GearMgr& gearMgr ) ;
@@ -92,8 +80,7 @@ private:
   int _nDisks ;
   double _bZ ;
   
-  bool _is_staggered_design;
-  
+   
   std::vector<FTD_Disk> _FTDgeo;
   
 };

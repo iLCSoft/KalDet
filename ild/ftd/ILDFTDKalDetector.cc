@@ -24,28 +24,122 @@
 #include "TVector3.h"
 
 ILDFTDKalDetector::ILDFTDKalDetector( const gear::GearMgr& gearMgr ) : 
-TVKalDetector(300), _nDisks(0), _is_staggered_design(true) // SJA:FIXME initial size, 300 looks reasonable for ILD, though this would be better stored as a const somewhere
+TVKalDetector(300), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable for ILD, though this would be better stored as a const somewhere
 {
   
   streamlog_out(DEBUG1) << "ILDFTDKalDetector building FTD detector using GEAR " << std::endl ;
   
   setupGearGeom( gearMgr ) ; 
   
-  if( _is_staggered_design ){
-    streamlog_out(DEBUG1) << "ILDFTDKalDetector use staggered design" << std::endl ;
-    this->build_staggered_design();
-  }
-  else{
-    streamlog_out(DEBUG1) << "ILDFTDKalDetector use tilted design " << std::endl ;
-    this->build_tilted_design(); 
-  }
+  this->build_staggered_design();
+
   
   SetOwner();
   
 }
 
 
-void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, bool even_petals, double phi0, double zpos , bool front){
+
+
+void ILDFTDKalDetector::build_staggered_design() {
+  
+  streamlog_out(DEBUG) << "ILDFTDKalDetector::build_staggered_design " << std::endl;
+  
+  
+  std::string name = "FTD" ;
+  
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  
+  
+  
+  for (int idisk = 0; idisk < _nDisks; ++idisk) {
+    
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::build_staggered_design build disk " << idisk << std::endl;
+    
+    int npetals =  _FTDgeo[idisk].nPetals ;
+    double phi0 =  _FTDgeo[idisk].phi0 ;
+    
+    double senZPos_even_front = _FTDgeo[idisk].senZPos_even_front;
+    double senZPos_odd_front = _FTDgeo[idisk].senZPos_odd_front;
+    
+    
+    // check that the number of petals is divisible by 2
+    int nsegments = npetals/2.0;
+    
+    // even segments forward
+    this->create_segmented_disk_layers(idisk, nsegments, true, phi0,  senZPos_even_front );
+    
+    // even segments backwards
+    this->create_segmented_disk_layers(idisk, nsegments, true, phi0, -senZPos_even_front );
+    
+ 
+    // odd segements 
+    // update phi0 by the angular distance of one petal
+    phi0 += 2.0 * M_PI / npetals; 
+    
+    // odd segments forward
+    this->create_segmented_disk_layers(idisk, nsegments, false, phi0,  senZPos_odd_front );
+    
+    // odd segments backward
+    this->create_segmented_disk_layers(idisk, nsegments, false, phi0, -senZPos_odd_front );
+    
+   
+    
+    
+    // make the air disks
+    
+    TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air") ;
+    
+    Bool_t dummy  = false ;
+    
+    // place air discs to help transport during track extrapolation
+    if( idisk < _nDisks-1 ){
+      
+      // place the disc half way between the two discs 
+      double z = ( _FTDgeo[idisk].senZPos_even_front + _FTDgeo[idisk+1].senZPos_even_front ) * 0.5 ;
+      
+      TVector3 xc_fwd(0.0, 0.0, z) ;
+      TVector3 normal_fwd(xc_fwd) ;
+      normal_fwd.SetMag(1.0) ;
+      
+      double eps1 = 1.0e-04 ; // offset for disk number 
+      double eps2 = 1.0e-05 ; // odd or even 
+      double eps4 = 1.0e-08 ; // offset for forwards and backwards
+      
+      double height = _FTDgeo[idisk].height ;
+      double rInner = _FTDgeo[idisk].rInner ;
+      
+      
+      double sort_policy = rInner+height + eps1 * idisk + eps2 * 2 ; // we need to be after the even and odd
+      
+      Add(new ILDDiscMeasLayer( air, air, xc_fwd, normal_fwd, _bZ, sort_policy,
+                                rInner, rInner+height, dummy,-1, "FTDAirSupportDiscFront" ) );
+      
+      TVector3 xc_bwd(0.0, 0.0, -z) ;
+      TVector3 normal_bwd(xc_bwd) ;
+      normal_bwd.SetMag(1.0) ;
+      
+      // offset needed for rear disks 
+      sort_policy += eps4 ;
+      
+      
+      Add(new ILDDiscMeasLayer( air, air, xc_bwd, normal_bwd, _bZ, sort_policy,
+                                rInner, rInner+height, dummy,-1, "FTDAirSupportDiscRear" ) );
+      
+      
+      
+    }
+    
+  }
+  
+}
+
+
+
+
+
+
+void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, bool even_petals, double phi0, double zpos ){
   
   Bool_t active = true ;
   Bool_t dummy  = false ;
@@ -60,44 +154,57 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   double outerBaseLength = _FTDgeo[idisk].outerBaseLength ;
   double height = _FTDgeo[idisk].height ;
   double rInner = _FTDgeo[idisk].rInner ;
-  
+  bool isDoubleSided = _FTDgeo[idisk].isDoubleSided ;
+  int nSensors = _FTDgeo[idisk].nSensors ;
+  int zsign = zpos > 0 ? +1 : -1 ;
   
   UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   encoder.reset() ;  // reset to 0
   
   encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
-  encoder[lcio::ILDCellID0::side] = zpos > 0 ? 1 : -1 ;
+  encoder[lcio::ILDCellID0::side] = zsign ;
   encoder[lcio::ILDCellID0::layer]  = idisk ;
   
   int start_index = even_petals ? 0 : 1 ;
-  std::vector<int> module_ids;
+  std::vector<int> sensors_front;
+  std::vector<int> sensors_back;
+  std::vector<int> module_ids_front;
+  std::vector<int> module_ids_back;
   
+  if( isDoubleSided ){ // sensors on front and back    double supZPos_odd_front = _FTDgeo[idisk].supZPos_odd;
+    
+    // first half is on the front, second half on the back, sensors start with sensor number 1
+    for( int iSensor=1; iSensor <= nSensors/2; iSensor++ ) sensors_front.push_back( iSensor );
+    for( int iSensor=nSensors/2 + 1; iSensor <= nSensors; iSensor++ ) sensors_back.push_back( iSensor );
+    
+  }
+  else{ // only sensors on the front
+    
+    for( int iSensor=1; iSensor <= nSensors; iSensor++ ) sensors_front.push_back( iSensor );
+    
+  }
+
   for (int i=0; i<nsegments; ++i) {
+    
     encoder[lcio::ILDCellID0::module] = start_index + i*2 ;
     
-    if (front) {
-      encoder[lcio::ILDCellID0::sensor] = 1 ;
-    }
-    else{
-      encoder[lcio::ILDCellID0::sensor] = 3 ;
-    }
-    
-    module_ids.push_back(encoder.lowWord());
-    
-    if (front) {
-      encoder[lcio::ILDCellID0::sensor] = 2 ;
-    }
-    else{
-      encoder[lcio::ILDCellID0::sensor] = 4 ;
+    for( unsigned j=0; j<sensors_front.size(); j++ ){
+      
+      encoder[lcio::ILDCellID0::sensor] = sensors_front[j];
+      module_ids_front.push_back( encoder.lowWord() );
+      
     }
     
-    module_ids.push_back(encoder.lowWord());
+    for( unsigned j=0; j<sensors_back.size(); j++ ){
+      
+      encoder[lcio::ILDCellID0::sensor] = sensors_back[j];
+      module_ids_back.push_back( encoder.lowWord() );
+      
+    }
     
   }
   
   // create segmented disk 
-  
-  int zsign = zpos > 0 ? +1 : -1 ;
   
   // front face of sensitive  
   double z = zpos - zsign*0.5*(senThickness) ;  
@@ -126,14 +233,14 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   if ( ! even_petals ) { 
     sort_policy += eps2;
  
-    const char *name2 = z > 0 ? "FTDMeasLayerPositiveZOdd" : "FTDMeasLayerNegativeZOdd";
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " number of module_ids = " << module_ids.size() << std::endl;
-    Add( new ILDSegmentedDiscMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, active, module_ids,name2));
+    const char *name2 = z > 0 ? "FTDMeasLayerFrontPositiveZOdd" : "FTDMeasLayerFrontNegativeZOdd";
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " number of module_ids = " << module_ids_front.size() << std::endl;
+    Add( new ILDSegmentedDiscMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, active, module_ids_front,name2));
   }
   else{
-    const char *name2 = z > 0 ? "FTDMeasLayerPositiveZEven" : "FTDMeasLayerNegativeZEven";
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " number of module_ids = " << module_ids.size() << std::endl;
-    Add( new ILDSegmentedDiscMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, active, module_ids,name2));
+    const char *name2 = z > 0 ? "FTDMeasLayerFrontPositiveZEven" : "FTDMeasLayerFrontNegativeZEven";
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " number of module_ids = " << module_ids_front.size() << std::endl;
+    Add( new ILDSegmentedDiscMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, active, module_ids_front,name2));
   }
   
   // interface between sensitive and support
@@ -148,444 +255,73 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add interface between sensitive and support at " << z << std::endl;
   Add( new ILDSegmentedDiscMeasLayer(silicon, carbon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name3));
   
-  
-  // rear face of support
-  z += zsign*supThickness;   
-  //  sort_policy = fabs(z) ;
-  sort_policy = rInner+height + eps1 * idisk + eps3 * 4 ;
-  if( z < 0 ) sort_policy += eps4 ;
-  if ( ! even_petals ) sort_policy += eps2;
-  
-  const char *name4 = z > 0 ? "FTDSupRearPositiveZ" : "FTDSupRearNegativeZ";
-  
-  streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of support at " << z << std::endl;
-  Add( new ILDSegmentedDiscMeasLayer(carbon, air, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name4));
-  
-  
-}
-
-
-void ILDFTDKalDetector::build_staggered_design() {
-  
-  streamlog_out(DEBUG) << "ILDFTDKalDetector::build_staggered_design " << std::endl;
-  
-  
-  std::string name = "FTD" ;
-  
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
-  
-  double z_of_last_disc = 0.0 ;
-  
-  for (int idisk = 0; idisk < _nDisks; ++idisk) {
+  if( isDoubleSided ){
     
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::build_staggered_design build disk " << idisk << std::endl;
+    // interface between support and sensitive
+    z += zsign*supThickness;   
+    //  sort_policy = fabs(z) ;
+    sort_policy = rInner+height + eps1 * idisk + eps3 * 4 ;
+    if( z < 0 ) sort_policy += eps4 ;
+    if ( ! even_petals ) sort_policy += eps2;
     
-    int npetals =  _FTDgeo[idisk].nPetals ;
-    double phi0 =  _FTDgeo[idisk].phi0 ;
-    double senThickness = _FTDgeo[idisk].senThickness ;
-    double supThickness = _FTDgeo[idisk].supThickness ;
+    const char *name4 = z > 0 ? "FTDSupportSenIntfPositiveZ" : "FTDSupportSenIntfNegativeZ";
     
-    double senZPos_even_front = _FTDgeo[idisk].senZPos_even_petal1;
-    double supZPos_even_front = _FTDgeo[idisk].supZPos_even_petal1;
-    
-    double senZPos_even_back = _FTDgeo[idisk].senZPos_even_petal3;
-    double supZPos_even_back = _FTDgeo[idisk].supZPos_even_petal3;
-    
-    double senZPos_odd_front = _FTDgeo[idisk].senZPos_odd_petal1;
-    double supZPos_odd_front = _FTDgeo[idisk].supZPos_odd_petal1;
-    
-    double senZPos_odd_back = _FTDgeo[idisk].senZPos_odd_petal3;
-    double supZPos_odd_back = _FTDgeo[idisk].supZPos_odd_petal3;
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add interface between support and sensitive at " << z << std::endl;
+    Add( new ILDSegmentedDiscMeasLayer(carbon, silicon , _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name4));
     
     
-    // for this design we are assumming that the sensitive and support are share a common boundary
-    // here we check if this is the case and exit if not
-    double sepration = fabs( senZPos_even_front - supZPos_even_front ) - ( 0.5*senThickness + 0.5*supThickness ) ;
-    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
-      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
-      << sepration << " microns. exit(1) called" 
-      << std::endl ;
-      exit(1);
+    // measurement plane at the back
+    z += zsign + 0.5*senThickness;   
+    //  sort_policy = fabs(z) ;
+    sort_policy = rInner+height + eps1 * idisk + eps3 * 5 ;
+    if( z < 0 ) sort_policy += eps4 ;
+    if ( ! even_petals ){ 
+      
+      sort_policy += eps2;
+      
+      const char *name5 = z > 0 ? "FTDMeasLayerBackPositiveZOdd" : "FTDMeasLayerBackNegativeZOdd";
+      streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " number of module_ids = " << module_ids_back.size() << std::endl;
+      Add( new ILDSegmentedDiscMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, active, module_ids_back,name5));
+    }
+    else{
+      const char *name5 = z > 0 ? "FTDMeasLayerBackPositiveZEven" : "FTDMeasLayerBackNegativeZEven";
+      streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " number of module_ids = " << module_ids_back.size() << std::endl;
+      Add( new ILDSegmentedDiscMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, active, module_ids_back,name5));
     }
     
-    sepration = fabs( senZPos_odd_front - supZPos_odd_front ) - ( 0.5*senThickness + 0.5*supThickness ) ;
-    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
-      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
-      << sepration << " microns. exit(1) called" 
-      << std::endl ;
-      exit(1);
-    }
-
+    // rear face of sensitive
+    z += zsign + 0.5*senThickness;  
+    //  sort_policy = fabs(z) ;
+    sort_policy = rInner+height + eps1 * idisk + eps3 * 4 ;
+    if( z < 0 ) sort_policy += eps4 ;
+    if ( ! even_petals ) sort_policy += eps2;
     
-    sepration = fabs( senZPos_even_back - supZPos_even_back ) - ( 0.5*senThickness + 0.5*supThickness ) ;
-    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
-      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
-      << sepration << " microns. exit(1) called" 
-      << std::endl ;
-      exit(1);
-    }
+    const char *name6 = z > 0 ? "FTDSenRearPositiveZ" : "FTDSenRearNegativeZ";
+    
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of sensitive at " << z << std::endl;
+    Add( new ILDSegmentedDiscMeasLayer(silicon, air, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name6));
     
     
-    sepration = fabs( senZPos_odd_back - supZPos_odd_back ) - ( 0.5*senThickness + 0.5*supThickness ) ;
-    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
-      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
-      << sepration << " microns. exit(1) called" 
-      << std::endl ;
-      exit(1);
-    }
     
-    // check that the number of petals is divisible by 2
-    int nsegments = npetals/2.0;
+  }
+  else{
     
-    // even segments forward
-    this->create_segmented_disk_layers(idisk, nsegments, true, phi0,  senZPos_even_front, true);
+    // rear face of support
+    z += zsign*supThickness;   
+    //  sort_policy = fabs(z) ;
+    sort_policy = rInner+height + eps1 * idisk + eps3 * 4 ;
+    if( z < 0 ) sort_policy += eps4 ;
+    if ( ! even_petals ) sort_policy += eps2;
     
-    // even segments backwards
-    this->create_segmented_disk_layers(idisk, nsegments, true, phi0, -senZPos_even_front, true);
+    const char *name4 = z > 0 ? "FTDSupRearPositiveZ" : "FTDSupRearNegativeZ";
     
-    
-//    // even segments forward
-//    this->create_segmented_disk_layers(idisk, nsegments, true, phi0,  senZPos_even_back, false);
-//    
-//    // even segments backwards
-//    this->create_segmented_disk_layers(idisk, nsegments, true, phi0, -senZPos_even_back, false);
-    
-    
-    // odd segements 
-    // update phi0 by the angular distance of one petal
-    phi0 += 2.0 * M_PI / npetals; 
-    
-    // odd segments forward
-    this->create_segmented_disk_layers(idisk, nsegments, false, phi0,  senZPos_odd_front, true);
-    
-    // odd segments backward
-    this->create_segmented_disk_layers(idisk, nsegments, false, phi0, -senZPos_odd_front, true);
-    
-//    // odd segments forward
-//    this->create_segmented_disk_layers(idisk, nsegments, false, phi0,  senZPos_odd_back, false);
-//    
-//    // odd segments backward
-//    this->create_segmented_disk_layers(idisk, nsegments, false, phi0, -senZPos_odd_back, false);
-    
-    
-    TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air") ;
-    
-    Bool_t dummy  = false ;
-    
-    // place air discs to help transport during track extrapolation
-    if( idisk < _nDisks-1 ){
-      
-      // place the disc half way between the two discs 
-      double z = ( _FTDgeo[idisk].senZPos_even_petal1 + _FTDgeo[idisk+1].senZPos_even_petal1 ) * 0.5 ;
-      
-      TVector3 xc_fwd(0.0, 0.0, z) ;
-      TVector3 normal_fwd(xc_fwd) ;
-      normal_fwd.SetMag(1.0) ;
-      
-      double eps1 = 1.0e-04 ; // offset for disk number 
-      double eps2 = 1.0e-05 ; // odd or even 
-      double eps4 = 1.0e-08 ; // offset for forwards and backwards
-      
-      double height = _FTDgeo[idisk].height ;
-      double rInner = _FTDgeo[idisk].rInner ;
-
-      
-      double sort_policy = rInner+height + eps1 * idisk + eps2 * 2 ; // we need to be after the even and odd
-
-      Add(new ILDDiscMeasLayer( air, air, xc_fwd, normal_fwd, _bZ, sort_policy,
-                               rInner, rInner+height, dummy,-1, "FTDAirSupportDiscFront" ) );
-      
-      TVector3 xc_bwd(0.0, 0.0, -z) ;
-      TVector3 normal_bwd(xc_bwd) ;
-      normal_bwd.SetMag(1.0) ;
-      
-      // offset needed for rear disks 
-      sort_policy += eps4 ;
-      
-            
-      Add(new ILDDiscMeasLayer( air, air, xc_bwd, normal_bwd, _bZ, sort_policy,
-                               rInner, rInner+height, dummy,-1, "FTDAirSupportDiscRear" ) );
-
-      
-      // save the position of this disc for the next loop
-      z_of_last_disc = supZPos_even_front ;   
-      
-    }
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of support at " << z << std::endl;
+    Add( new ILDSegmentedDiscMeasLayer(carbon, air, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name4));
     
   }
   
 }
 
-
-void ILDFTDKalDetector::build_tilted_design() {
-  
-  TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air") ;
-  TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon") ;
-  TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon") ;
-  
-  Bool_t active = true ;
-  Bool_t dummy  = false ;
-  
-  std::string name = "FTD" ;
-  
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
-  
-  
-  double z_of_last_disc = 0.0 ;
-  
-  for (int idisk = 0; idisk < _nDisks; ++idisk) {
-    
-    static const  Double_t eps1 = 1e-6;
-    static const  Double_t eps2 = 1e-4;
-    
-    int npetals =  _FTDgeo[idisk].nPetals ;
-    double phi0 =  _FTDgeo[idisk].phi0 ;
-    double alpha  = _FTDgeo[idisk].alpha ; 
-    double height = _FTDgeo[idisk].height ;
-    double rInner = _FTDgeo[idisk].rInner ;
-    double innerBaseLength = _FTDgeo[idisk].innerBaseLength ;
-    double outerBaseLength = _FTDgeo[idisk].outerBaseLength ;
-    double senThickness = _FTDgeo[idisk].senThickness ;
-    double supThickness = _FTDgeo[idisk].supThickness ;
-    double senZPos = _FTDgeo[idisk].senZPos_even_petal1;
-    double supZPos = _FTDgeo[idisk].supZPos_even_petal1;
-    
-    // for this design we are assumming that the sensitive and support are share a common boundary
-    // here we check if this is the case and exit if not
-    double sepration = fabs( senZPos - supZPos ) - ( 0.5*senThickness + 0.5*supThickness ) ;
-    if( sepration > 1.0e-04 /* 0.1 microns */ ) {
-      streamlog_out(ERROR) << "ILDFTDKalDetector design assumes that the sensitive and support are share a common boundary. Separation found to be: "
-      << sepration << " microns. exit(1) called" 
-      << std::endl ;
-      exit(1);
-    }
-    
-    
-    double dphi = M_PI / npetals;
-    
-    for(int ipet=0; ipet<npetals; ++ipet){    
-      
-      encoder.reset() ;  // reset to 0
-      
-      encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
-      encoder[lcio::ILDCellID0::side] = 1 ;
-      encoder[lcio::ILDCellID0::layer]  = idisk ;
-      encoder[lcio::ILDCellID0::module] = ipet ;
-      encoder[lcio::ILDCellID0::sensor] = 0 ;
-      
-      int CellID_FWD = encoder.lowWord() ;
-      
-      encoder[lcio::ILDCellID0::side] = -1 ;
-      
-      int CellID_BWD = encoder.lowWord() ;
-      
-      double cosphi = cos( phi0 + ipet * dphi ) ;
-      double sinphi = sin( phi0 + ipet * dphi ) ; 
-      double sinalpha = sin( alpha ) ;
-      double cosalpha = cos( alpha ) ;
-      
-      TVector3 sen_front_face_centre_fwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, +senZPos - senThickness*0.5 );         // for +z  
-      
-      TVector3 measurement_plane_centre_fwd( sen_front_face_centre_fwd.X(), 
-                                            sen_front_face_centre_fwd.Y(), 
-                                            sen_front_face_centre_fwd.Z() + senThickness*0.5 ); 
-      
-      TVector3 sen_rear_face_centre_fwd( sen_front_face_centre_fwd.X(), 
-                                        sen_front_face_centre_fwd.Y(), 
-                                        sen_front_face_centre_fwd.Z() + senThickness ); 
-      
-      TVector3 sup_rear_face_centre_fwd( sen_rear_face_centre_fwd.X(), 
-                                        sen_rear_face_centre_fwd.Y(), 
-                                        sen_rear_face_centre_fwd.Z() + supThickness ); 
-      
-      
-      
-      // note this is the petal facing the one in +z, not the rotated one 
-      TVector3 sen_front_face_centre_bwd( cosphi * rInner + height*0.5, sinphi * rInner + height*0.5, -senZPos + senThickness*0.5 );         // for -z  
-      
-      TVector3 measurement_plane_centre_bwd( sen_front_face_centre_bwd.X(), 
-                                            sen_front_face_centre_bwd.Y(), 
-                                            sen_front_face_centre_bwd.Z() - senThickness*0.5 ); 
-      
-      TVector3 sen_rear_face_centre_bwd( sen_front_face_centre_bwd.X(), 
-                                        sen_front_face_centre_bwd.Y(), 
-                                        sen_front_face_centre_bwd.Z() - senThickness ); 
-      
-      TVector3 sup_rear_face_centre_bwd( sen_rear_face_centre_bwd.X(), 
-                                        sen_rear_face_centre_bwd.Y(), 
-                                        sen_rear_face_centre_bwd.Z() - supThickness ); 
-      
-      
-      TVector3 normalF( sinphi*sinalpha, -cosphi*sinalpha, cosalpha );
-      TVector3 normalB( -normalF );
-      
-      double dist_to_IP =  sen_front_face_centre_fwd.Mag() ;
-      
-      if(ipet == 0 ){ // need to split the first petal due to overlap
-                      // sorting policy is modified for the half which is further from the IP than the last petal in the disc. 
-                      // sorting policy = dist_to_IP+3*npetals*eps1 
-                      // note it is npetals used here not ipetal 
-                      // also the int side argument is set to 1 and -1 as opposed to 0 for the other petals 
-        
-        // +z
-        // air - sensitive boundary
-        Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+4*ipet*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, dummy) );
-        
-        // measurement plane defined as the middle of the sensitive volume
-        Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+1)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, active , CellID_FWD) );
-        streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with CellID = "
-        << CellID_FWD
-        << std::endl ;
-        
-        // sensitive - support boundary 
-        Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+2)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
-        
-        // support - air boundary
-        Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+3)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
-        
-        // +z
-        // air - sensitive boundary
-        Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+4*npetals*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, dummy) );
-        
-        // measurement plane defined as the middle of the sensitive volume
-        Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*npetals+1)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, active , CellID_FWD) );
-        streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with CellID = "
-        << CellID_FWD
-        << std::endl ;
-        
-        // sensitive - support boundary 
-        Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*npetals+2)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
-        
-        // support - air boundary
-        Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*npetals+3)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
-        
-        // -z
-        // air - sensitive boundary
-        Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+4*ipet*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, dummy) );
-        
-        // measurement plane defined as the middle of the sensitive volume
-        Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, active , CellID_BWD) );
-        streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with CellID = "
-        << CellID_BWD
-        << std::endl ;
-        
-        // sensitive - support boundary 
-        Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+2)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
-        
-        // support - air boundary
-        Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+3)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, 1, dummy ) );
-        
-        
-        // -z
-        // air - sensitive boundary
-        Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+4*npetals*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, dummy) );
-        
-        // measurement plane defined as the middle of the sensitive volume
-        Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, active , CellID_BWD) );
-        streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with CellID = "
-        << CellID_BWD
-        << std::endl ;
-        
-        // sensitive - support boundary 
-        Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*npetals+2)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
-        
-        // support - air boundary
-        Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*npetals+3)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, -1, dummy ) );
-        
-        
-        
-      }
-      else{
-        
-        // +z
-        // air - sensitive boundary
-        Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_fwd, normalF, _bZ, dist_to_IP+4*ipet*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
-        
-        // measurement plane defined as the middle of the sensitive volume
-        Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+1)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, active , CellID_FWD) );
-        streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with CellID = "
-        << CellID_FWD
-        << std::endl ;
-        
-        // sensitive - support boundary 
-        Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+2)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
-        
-        // support - air boundary
-        Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_fwd, normalF, _bZ, dist_to_IP+(4*ipet+3)*eps1,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
-        
-        
-        // -z
-        // air - sensitive boundary
-        Add(new ILDRotatedTrapMeaslayer( air, silicon, sen_front_face_centre_bwd, normalB, _bZ, dist_to_IP+4*ipet*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, dummy) );
-        
-        // measurement plane defined as the middle of the sensitive volume
-        Add(new ILDRotatedTrapMeaslayer( silicon, silicon, measurement_plane_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+1)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, active , CellID_BWD) );
-        streamlog_out(DEBUG0) << "ILDFTDKalDetector add surface with CellID = "
-        << CellID_FWD
-        << std::endl ;
-        
-        // sensitive - support boundary 
-        Add(new ILDRotatedTrapMeaslayer( silicon, carbon, sen_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+2)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
-        
-        // support - air boundary
-        Add(new ILDRotatedTrapMeaslayer( carbon, air, sup_rear_face_centre_bwd, normalB, _bZ, dist_to_IP+(4*ipet+3)*eps1+eps2,
-                                        height, innerBaseLength, outerBaseLength, alpha, 0, dummy ) );
-        
-      }
-      
-    }
-    
-    // place air discs to help transport during track extrapolation
-    if( idisk != 0 ){
-      
-      // place the disc half way between the two discs 
-      double z = z_of_last_disc + (senZPos - z_of_last_disc) * 0.5 ;
-      
-      TVector3 xc_fwd(0.0, 0.0, z) ;
-      TVector3 normal_fwd(xc_fwd) ;
-      normal_fwd.SetMag(1.0) ;
-      
-      Add(new ILDDiscMeasLayer( air, air, xc_fwd, normal_fwd, _bZ, z,
-                               rInner, rInner+height, dummy ) );
-      
-      TVector3 xc_bwd(0.0, 0.0, -z) ;
-      TVector3 normal_bwd(xc_bwd) ;
-      normal_bwd.SetMag(1.0) ;
-      
-      Add(new ILDDiscMeasLayer( air, air, xc_bwd, normal_bwd, _bZ, z+eps2,
-                               rInner, rInner+height, dummy ) );
-      
-      
-      // save the position of this disc for the next loop
-      z_of_last_disc = senZPos ;   
-    }
-    
-  }
-  
-}
 
 
 void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
@@ -617,77 +353,12 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _FTDgeo[disk].senThickness =  ftdlayers.getSensitiveThickness(disk) ;
     _FTDgeo[disk].supThickness =  ftdlayers.getSupportThickness(disk) ;
     
+    _FTDgeo[disk].senZPos_even_front = ftdlayers.getSensitiveZposition(disk, 0, 1) ;
+    _FTDgeo[disk].senZPos_odd_front = ftdlayers.getSensitiveZposition(disk, 1, 1) ;
     
-//     _FTDgeo[disk].senZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
-//     _FTDgeo[disk].senZPos_even_petal2 = ftdlayers.getSensitiveZposition(disk, 0, 2) ; 
-//     _FTDgeo[disk].senZPos_even_petal3 = ftdlayers.getSensitiveZposition(disk, 0, 3) ; 
-//     _FTDgeo[disk].senZPos_even_petal4 = ftdlayers.getSensitiveZposition(disk, 0, 4) ; 
-//     
-//     // currently the design assumes that the petal on the same side are at the same z
-//     assert(_FTDgeo[disk].senZPos_even_petal1==_FTDgeo[disk].senZPos_even_petal2);
-//     assert(_FTDgeo[disk].senZPos_even_petal3==_FTDgeo[disk].senZPos_even_petal4);
-//     
-//     _FTDgeo[disk].senZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
-//     _FTDgeo[disk].senZPos_odd_petal2 = ftdlayers.getSensitiveZposition(disk, 1, 2) ; 
-//     _FTDgeo[disk].senZPos_odd_petal3 = ftdlayers.getSensitiveZposition(disk, 1, 3) ; 
-//     _FTDgeo[disk].senZPos_odd_petal4 = ftdlayers.getSensitiveZposition(disk, 1, 4) ; 
-//     
-//     // currently the design assumes that the petal on the same side are at the same z
-//     assert(_FTDgeo[disk].senZPos_odd_petal1==_FTDgeo[disk].senZPos_odd_petal2);
-//     assert(_FTDgeo[disk].senZPos_odd_petal3==_FTDgeo[disk].senZPos_odd_petal4);
-//     
-//     _FTDgeo[disk].supZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
-//     _FTDgeo[disk].supZPos_even_petal2 = ftdlayers.getSensitiveZposition(disk, 0, 2) ; 
-//     _FTDgeo[disk].supZPos_even_petal3 = ftdlayers.getSensitiveZposition(disk, 0, 3) ; 
-//     _FTDgeo[disk].supZPos_even_petal4 = ftdlayers.getSensitiveZposition(disk, 0, 4) ; 
-//     
-//     assert(_FTDgeo[disk].supZPos_even_petal1==_FTDgeo[disk].supZPos_even_petal2);
-//     assert(_FTDgeo[disk].supZPos_even_petal3==_FTDgeo[disk].supZPos_even_petal4);
-//     
-//     _FTDgeo[disk].supZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
-//     _FTDgeo[disk].supZPos_odd_petal2 = ftdlayers.getSensitiveZposition(disk, 1, 2) ; 
-//     _FTDgeo[disk].supZPos_odd_petal3 = ftdlayers.getSensitiveZposition(disk, 1, 3) ; 
-//     _FTDgeo[disk].supZPos_odd_petal4 = ftdlayers.getSensitiveZposition(disk, 1, 4) ; 
-//     
-//     assert(_FTDgeo[disk].supZPos_odd_petal1==_FTDgeo[disk].supZPos_odd_petal2);
-//     assert(_FTDgeo[disk].supZPos_odd_petal3==_FTDgeo[disk].supZPos_odd_petal4);
+    _FTDgeo[disk].isDoubleSided = ftdlayers.isDoubleSided( disk );
+    _FTDgeo[disk].nSensors = ftdlayers.getNSensors( disk );
     
-    ///////////////////////////////////////////////////////////////////////////////
-    double thickness= _FTDgeo[disk].senThickness + _FTDgeo[disk].supThickness;
-    
-    _FTDgeo[disk].senZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
-    _FTDgeo[disk].senZPos_even_petal2 = _FTDgeo[disk].senZPos_even_petal1;
-    _FTDgeo[disk].senZPos_even_petal3 = _FTDgeo[disk].senZPos_even_petal1 + thickness;
-    _FTDgeo[disk].senZPos_even_petal4 = _FTDgeo[disk].senZPos_even_petal3;
-    
-    _FTDgeo[disk].senZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
-    _FTDgeo[disk].senZPos_odd_petal2 = _FTDgeo[disk].senZPos_odd_petal1;
-    _FTDgeo[disk].senZPos_odd_petal3 = _FTDgeo[disk].senZPos_odd_petal1 + thickness;
-    _FTDgeo[disk].senZPos_odd_petal4 = _FTDgeo[disk].senZPos_odd_petal3;
-    
-
-    _FTDgeo[disk].supZPos_even_petal1 = ftdlayers.getSensitiveZposition(disk, 0, 1) ; 
-    _FTDgeo[disk].supZPos_even_petal2 = _FTDgeo[disk].senZPos_even_petal1;
-    _FTDgeo[disk].supZPos_even_petal3 = _FTDgeo[disk].senZPos_even_petal1 + thickness;
-    _FTDgeo[disk].supZPos_even_petal4 = _FTDgeo[disk].senZPos_even_petal3;
-    
-    _FTDgeo[disk].supZPos_odd_petal1 = ftdlayers.getSensitiveZposition(disk, 1, 1) ; 
-    _FTDgeo[disk].supZPos_odd_petal2 = _FTDgeo[disk].senZPos_odd_petal1;
-    _FTDgeo[disk].supZPos_odd_petal3 = _FTDgeo[disk].senZPos_odd_petal1 + thickness;
-    _FTDgeo[disk].supZPos_odd_petal4 = _FTDgeo[disk].senZPos_odd_petal3;
-    
-    
-    ///////////////////////////////////////////////////////////////////////////////
-    
-    
-    
-    
-    // rough check to see if the petal is rotated
-    if( fabs(_FTDgeo[disk].alpha) > 1.0e-08  ) { 
-      _is_staggered_design = false;
-    } else {
-      _is_staggered_design = true; 
-    }
     
   }
   
