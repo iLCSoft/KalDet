@@ -339,6 +339,8 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   //           which if traversed in the reverse direction to the next boundary then the track be propagated through carbon
   //           for a significant distance 
   
+  double eps = 1.0e-08;
+  
   for(int disk=0; disk< _nDisks; ++disk){
     
     // numbers taken from the ILD_01 gear file for the sensitive part 
@@ -358,6 +360,82 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     
     _FTDgeo[disk].isDoubleSided = ftdlayers.isDoubleSided( disk );
     _FTDgeo[disk].nSensors = ftdlayers.getNSensors( disk );
+    
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Assertions       ////////////////////////////////////////////////////////////////////////////////////
+    
+    // there should be an even number of petals per disk
+    assert( _FTDgeo[disk].nPetals%2 == 0 );
+    
+    // support and sensitive should have the same size an position in xy
+    assert( fabs( ftdlayers.getSupportLengthMin(disk) - ftdlayers.getSensitiveLengthMin(disk) ) < eps );
+    assert( fabs( ftdlayers.getSupportLengthMax(disk) - ftdlayers.getSensitiveLengthMax(disk) ) < eps );
+    assert( fabs( ftdlayers.getSupportWidth(disk) - ftdlayers.getSensitiveWidth(disk) ) < eps );
+    assert( fabs( ftdlayers.getSupportRinner(disk) - ftdlayers.getSensitiveRinner(disk) ) < eps );
+    
+    // double sided petals should have as many sensors on the front as on the back
+    if( _FTDgeo[disk].isDoubleSided ) assert( _FTDgeo[disk].nSensors%2 == 0 ); 
+    
+    
+    // petals should not be rotated around their symmetry axis
+    assert( fabs( ftdlayers.getAlpha( disk ) ) < eps );
+    
+    
+    // the z positions of the sensors should be all the same on one side of the petal
+    // and in case of double sided petals, the second half of the sensors should be behind the first half
+    
+    if( _FTDgeo[disk].isDoubleSided ){ // double sided: first half of sensors should have one z value, and second half as well 
+      
+      for( int iPetal=0; iPetal< _FTDgeo[disk].nPetals; iPetal++){
+        
+        int sensors1Side = _FTDgeo[disk].nSensors/2;
+        
+        //check first half
+        for( int iSensor=2; iSensor <= sensors1Side; iSensor++ ){
+          
+          assert( fabs( ftdlayers.getSensitiveZposition( disk, iPetal, iSensor) - ftdlayers.getSensitiveZposition( disk, iPetal, iSensor-1) ) < eps );
+          
+        }
+        
+        // check second half
+        for( int iSensor=sensors1Side + 2; iSensor <= _FTDgeo[disk].nSensors; iSensor++ ){
+          
+          assert( fabs( ftdlayers.getSensitiveZposition( disk, iPetal, iSensor) - ftdlayers.getSensitiveZposition( disk, iPetal, iSensor-1) ) < eps );
+          
+          // also check if the sensors on the back are farther away from the origin:
+          assert( fabs( ftdlayers.getSensitiveZposition( disk, iPetal, iSensor) ) - fabs( ftdlayers.getSensitiveZposition( disk, iPetal, iSensor-sensors1Side ) ) >= 0. );
+        }
+      }
+    }
+    else{ // single sided: all sensors should have the same z
+      
+      for( int iPetal=0; iPetal< _FTDgeo[disk].nPetals; iPetal++){
+        
+        for(int iSensor=2; iSensor <= _FTDgeo[disk].nSensors; iSensor++ ){
+          
+         assert( fabs( ftdlayers.getSensitiveZposition( disk, iPetal, iSensor) - ftdlayers.getSensitiveZposition( disk, iPetal, iSensor-1) ) < eps );
+          
+        }
+      }
+    }
+    
+    // there should be no gap between support and sensitive
+    
+    for( int iPetal=0; iPetal< _FTDgeo[disk].nPetals; iPetal++){
+      
+      
+      int side = ftdlayers.getSupportZposition( disk, iPetal ) > 0? 1 : -1;
+      
+      double endSensitive = ftdlayers.getSensitiveZposition( disk, iPetal, 1) + side * _FTDgeo[disk].senThickness/2.; 
+      double endSupport =   ftdlayers.getSupportZposition( disk, iPetal ) -side * _FTDgeo[disk].supThickness/2.;
+      
+      assert( fabs( endSensitive- endSupport ) < eps ); 
+      
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     
     
   }
