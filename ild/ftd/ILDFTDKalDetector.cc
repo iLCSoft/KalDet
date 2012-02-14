@@ -271,7 +271,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
     
     
     // measurement plane at the back
-    z += zsign + 0.5*senThickness;   
+    z += zsign*0.5*senThickness;   
     //  sort_policy = fabs(z) ;
     sort_policy = rInner+height + eps1 * idisk + eps3 * 5 ;
     if( z < 0 ) sort_policy += eps4 ;
@@ -290,7 +290,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
     }
     
     // rear face of sensitive
-    z += zsign + 0.5*senThickness;  
+    z += zsign*0.5*senThickness;  
     //  sort_policy = fabs(z) ;
     sort_policy = rInner+height + eps1 * idisk + eps3 * 4 ;
     if( z < 0 ) sort_policy += eps4 ;
