@@ -26,20 +26,25 @@ FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES streamlog REQUIRED )
 INCLUDE( ilcsoft_default_settings )
 
  
-FIND_PACKAGE( LCIO REQUIRED )
-FIND_PACKAGE( GEAR REQUIRED )
+#FG: switch back to depend on Marlin (still needed by lctpc/lp1jgem/EXTPCMeasLayer.cxx)
+FIND_PACKAGE( Marlin 1.0 REQUIRED )
+#FIND_PACKAGE( LCIO REQUIRED )
+#FIND_PACKAGE( GEAR REQUIRED )
 FIND_PACKAGE( KalTest 1.2 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
-SET( KalDet_DEPENDS_INCLUDE_DIRS ${LCIO_INCLUDE_DIRS} ${GEAR_INCLUDE_DIRS} ${KalTest_INCLUDE_DIRS} ${ROOT_INCLUDE_DIRS} ${streamlog_INCLUDE_DIRS})
-SET( KalDet_DEPENDS_LIBRARY_DIRS ${LCIO_LIBRARY_DIRS} ${GEAR_LIBRARY_DIRS} ${KalTest_LIBRARY_DIRS} ${ROOT_LIBRARY_DIRS} ${streamlog_LIBRARY_DIRS})
-SET( KalDet_DEPENDS_LIBRARIES    ${LCIO_LIBRARIES}    ${GEAR_LIBRARIES}    ${KalTest_LIBRARIES}    ${ROOT_LIBRARIES}    ${streamlog_LIBRARIES} )
+#NB: need ROOT before KalTest (needed on case sensitive systems and classes that differ only in capitalization)
+FOREACH( pkg Marlin ROOT KalTest )
 
-INCLUDE_DIRECTORIES( ${KalDet_DEPENDS_INCLUDE_DIRS} )
-LINK_LIBRARIES( ${KalDet_DEPENDS_LIBRARIES} )
+  IF( ${pkg}_FOUND )
+    INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
+    LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
+  ENDIF()
+
+ENDFOREACH()
 
 ### LIBRARY AND TOOLS ######################################################
-
+ 
 
 # require proper c++
 ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
