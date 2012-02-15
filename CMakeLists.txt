@@ -28,13 +28,13 @@ INCLUDE( ilcsoft_default_settings )
  
 #FG: switch back to depend on Marlin (still needed by lctpc/lp1jgem/EXTPCMeasLayer.cxx)
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
-#FIND_PACKAGE( LCIO REQUIRED )
-#FIND_PACKAGE( GEAR REQUIRED )
+FIND_PACKAGE( LCIO REQUIRED )
+FIND_PACKAGE( GEAR REQUIRED )
 FIND_PACKAGE( KalTest 1.2 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
 
 #NB: need ROOT before KalTest (needed on case sensitive systems and classes that differ only in capitalization)
-FOREACH( pkg Marlin ROOT KalTest )
+FOREACH( pkg Marlin ROOT KalTest LCIO GEAR )
 
   IF( ${pkg}_FOUND )
     INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
@@ -93,18 +93,29 @@ ENDFOREACH()
 INCLUDE_DIRECTORIES( ${ROOT_DICT_INCLUDE_DIRS} )
 
 
+# ild directory is treated separately as it does not require any root dictionaries
+
 FILE( GLOB_RECURSE ild_sources "ild/*.cc" )
-FILE( GLOB_RECURSE ild_headers "ild/*.h" )
+FILE( GLOB_RECURSE lib_headers "ild/*.h" )
+
 INCLUDE_DIRECTORIES( ild/common )
 
 INSTALL( FILES ${ild_headers} DESTINATION "include/kaldet" )
 
 # needed for adding header files to xcode project
 IF(CMAKE_GENERATOR MATCHES "Xcode")
-FILE( GLOB_RECURSE library_headers "*.h" )
-ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${library_sources} ${ild_sources} ${ild_headers})
+
+  FOREACH( lib_input_dir ${lib_input_dirs} ) 
+
+    FILE( GLOB_RECURSE lib_input_headers "${lib_input_dir}/*.h" )
+    LIST( APPEND  lib_headers ${lib_input_headers} ) 
+
+  ENDFOREACH()   
+
+  ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${lib_sources} ${ild_sources} ${lib_headers} )
+
 ELSE()
-ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${lib_sources} ${ild_sources} )
+  ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${lib_sources} ${ild_sources} )
 ENDIF()      
 
 

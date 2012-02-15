@@ -33,6 +33,7 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& 
   
   unsigned nSITLayers = _paramSIT->getZPlanarLayerLayout().getNLayers();
   //  for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
+
   for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( 0.0 ); 
   
   unsigned nSETLayers = _paramSET->getZPlanarLayerLayout().getNLayers();
