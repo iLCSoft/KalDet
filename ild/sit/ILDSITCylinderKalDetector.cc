@@ -41,7 +41,7 @@ TVKalDetector(100)
 
   UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   
-  for (int ilayer = 0 ; ilayer<_nLayers ; ++ilayer) {
+  for ( unsigned int ilayer = 0 ; ilayer<_nLayers ; ++ilayer) {
 
     encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::SIT ;
     encoder[lcio::ILDCellID0::layer]  = ilayer ;
@@ -115,7 +115,7 @@ void ILDSITCylinderKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   }
 
   
-  for(int layer=0; layer< _nLayers; ++layer){
+  for(unsigned int layer=0; layer< _nLayers; ++layer){
 
     _SITgeo[layer].senThickness =  SIT_si;
     _SITgeo[layer].supThickness =  SIT_sp;

@@ -26,7 +26,7 @@ private:
   
   void setupGearGeom( const gear::GearMgr& gearMgr ) ;
   
-  int _nLayers ;
+  unsigned int _nLayers ;
   double _bZ ;
   
   struct SIT_Layer {

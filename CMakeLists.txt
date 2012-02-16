@@ -100,7 +100,7 @@ FILE( GLOB_RECURSE lib_headers "ild/*.h" )
 
 INCLUDE_DIRECTORIES( ild/common )
 
-INSTALL( FILES ${ild_headers} DESTINATION "include/kaldet" )
+INSTALL( FILES ${lib_headers} DESTINATION "include/kaldet" )
 
 # needed for adding header files to xcode project
 IF(CMAKE_GENERATOR MATCHES "Xcode")
