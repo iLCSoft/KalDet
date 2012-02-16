@@ -20,57 +20,72 @@
 
 void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& gear_mgr) {
 
-  _paramVXD = &(gear_mgr.getVXDParameters());
-  _paramSIT = &(gear_mgr.getSITParameters());
-  _paramSET = &(gear_mgr.getSETParameters());
-  _paramFTD = &(gear_mgr.getFTDParameters());
-  
   // set the strip angle values, that are at the moment not in gear, so it's hardcoded here
 #ifdef HARDCODEDGEAR
   
-  unsigned nVTXLayers = _paramVXD->getZPlanarLayerLayout().getNLayers();
-  for( unsigned i=0; i<nVTXLayers; i++) _VTXStripAngles.push_back( 0. );
+  _paramVXD = 0 ; try {  _paramVXD = &(gear_mgr.getVXDParameters()); }  catch( gear::UnknownParameterException& e){}
+  _paramSIT = 0 ; try {  _paramSIT = &(gear_mgr.getSITParameters()); }  catch( gear::UnknownParameterException& e){}
+  _paramSET = 0 ; try {  _paramSET = &(gear_mgr.getSETParameters()); }  catch( gear::UnknownParameterException& e){}
+  _paramFTD = 0 ; try {  _paramFTD = &(gear_mgr.getFTDParameters()); }  catch( gear::UnknownParameterException& e){}
   
-  unsigned nSITLayers = _paramSIT->getZPlanarLayerLayout().getNLayers();
-  //  for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
 
-  for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( 0.0 ); 
-  
-  unsigned nSETLayers = _paramSET->getZPlanarLayerLayout().getNLayers();
-  //  for( unsigned i=0; i<nSETLayers; i++) _SETStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
-  for( unsigned i=0; i<nSETLayers; i++) _SETStripAngles.push_back( 0.0 );
-  
-  const gear::FTDLayerLayout& ftdLayers = _paramFTD->getFTDLayerLayout() ;
-  unsigned nFTDLayers = ftdLayers.getNLayers();
+  if( _paramVXD ){
+    unsigned nVTXLayers = _paramVXD->getZPlanarLayerLayout().getNLayers() ;
+    for( unsigned i=0; i<nVTXLayers; i++) _VTXStripAngles.push_back( 0. );
 
-  for( unsigned layer=0; layer<nFTDLayers; layer++ ){
+  }
+
+  if( _paramSIT ){
+
+    unsigned nSITLayers = _paramSIT->getZPlanarLayerLayout().getNLayers();
+    //  for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
     
-    std::vector< double > angles;
+    for( unsigned i=0; i<nSITLayers; i++) _SITStripAngles.push_back( 0.0 ); 
+
+  }    
+
+  if( _paramSET ){
+
+    unsigned nSETLayers = _paramSET->getZPlanarLayerLayout().getNLayers();
+    //  for( unsigned i=0; i<nSETLayers; i++) _SETStripAngles.push_back( pow(-1,i) * 5.* M_PI/180. ); // alternately + and - 5°
+    for( unsigned i=0; i<nSETLayers; i++) _SETStripAngles.push_back( 0.0 );
+
+  }
+
+  if( _paramFTD ){
+
+    const gear::FTDLayerLayout& ftdLayers = _paramFTD->getFTDLayerLayout() ;
+    unsigned nFTDLayers = ftdLayers.getNLayers();
     
-    unsigned nSensors = 4; //ftdLayers.getNSensors( layer );
-    bool isDoubleSided = true; //ftdLayers.isDoubleSided( layer );
-    
-    if( isDoubleSided){ // it is a strip detector
+    for( unsigned layer=0; layer<nFTDLayers; layer++ ){
       
+      std::vector< double > angles;
       
-      for( unsigned sensor=1; sensor <= nSensors; sensor++ ){
-        
-//        if ( sensor <= nSensors/2 ) angles.push_back( 5.* M_PI/180. );   // the first half of the sensors is in front with one angle,
-//        else                        angles.push_back( -5.* M_PI/180. );  // the other is in the back with the opposite angle 
-        
-        angles.push_back(0.0);
-        
+      unsigned nSensors = 4; //ftdLayers.getNSensors( layer );
+      bool isDoubleSided = true; //ftdLayers.isDoubleSided( layer );
+      
+      if( isDoubleSided){ // it is a strip detector
+	
+	
+	for( unsigned sensor=1; sensor <= nSensors; sensor++ ){
+	  
+	  //        if ( sensor <= nSensors/2 ) angles.push_back( 5.* M_PI/180. );   // the first half of the sensors is in front with one angle,
+	  //        else                        angles.push_back( -5.* M_PI/180. );  // the other is in the back with the opposite angle 
+	  
+	  angles.push_back(0.0);
+	  
+	}
+	
+      }
+      else{ // a pixel detector, so no stripAngle
+	
+	for( unsigned sensor=1; sensor <= nSensors; sensor++ ) angles.push_back(0.);
+	
       }
       
-    }
-    else{ // a pixel detector, so no stripAngle
-      
-      for( unsigned sensor=1; sensor <= nSensors; sensor++ ) angles.push_back(0.);
+      _FTDStripAngles.push_back( angles );
       
     }
-    
-    _FTDStripAngles.push_back( angles );
-    
   }
 
   
@@ -81,11 +96,17 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& 
 
 void ILDMeasurementSurfaceStoreFiller::getMeasurementSurfaces( std::vector<MeasurementSurface*>& surface_list ) const {
   
+  if( _paramVXD ) 
+    this->storeZPlanar( _paramVXD , UTIL::ILDDetID::VXD, surface_list );
   
-  this->storeZPlanar( _paramVXD , UTIL::ILDDetID::VXD, surface_list );
-  this->storeZPlanar( _paramSIT , UTIL::ILDDetID::SIT, surface_list );
-  this->storeZPlanar( _paramSET , UTIL::ILDDetID::SET, surface_list );
-  this->storeFTD( _paramFTD , surface_list);
+  if( _paramSIT ) 
+    this->storeZPlanar( _paramSIT , UTIL::ILDDetID::SIT, surface_list );
+  
+  if(_paramSET  ) 
+    this->storeZPlanar( _paramSET , UTIL::ILDDetID::SET, surface_list );
+  
+  if( _paramFTD ) 
+    this->storeFTD( _paramFTD , surface_list);
   
   
 }
