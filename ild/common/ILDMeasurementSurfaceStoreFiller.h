@@ -16,13 +16,16 @@ using namespace gear;
 class ILDMeasurementSurfaceStoreFiller : public MeasurementSurfaceStoreFiller{
   
   public:
-  
+
+   
   ILDMeasurementSurfaceStoreFiller(const gear::GearMgr& gear_mgr) {
 
     this->get_gear_parameters(gear_mgr);
     
   }
-    
+
+  ~ILDMeasurementSurfaceStoreFiller() { /* no op */ }
+  
   void getMeasurementSurfaces( std::vector<MeasurementSurface*>& surface_list ) const;
   
   std::string getName() const { return "ILDMeasurementSurfaceStoreFiller" ; } ;    
@@ -40,30 +43,38 @@ class ILDMeasurementSurfaceStoreFiller : public MeasurementSurfaceStoreFiller{
   
    
   void get_gear_parameters(const gear::GearMgr& gear_mgr);
-  
-#define HARDCODEDGEAR 1
-#ifdef HARDCODEDGEAR
-  
-  
+ 
   /** the strip angles for every layer */
   std::vector< double > _VTXStripAngles;
   std::vector< double > _SITStripAngles;
   std::vector< double > _SETStripAngles;
+
+  /** the number of sensors for every layer */
+  std::vector< int > _VTXNSensors;
+  std::vector< int > _SITNSensors;
+  std::vector< int > _SETNSensors;
+
+  
+  //#define HARDCODEDGEAR 
+#ifdef HARDCODEDGEAR
   
   /** the strip angles for every layer and sensor */
   std::vector< std::vector< double > > _FTDStripAngles;
+
+#endif
   
   unsigned _nVTXLayers;
   unsigned _nSITLayers;
   unsigned _nFTDLayers;
   unsigned _nSETLayers;
   
+  
   const gear::ZPlanarParameters* _paramVXD;
   const gear::ZPlanarParameters* _paramSIT;
   const gear::ZPlanarParameters* _paramSET;
   const gear::FTDParameters* _paramFTD;
   
-#endif
+
   
 };
 

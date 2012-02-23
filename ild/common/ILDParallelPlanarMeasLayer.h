@@ -23,11 +23,13 @@ public:
                              Double_t   xiwidth,
                              Double_t   zetawidth,
                              Double_t   xioffset,
+                             Double_t   zoffset,
+                             Double_t   UOrigin,
                              Bool_t     is_active,
                              Int_t      CellID = -1,
                              const Char_t    *name = "ILDParallelPlanarMeasLayer")
   :
-  ILDPlanarMeasLayer(min,mout,TVector3(r*cos(phi),r*sin(phi),0),TVector3(cos(phi),sin(phi),0),Bz,SortingPolicy,xiwidth,zetawidth,xioffset,is_active,CellID,name), _r(r),_phi(phi),_cos_phi(cos(_phi)),_sin_phi(sin(_phi))
+  ILDPlanarMeasLayer(min,mout,TVector3(r*cos(phi),r*sin(phi),zoffset),TVector3(cos(phi),sin(phi),0.0),Bz,SortingPolicy,xiwidth,zetawidth,xioffset,UOrigin,is_active,CellID,name), _r(r),_phi(phi),_cos_phi(cos(_phi)),_sin_phi(sin(_phi))
   { /* no op */ }
   
   

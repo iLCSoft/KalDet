@@ -13,13 +13,29 @@
 
 TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVector3 &xv) const
 {
-  // Calculate hit coordinate information:
-  //	mv(0,0) = u (transverse)
-
   
-  TKalMatrix mv(1,1);
-  mv(0,0) = (xv.Y() - GetXc().Y())*GetNormal().X()/GetNormal().Perp() - (xv.X() - GetXc().X())*GetNormal().Y()/GetNormal().Perp() ;
+  double cos_phi = GetNormal().X()/GetNormal().Perp();
+  double sin_phi = GetNormal().Y()/GetNormal().Perp();
+  
+  // theta is the strip angle rotation in the plane of the wafer
+  double cos_theta = cos(_stripAngle);
+  double sin_theta = sin(_stripAngle);
+  
+  double delta_x = xv.X() - GetXc().X();
+  double delta_y = xv.Y() - GetXc().Y();
 
+  double delta_t = (delta_x * sin_phi - delta_y * cos_phi) ; 
+  double delta_z = xv.Z() - GetXc().Z();
+
+
+  TKalMatrix mv(ILDPlanarStripHit_DIM,1);
+  
+  mv(0,0) = ( (delta_t + fUOrigin) * cos_theta ) + delta_z * sin_theta ;
+  
+  if (ILDPlanarStripHit_DIM == 2) {
+    mv(1,0) = delta_z * cos_theta - delta_t * sin_theta;
+  }
+  
   return mv;
 
 }
@@ -33,10 +49,29 @@ TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVTrackHit &,
 TVector3 ILDParallelStripPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
 
-  double x = -vht(0,0) * this->GetNormal().Y() / this->GetNormal().Perp() + this->GetXc().X();
-  double y =  vht(0,0) * this->GetNormal().X() / this->GetNormal().Perp() + this->GetXc().Y();
+  
+  double cos_phi = GetNormal().X()/GetNormal().Perp();
+  double sin_phi = GetNormal().Y()/GetNormal().Perp();
+  
+  // theta is the strip angle rotation in the plane of the wafer
+  double cos_theta = cos(_stripAngle);
+  double sin_theta = sin(_stripAngle);
+  
+  double t =  (vht(0,0) - fUOrigin ) * cos_theta ;
+    
+  double x =  t * sin_phi + this->GetXc().X();
+  double y = -t * cos_phi + this->GetXc().Y();
+  
+  double dz = 0.0;
+  
+  if (ILDPlanarStripHit_DIM == 2) {
+    dz = vht(1,0) * cos_theta ;
+  }
 
-  double z   = this->GetXc().Z();
+  
+  double z = vht(0,0) * sin_theta + this->GetXc().Z() + dz;
+
+  this->IsOnSurface(TVector3(x,y,z));
   
   return TVector3(x,y,z);
 
@@ -55,19 +90,33 @@ void ILDParallelStripPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
   //        a = (drho, phi0, kappa, dz, tanl, t0)
   //
   
+  double cos_phi = GetNormal().X()/GetNormal().Perp();
+  double sin_phi = GetNormal().Y()/GetNormal().Perp();
+
+  // theta is the strip angle rotation in the plane of the wafer
+  double cos_theta = cos(_stripAngle);
+  double sin_theta = sin(_stripAngle);
+  
   Int_t sdim = H.GetNcols();
   Int_t hdim = TMath::Max(5,sdim-1);
   
   // Set H = (@h/@a) = (@d/@a, @z/@a)^t
   
   for (Int_t i=0; i<hdim; i++) {
-    H(0,i) = (this->GetNormal().X() / this->GetNormal().Perp()) * dxphiada(1,i)
-    -(this->GetNormal().Y() / this->GetNormal().Perp()) * dxphiada(0,i);   
+    
+    H(0,i) =  cos_theta * sin_phi * dxphiada(0,i) - cos_theta * cos_phi * dxphiada(1,i) + sin_theta * dxphiada(2,i) ;   
+
+    if (ILDPlanarStripHit_DIM == 2) {
+      H(1,i) = -sin_theta * sin_phi * dxphiada(0,i) + sin_theta * cos_phi * dxphiada(1,i) + cos_theta * dxphiada(2,i);
+    }
+    
   }
   if (sdim == 6) {
     H(0,sdim-1) = 0.;
-  }
-  
+    if (ILDPlanarStripHit_DIM == 2) {
+      H(1,sdim-1) = 0.;
+    }
+  }  
 }
 
 ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
@@ -81,11 +130,6 @@ ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
   
   const float eps = 1.0e-07;
 
-  // U must be in the transverse plane
-  if( fabs(U.dot(Z)) > eps ) {
-    streamlog_out(ERROR) << "ILDParallelStripPlanarMeasLayer: TrackerHitPlane measurment vectors U is not in the global X-Y plane. exit(1) called from file " << __FILE__ << " and line " << __LINE__ << std::endl;
-    exit(1);
-  }
 
   if( plane_hit == NULL )  return NULL; // SJA:FIXME: should be replaced with an exception  
   
@@ -94,22 +138,29 @@ ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
   const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
   
   // convert to layer coordinates       
-  TKalMatrix h    = this->XvToMv(hit);
+  TKalMatrix h(ILDPlanarStripHit_DIM,1);    
+  h = this->XvToMv(hit);
   
-  Double_t  x[1] ;
-  Double_t dx[1] ;
+  Double_t  x[ILDPlanarStripHit_DIM] ;
+  Double_t dx[ILDPlanarStripHit_DIM] ;
   
   x[0] = h(0, 0);
-  
+  if(ILDPlanarStripHit_DIM == 2) x[1] = h(1, 0);
+
   dx[0] = plane_hit->getdU() ;
+  if(ILDPlanarStripHit_DIM == 2) dx[1] = plane_hit->getdV() ;
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "ILDPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
-  << " Layer R = " << this->GetXc().Mag() 
+  streamlog_out(DEBUG0) << "ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarStripHit created" 
+  << " for CellID " << trkhit->getCellID0()
+  << " Layer R = " << this->GetXc().Perp() 
   << " Layer phi = " << this->GetXc().Phi() 
+  << " Layer z0 = " << this->GetXc().Z() 
   << " u = "  <<  x[0]
+  //  << " v = "  <<  x[1]
   << " du = " << dx[0]
+  //  << " dv = " << dx[1]
   << " x = " << plane_hit->getPosition()[0]
   << " y = " << plane_hit->getPosition()[1]
   << " z = " << plane_hit->getPosition()[2]

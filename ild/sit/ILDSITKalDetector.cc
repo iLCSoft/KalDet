@@ -4,6 +4,7 @@
 #include "MaterialDataBase.h"
 
 #include "ILDParallelPlanarMeasLayer.h"
+#include "ILDParallelStripPlanarMeasLayer.h"
 
 #include "ILDPlanarHit.h"
 
@@ -42,7 +43,8 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
   Bool_t active = true;
   Bool_t dummy  = false;
   
-  static const double eps = 1e-6; 
+  static const double eps_layer  = 1e-6; 
+  static const double eps_sensor = 1e-8; 
   
   UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   
@@ -57,19 +59,26 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
     
     nLadders = _SITgeo[layer].nLadders ;
     
-    double phi0 = _SITgeo[layer].phi0 ;
+    const double phi0 = _SITgeo[layer].phi0 ;
     
-    double ladder_distance = _SITgeo[layer].supRMin ;
-    double ladder_thickness = _SITgeo[layer].supThickness ;
+    const double ladder_distance = _SITgeo[layer].supRMin ;
+    const double ladder_thickness = _SITgeo[layer].supThickness ;
     
-    double sensitive_distance = _SITgeo[layer].senRMin ;
-    double sensitive_thickness = _SITgeo[layer].senThickness ;
+    const double sensitive_distance = _SITgeo[layer].senRMin ;
+    const double sensitive_thickness = _SITgeo[layer].senThickness ;
     
-    double width = _SITgeo[layer].width ;
-    double length = _SITgeo[layer].length;
+    const double width = _SITgeo[layer].width ;
+    const double length = _SITgeo[layer].length;
     
     double currPhi;
-    double dphi = _SITgeo[layer].dphi ;
+    const double dphi = _SITgeo[layer].dphi ;
+    
+    const double stripAngle = pow(-1,layer) *_SITgeo[layer].stripAngle;
+    
+    const int nsensors = _SITgeo[layer].nSensorsPerLadder;
+    
+    const double sensor_length = _SITgeo[layer].sensorLength;
+    
     
     for (int ladder=0; ladder<nLadders; ++ladder) {
       
@@ -82,52 +91,81 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
       encoder[lcio::ILDCellID0::side] = 0 ;
       encoder[lcio::ILDCellID0::layer]  = layer ;
       encoder[lcio::ILDCellID0::module] = ladder ;
-      encoder[lcio::ILDCellID0::sensor] = 0 ;
       
-      int CellID = encoder.lowWord() ;
-      
-      streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with CellID = "
-      << CellID
-      << std::endl ;
+      double z_centre_support = 0.0;
       
       // check if the sensitive is inside or outside for the support 
       if( sensitive_distance < ladder_distance  ) {
         
-        double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps ;
-        double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps ;
-        double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps ;
-        double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+3) * eps ;
+        double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps_layer ;
+        double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps_layer ;
+        double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+3) * eps_layer ;
         
         // air - sensitive boundary
-        Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy,-1,"SITSenFront")) ;
+        Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset,z_centre_support, offset, dummy,-1,"SITSenFront")) ;
         
-        // measurement plane defined as the middle of the sensitive volume 
-        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, CellID, "SITMeaslayer" )) ;
+        for (int isensor=0; isensor<nsensors; ++isensor) {
+
+          encoder[lcio::ILDCellID0::sensor] = isensor ;          
+          int CellID = encoder.lowWord() ;
+          
+          double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps_layer + eps_sensor * isensor ;
+          
+          double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
+          
+          // measurement plane defined as the middle of the sensitive volume 
+          Add(new ILDParallelStripPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
+
+          streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with CellID = "
+          << CellID
+          << std::endl ;
+          
+        }
         
+       
         // sensitive - support boundary 
-        Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy,-1,"SITSenSupportIntf" )) ; 
+        Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset,z_centre_support, offset, dummy,-1,"SITSenSupportIntf" )) ; 
         
         // support - air boundary
-        Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, dummy,-1,"SITSupRear" )) ; 
+        Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset,z_centre_support, offset, dummy,-1,"SITSupRear" )) ; 
       }
       else {
         
-        double sup_front_sorting_policy         = ladder_distance     + (4 * ladder+0) * eps ;
-        double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+1) * eps ;
-        double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+2) * eps ;
-        double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+3) * eps ;
+        double sup_front_sorting_policy         = ladder_distance     + (4 * ladder+0) * eps_layer ;
+        double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+1) * eps_layer ;
+        double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+3) * eps_layer ;
         
         // air - support boundary
-        Add(new ILDParallelPlanarMeasLayer(air, carbon, ladder_distance, currPhi, _bZ, sup_front_sorting_policy, width, length, offset, dummy,-1,"SITSupFront")) ;
+        Add(new ILDParallelPlanarMeasLayer(air, carbon, ladder_distance, currPhi, _bZ, sup_front_sorting_policy, width, length, offset,z_centre_support, offset, dummy,-1,"SITSupFront")) ;
         
         // support boundary - sensitive
-        Add(new ILDParallelPlanarMeasLayer(carbon, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, dummy,-1,"SITSenSupportIntf" )) ; 
+        Add(new ILDParallelPlanarMeasLayer(carbon, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset,z_centre_support, offset, dummy,-1,"SITSenSupportIntf" )) ; 
         
-        // measurement plane defined as the middle of the sensitive volume 
-        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, active, CellID, "SITMeaslayer" )) ;
+        
+        for (int isensor=0; isensor<nsensors; ++isensor) {
+
+          encoder[lcio::ILDCellID0::sensor] = isensor ;          
+          int CellID = encoder.lowWord() ;
+          
+          double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+2) * eps_layer + eps_sensor * isensor ;
+
+          double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
+
+          // measurement plane defined as the middle of the sensitive volume 
+          Add(new ILDParallelStripPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
+        
+          streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with CellID = "
+          << CellID
+          << std::endl ;
+
+          
+        }
+
+        
+
         
         // support - air boundary
-        Add(new ILDParallelPlanarMeasLayer(silicon, air, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, dummy,-1,"SITSenRear" )) ;  
+        Add(new ILDParallelPlanarMeasLayer(silicon, air, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset,z_centre_support, offset, dummy,-1,"SITSenRear" )) ;  
       }
       
       
@@ -150,12 +188,40 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   _nLayers = pSITLayerLayout.getNLayers(); 
   _SITgeo.resize(_nLayers);
   
+  bool n_sensors_per_ladder_present = true;
+  
+  try {
+
+    std::vector<int> v = pSITDetMain.getIntVals("n_sensors_per_ladder");
+
+  } catch (gear::UnknownParameterException& e) {
+
+    n_sensors_per_ladder_present = false;
+
+  }
+
+  double strip_angle_deg = 0.0;
+  bool strip_angle_present = true;
+  
+  try {
+    
+    strip_angle_deg = pSITDetMain.getDoubleVal("strip_angle_deg");
+    
+  } catch (gear::UnknownParameterException& e) {
+    
+    strip_angle_present = false;
+    
+  }
+  
+  
   //SJA:FIXME: for now the support is taken as the same size the sensitive
   //           if this is not done then the exposed areas of the support would leave a carbon - air boundary,
   //           which if traversed in the reverse direction to the next boundary then the track would be propagated through carbon
   //           for a significant distance 
   
   for( int layer=0; layer < _nLayers; ++layer){
+    
+      
     _SITgeo[layer].nLadders = pSITLayerLayout.getNLadders(layer); 
     _SITgeo[layer].phi0 = pSITLayerLayout.getPhi0(layer); 
     _SITgeo[layer].dphi = 2*M_PI / _SITgeo[layer].nLadders; 
@@ -166,8 +232,29 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _SITgeo[layer].offset = pSITLayerLayout.getSensitiveOffset(layer); 
     _SITgeo[layer].senThickness = pSITLayerLayout.getSensitiveThickness(layer); 
     _SITgeo[layer].supThickness = pSITLayerLayout.getLadderThickness(layer); 
+
+    if (n_sensors_per_ladder_present) {
+      _SITgeo[layer].nSensorsPerLadder =   pSITDetMain.getIntVals("n_sensors_per_ladder")[layer];
+    }
+    else{
+      _SITgeo[layer].nSensorsPerLadder = 1 ;
+    }
+    
+    _SITgeo[layer].sensorLength = _SITgeo[layer].length / _SITgeo[layer].nSensorsPerLadder;
+    
+    
+    if (strip_angle_present) {
+      _SITgeo[layer].stripAngle = strip_angle_deg * M_PI/180 ;
+    } else {
+      _SITgeo[layer].stripAngle = 0.0 ;
+    }
+
+    std::cout << " layer  = " << layer << std::endl;
+    std::cout << " nSensorsPerLadder  = " << _SITgeo[layer].nSensorsPerLadder << std::endl;
+    std::cout << " sensorLength  = " << _SITgeo[layer].sensorLength << std::endl;
+    std::cout << " stripAngle  = " << _SITgeo[layer].stripAngle << std::endl;
+    
   }
-  
   
   
   

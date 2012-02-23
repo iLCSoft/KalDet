@@ -285,6 +285,12 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   
   xx.SetXYZ(x_ins, y_ins, z_pca + s_ins * tanl);
   
+//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: " 
+//  << " x = " << xx.X()
+//  << " y = " << xx.Y()
+//  << " z = " << xx.Z()
+//  << std::endl;
+  
   phi = s_ins / r ;
   
   return (IsOnSurface(xx) ? 1 : 0);

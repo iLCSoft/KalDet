@@ -1,5 +1,5 @@
-#ifndef ILDPLANARHIT_H
-#define ILDPLANARHIT_H
+#ifndef ILDPLANARSTRIPHIT_H
+#define ILDPLANARSTRIPHIT_H
 
 /** ILDPlanarStripHit: User defined KalTest hit class using u coordinate, which provides coordinate vector as defined by the MeasLayer 
  *  
@@ -11,6 +11,8 @@
 #include "ILDVTrackHit.h"
 
 
+#define ILDPlanarStripHit_DIM 1 // set to 2 if one want to debug strip hits by using the 2nd dimention
+
 class ILDPlanarStripHit : public ILDVTrackHit {
   
 public:
@@ -21,7 +23,7 @@ public:
                Double_t       *dx,
                Double_t        bfield,
                EVENT::TrackerHit* trkhit) 
-  : ILDVTrackHit(ms, x, dx, bfield, 1,trkhit)
+  : ILDVTrackHit(ms, x, dx, bfield, ILDPlanarStripHit_DIM,trkhit)
   { /* no op */ } 
   
   // TVTrackHit's pure virtuals that must be implemented

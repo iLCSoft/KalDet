@@ -34,6 +34,7 @@ private:
   
   struct SIT_Layer {
     int nLadders;
+    int nSensorsPerLadder;
     double phi0;
     double dphi;
     double senRMin;
@@ -43,6 +44,8 @@ private:
     double offset;
     double senThickness;
     double supThickness;
+    double sensorLength;
+    double stripAngle;
   };
   std::vector<SIT_Layer> _SITgeo;
   

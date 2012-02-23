@@ -22,13 +22,15 @@ using namespace std;
 TKalMatrix ILDPlanarStripHit::XvToMv(const TVector3 &xv, Double_t /*t0*/) const
 {
  
-  TKalMatrix h = this->GetMeasLayer().XvToMv(*(this),xv);
+//  TKalMatrix h = this->GetMeasLayer().XvToMv(*(this),xv);
+//
+//  TKalMatrix h_return(1,2);
+//
+//  h_return(0,0) = h(0,0); 
+//  
+//  return h_return;
 
-  TKalMatrix h_return(1,2);
-
-  h_return(0,0) = h(0,0); 
-  
-  return h_return;
+  return this->GetMeasLayer().XvToMv(*(this),xv);
   
   
 }

@@ -41,6 +41,7 @@ ILDPlanarMeasLayer::ILDPlanarMeasLayer(TMaterial &min,
                                        Double_t   xiwidth,
                                        Double_t   zetawidth,
                                        Double_t   xioffset,
+                                       Double_t   UOrigin,
                                        Bool_t     is_active,
                                        Int_t      CellID,
                                        const Char_t    *name)
@@ -49,16 +50,21 @@ TPlane(center, normal),
 fSortingPolicy(SortingPolicy),
 fXiwidth(xiwidth),
 fZetawidth(zetawidth),
-fXioffset(xioffset)
+fXioffset(xioffset),
+fUOrigin(UOrigin)
 
 {
   
   streamlog_out(DEBUG0) << "ILDPlanarMeasLayer created" 
-  << " Layer R = " << this->GetXc().Mag() 
+  << " Layer x0 = " << this->GetXc().X() 
+  << " y0 = " << this->GetXc().Y() 
+  << " z0 = " << this->GetXc().Z() 
+  << " R = " << this->GetXc().Perp() 
   << " phi = " << this->GetXc().Phi() 
-  << " xiwidth = " << xiwidth 
-  << " zetawidth = " << zetawidth 
-  << " xioffset = " << xioffset 
+  << " xiwidth = " << fXiwidth 
+  << " zetawidth = " << fZetawidth 
+  << " xioffset = " << fXioffset 
+  << " UOrigin = " << UOrigin
   << " is_active = " << is_active 
   << " CellID = " << CellID 
   << " name = " << this->ILDVMeasLayer::GetName()  
@@ -79,8 +85,18 @@ TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVector3 &xv) const
   
   TKalMatrix mv(kMdim,1);
   
-  mv(0,0) = (xv.Y() - GetXc().Y())*GetNormal().X()/GetNormal().Perp() - (xv.X() - GetXc().X())*GetNormal().Y()/GetNormal().Perp() ;
-  mv(1,0) = xv.Z();
+  double cos_phi = GetNormal().X()/GetNormal().Perp();
+  double sin_phi = GetNormal().Y()/GetNormal().Perp();
+  
+  double delta_x = xv.X() - GetXc().X();
+  double delta_y = xv.Y() - GetXc().Y();
+  double delta_z = xv.Z() - GetXc().Z();
+
+  double delta_t = (delta_x * sin_phi - delta_y * cos_phi) ;
+  
+  mv(0,0) = delta_t + fUOrigin;
+
+  mv(1,0) = delta_z ;
   
   return mv;
 }
@@ -96,9 +112,16 @@ TVector3 ILDPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
  
   //const ILDPlanarHit &ht = dynamic_cast<const ILDPlanarHit &>(vht);
   
-  Double_t z =  vht(1,0);
-  Double_t x = -vht(0,0)*GetNormal().Y()/GetNormal().Perp() + GetXc().X();
-  Double_t y =  vht(0,0)*GetNormal().X()/GetNormal().Perp() + GetXc().Y();
+  double cos_phi = GetNormal().X()/GetNormal().Perp();
+  double sin_phi = GetNormal().Y()/GetNormal().Perp();
+
+  double delta_t = vht(0,0) - fUOrigin;
+  
+  double x =  delta_t * sin_phi + this->GetXc().X();
+  double y = -delta_t * cos_phi + this->GetXc().Y();
+  
+  double z =  vht(1,0) + this->GetXc().Z();
+  
   
   return TVector3(x,y,z);
 }
@@ -115,15 +138,20 @@ void ILDPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
   //        a = (drho, phi0, kappa, dz, tanl, t0)
   //
   
+  double cos_phi = GetNormal().X()/GetNormal().Perp();
+  double sin_phi = GetNormal().Y()/GetNormal().Perp();
+  
+  
   Int_t sdim = H.GetNcols();
   Int_t hdim = TMath::Max(5,sdim-1);
   
   // Set H = (@h/@a) = (@d/@a, @z/@a)^t
   
   for (Int_t i=0; i<hdim; i++) {
-    H(0,i) = (GetNormal().X() / GetNormal().Perp()) * dxphiada(1,i)
-    -(GetNormal().Y() / GetNormal().Perp()) * dxphiada(0,i);   
+
+    H(0,i) =  sin_phi * dxphiada(0,i) - cos_phi * dxphiada(1,i) ;   
     H(1,i) =  dxphiada(2,i);
+    
   }
   if (sdim == 6) {
     H(0,sdim-1) = 0.;
@@ -133,14 +161,13 @@ void ILDPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
 }
 
 
-
+//#define DEBUG_ISONSURFACE 1 
 Bool_t ILDPlanarMeasLayer::IsOnSurface(const TVector3 &xx) const
 {
   
-  //  std::cout << "IsOnSurface " << std::endl;  
   
   Double_t xi   = (xx.Y()-GetXc().Y())*GetNormal().X()/GetNormal().Perp() - (xx.X()-GetXc().X())*GetNormal().Y()/GetNormal().Perp() ;
-  Double_t zeta = xx.Z();
+  Double_t zeta = xx.Z() - GetXc().Z();
     
   bool onSurface = false ;
   
@@ -148,38 +175,46 @@ Bool_t ILDPlanarMeasLayer::IsOnSurface(const TVector3 &xx) const
     if( xi <= GetXioffset() + GetXiwidth()/2  && xi >= GetXioffset() - GetXiwidth()/2  && TMath::Abs(zeta) <= GetZetawidth()/2){
       onSurface = true;
     }
+    
+#ifdef DEBUG_ISONSURFACE
     else{
-//      streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not within boundary x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
-//      streamlog_out(DEBUG4) << "xi = " << xi << " xi_max = " << GetXioffset() + GetXiwidth()/2 << " xi_min = " << GetXioffset() - GetXiwidth()/2 << " zeta = " << zeta << " zeta_min = " << -GetZetawidth()/2 << " zeta_max " << GetZetawidth()/2 << " Xioffset = " << GetXioffset() << std::endl;     
-//      onSurface = false;
-//      streamlog_out(DEBUG4) << " xi <= GetXioffset() + GetXiwidth()/2 = " << (xi <= GetXioffset() + GetXiwidth()/2) << std::endl ;
-//      streamlog_out(DEBUG4) << " xi >= GetXioffset() - GetXiwidth()/2 = " << (xi >= GetXioffset() - GetXiwidth()/2) << std::endl;
-//      streamlog_out(DEBUG4) << " TMath::Abs(zeta) <= GetZetawidth()/2 = " << (TMath::Abs(zeta) <= GetZetawidth()/2) << std::endl;
+      streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not within boundary x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
+      streamlog_out(DEBUG4) << "xi = " << xi << " xi_max = " << GetXioffset() + GetXiwidth()/2 << " xi_min = " << GetXioffset() - GetXiwidth()/2 << " zeta = " << zeta << " zeta_min = " << -GetZetawidth()/2 << " zeta_max " << GetZetawidth()/2 << " Xioffset = " << GetXioffset() << std::endl;     
+      onSurface = false;
+      streamlog_out(DEBUG4) << " xi <= GetXioffset() + GetXiwidth()/2 = " << (xi <= GetXioffset() + GetXiwidth()/2) << std::endl ;
+      streamlog_out(DEBUG4) << " xi >= GetXioffset() - GetXiwidth()/2 = " << (xi >= GetXioffset() - GetXiwidth()/2) << std::endl;
+      streamlog_out(DEBUG4) << " TMath::Abs(zeta) <= GetZetawidth()/2 = " << (TMath::Abs(zeta) <= GetZetawidth()/2) << std::endl;
     }
-  }
-  else{
-//    streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not on surface x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
-//    streamlog_out(DEBUG4) << "Distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl;
-  }
-  
-  if( onSurface == false ) {
-//    streamlog_out(DEBUG) << "GetNormal().X() " <<  GetNormal().X() << std::endl;  
-//    streamlog_out(DEBUG4) << "GetNormal().Y() " <<  GetNormal().Y() << std::endl;  
-//    streamlog_out(DEBUG4) << "GetNormal().Perp() " << GetNormal().Perp() << std::endl;  
-//    streamlog_out(DEBUG4) << "GetNormal().X()/GetNormal().Perp() " << GetNormal().X()/GetNormal().Perp() << std::endl;  
-//    streamlog_out(DEBUG4) << "GetNormal().Y()/GetNormal().Perp() " << GetNormal().Y()/GetNormal().Perp() << std::endl;  
-//    streamlog_out(DEBUG4) << "xx.X()-GetXc().X() " <<  xx.X()-GetXc().X() << std::endl;  
-//    streamlog_out(DEBUG4) << "xx.Y()-GetXc().Y() " <<  xx.Y()-GetXc().Y() << std::endl;  
-//    
-//    streamlog_out(DEBUG4) << "zeta " << zeta << std::endl;  
-//    streamlog_out(DEBUG4) << "xi "   << xi   << std::endl;  
-//    streamlog_out(DEBUG4) << "zeta half width " << GetZetawidth()/2 << std::endl;  
-//    streamlog_out(DEBUG4) << "xi half width " << GetXiwidth()/2 << std::endl;  
-//    streamlog_out(DEBUG4) << "offset  " << GetXioffset() << std::endl;  
-//    
-//    streamlog_out(DEBUG4) << "distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl; 
+#endif
 
   }
+
+#ifdef DEBUG_ISONSURFACE  
+  else{
+    streamlog_out(DEBUG4) << "ILDPlanarMeasLayer::IsOnSurface: Point not on surface x = " << xx.x() << " y = " << xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << std::endl;   
+    streamlog_out(DEBUG4) << "Distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl;
+  }
+  if( onSurface == false ) {
+    streamlog_out(DEBUG) << "x0 " <<  GetXc().X() << std::endl;  
+    streamlog_out(DEBUG) << "y0 " <<  GetXc().Y() << std::endl;  
+    streamlog_out(DEBUG) << "z0 " <<  GetXc().Z() << std::endl;  
+    streamlog_out(DEBUG) << "GetNormal().X() " <<  GetNormal().X() << std::endl;  
+    streamlog_out(DEBUG4) << "GetNormal().Y() " <<  GetNormal().Y() << std::endl;  
+    streamlog_out(DEBUG4) << "GetNormal().Perp() " << GetNormal().Perp() << std::endl;  
+    streamlog_out(DEBUG4) << "GetNormal().X()/GetNormal().Perp() " << GetNormal().X()/GetNormal().Perp() << std::endl;  
+    streamlog_out(DEBUG4) << "GetNormal().Y()/GetNormal().Perp() " << GetNormal().Y()/GetNormal().Perp() << std::endl;  
+    streamlog_out(DEBUG4) << "xx.X()-GetXc().X() " <<  xx.X()-GetXc().X() << std::endl;  
+    streamlog_out(DEBUG4) << "xx.Y()-GetXc().Y() " <<  xx.Y()-GetXc().Y() << std::endl;  
+    
+    streamlog_out(DEBUG4) << "zeta " << zeta << std::endl;  
+    streamlog_out(DEBUG4) << "xi "   << xi   << std::endl;  
+    streamlog_out(DEBUG4) << "zeta half width " << GetZetawidth()/2 << std::endl;  
+    streamlog_out(DEBUG4) << "xi half width " << GetXiwidth()/2 << std::endl;  
+    streamlog_out(DEBUG4) << "offset  " << GetXioffset() << std::endl;  
+    
+    streamlog_out(DEBUG4) << "distance from plane " << (xx.X()-GetXc().X())*GetNormal().X() + (xx.Y()-GetXc().Y())*GetNormal().Y() << std::endl; 
+  }
+#endif
   
   return onSurface;
   
@@ -226,8 +261,10 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   bool hit_on_surface = IsOnSurface(hit);
   
   streamlog_out(DEBUG0) << "ILDPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
-  << " Layer R = " << this->GetXc().Mag() 
+  << " for CellID " << trkhit->getCellID0()
+  << " Layer R = " << this->GetXc().Perp() 
   << " Layer phi = " << this->GetXc().Phi() 
+  << " Layer z0 = " << this->GetXc().Z() 
   << " u = "  <<  x[0]
   << " v = "  <<  x[1]
   << " du = " << dx[0]
@@ -238,6 +275,7 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   << " r = " << sqrt( plane_hit->getPosition()[0]*plane_hit->getPosition()[0] + plane_hit->getPosition()[1]*plane_hit->getPosition()[1])
   << " onSurface = " << hit_on_surface
   << std::endl ;
+  
   
   return hit_on_surface ? new ILDPlanarHit( *this , x, dx, this->GetBz(), trkhit) : NULL; 
   

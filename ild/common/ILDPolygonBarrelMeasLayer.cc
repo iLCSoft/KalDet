@@ -57,7 +57,7 @@ _r0(r0),_lhalf(lhalf),_nsides(nsides),_zpos(zpos),_phi0(phi0)
     
     double phi = i*_segment_dphi+_start_phi;
     
-    ILDParallelPlanarMeasLayer p(min,mout,r0,phi,Bz,sortingPolicy,width,2*lhalf,0.0,false);
+    ILDParallelPlanarMeasLayer p(min,mout,r0,phi,Bz,sortingPolicy,width,2*lhalf,0.0,0.0,0.0,false); // NOTE: No Physical Offset or Coordinate Offset allowed
     _planes.push_back(p);
     
   }

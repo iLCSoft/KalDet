@@ -65,8 +65,8 @@ TVKalDetector(10)
      double epsilon = 0.001;
      if( fabs( zEnd-zStart ) > epsilon ){
      
-         Add( new ILDConeMeasLayer(beam, beryllium , zStart, rInnerStart, zEnd, rInnerEnd, bz, dummy,-1, name.c_str() ) );
-         Add( new ILDConeMeasLayer(beam, beryllium , -zStart, rInnerStart, -zEnd, rInnerEnd, bz, dummy,-1, name.c_str() ) );
+////         Add( new ILDConeMeasLayer(beam, beryllium , zStart, rInnerStart, zEnd, rInnerEnd, bz, dummy,-1, name.c_str() ) );
+////         Add( new ILDConeMeasLayer(beam, beryllium , -zStart, rInnerStart, -zEnd, rInnerEnd, bz, dummy,-1, name.c_str() ) );
          streamlog_out( DEBUG0 )   << " *** adding inner " << name << " Measurement layer using CellID: [ beampipe ] at"
          << " z1 = +-" << zStart
          << " z2 = +-" << zEnd
@@ -76,8 +76,8 @@ TVKalDetector(10)
          << std::endl ;  
             
          
-         Add( new ILDConeMeasLayer(beryllium , air , zStart, rOuterStart, zEnd, rOuterEnd, bz, dummy,-1, name.c_str() ) );
-         Add( new ILDConeMeasLayer(beryllium , air , -zStart, rOuterStart, -zEnd, rOuterEnd, bz, dummy,-1, name.c_str() ) );
+////         Add( new ILDConeMeasLayer(beryllium , air , zStart, rOuterStart, zEnd, rOuterEnd, bz, dummy,-1, name.c_str() ) );
+////         Add( new ILDConeMeasLayer(beryllium , air , -zStart, rOuterStart, -zEnd, rOuterEnd, bz, dummy,-1, name.c_str() ) );
          streamlog_out( DEBUG0 )   << " *** adding outer " << name << " Measurement layer using CellID: [ beampipe ] at"
          << " z1 = +-" << zStart
          << " z2 = +-" << zEnd
@@ -140,7 +140,7 @@ TVKalDetector(10)
     double phi = i*segment_dphi+phi0;
     double width = 2.0*(r_min_ecal_bar*tan(segment_dphi*0.5));
     double length = 2.0*z_max_ecal_bar;
-    Add ( new ILDParallelPlanarMeasLayer(air,air,r_min_ecal_bar,phi,bz,r_min_ecal_bar+i*1.0e-06,width,length,0.0,true,encoder.lowWord(),"ECalBarrelFace"));    
+    Add ( new ILDParallelPlanarMeasLayer(air,air,r_min_ecal_bar,phi,bz,r_min_ecal_bar+i*1.0e-06,width,length,0.0,0.0,0.0,true,encoder.lowWord(),"ECalBarrelFace"));    
     
   }
   

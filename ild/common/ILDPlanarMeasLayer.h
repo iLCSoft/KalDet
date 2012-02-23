@@ -40,6 +40,7 @@ public:
                      Double_t   xiwidth,
                      Double_t   zetawidth,
                      Double_t   xioffset,
+                     Double_t   fUOrigin,
                      Bool_t     is_active,
                      Int_t      CellID = -1,
                      const Char_t    *name = "ILDPlanarMeasL");
@@ -73,7 +74,8 @@ protected:
   Double_t fSortingPolicy;
   Double_t fXiwidth;
   Double_t fZetawidth;
-  Double_t fXioffset;
+  Double_t fXioffset; //determines how far the centre of the plane is translated in the direction positive rotation
+  Double_t fUOrigin;  //determines origin of the transverse coordinate
   
 };
 
