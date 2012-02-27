@@ -12,7 +12,7 @@ PROJECT( KalDet )
 
 # project version
 SET( KalDet_VERSION_MAJOR 1 )
-SET( KalDet_VERSION_MINOR 5 )
+SET( KalDet_VERSION_MINOR 6 )
 SET( KalDet_VERSION_PATCH 0 )
 
 cmake_policy(SET CMP0008 NEW)

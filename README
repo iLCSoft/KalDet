@@ -77,6 +77,20 @@ make install
 
 
  --------
+| v01-06 |  
+ -------- 
+
+ 	- ild 
+	  - ILDMeasurementSurfaceStoreFiller created to fill GEAR MeasurementSurfaceStore.
+	  - Variable number of sensors to the FTD, SIT and SET.
+	  - Added Rotated Strip measurements for ILDParallelStripPlanarMeasLayer.
+	  - Allow offset in z for planes. 
+     	  - Allow to set the origin of the u coordinate which lies in the plane, necessary for a plane composed of two pieces.
+	  - ILDFTDKalDetector adapted to deal with new gear output.
+	  - Added ILDConeMeasLayer using TCutCone. Still needs correcting in ILDSupportKalDetector
+
+
+ --------
 | v01-05 |  
  -------- 
 
