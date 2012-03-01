@@ -249,10 +249,10 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
       _SITgeo[layer].stripAngle = 0.0 ;
     }
 
-    std::cout << " layer  = " << layer << std::endl;
-    std::cout << " nSensorsPerLadder  = " << _SITgeo[layer].nSensorsPerLadder << std::endl;
-    std::cout << " sensorLength  = " << _SITgeo[layer].sensorLength << std::endl;
-    std::cout << " stripAngle  = " << _SITgeo[layer].stripAngle << std::endl;
+    streamlog_out(DEBUG0) << " layer  = " << layer << std::endl;
+    streamlog_out(DEBUG0) << " nSensorsPerLadder  = " << _SITgeo[layer].nSensorsPerLadder << std::endl;
+    streamlog_out(DEBUG0) << " sensorLength  = " << _SITgeo[layer].sensorLength << std::endl;
+    streamlog_out(DEBUG0) << " stripAngle  = " << _SITgeo[layer].stripAngle << std::endl;
     
   }
   

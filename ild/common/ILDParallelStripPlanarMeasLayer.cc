@@ -13,6 +13,13 @@
 
 TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVector3 &xv) const
 {
+ 
+//  std::cout << "\t ILDParallelStripPlanarMeasLayer::XvToMv: "
+//  << " x = " << xv.X() 
+//  << " y = " << xv.Y() 
+//  << " z = " << xv.Z() 
+//  << std::endl;
+
   
   double cos_phi = GetNormal().X()/GetNormal().Perp();
   double sin_phi = GetNormal().Y()/GetNormal().Perp();
@@ -36,6 +43,14 @@ TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVector3 &xv) const
     mv(1,0) = delta_z * cos_theta - delta_t * sin_theta;
   }
   
+//  std::cout << "\t ILDParallelStripPlanarMeasLayer::XvToMv: " 
+//  << " mv(0,0) = " << mv(0,0) ;
+//  if (ILDPlanarStripHit_DIM == 2) {
+//    std::cout << " mv(1,0) = " << mv(1,0);
+//  }
+//  std::cout << std::endl;
+
+  
   return mv;
 
 }
@@ -49,6 +64,12 @@ TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVTrackHit &,
 TVector3 ILDParallelStripPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
 
+//  std::cout << "\t ILDParallelStripPlanarMeasLayer::HitToXv: "
+//  << " vht(0,0) = " << vht(0,0);
+//  if (ILDPlanarStripHit_DIM == 2) {
+//    std::cout << " vht(1,0) = " << vht(1,0);
+//  }
+//  std::cout << std::endl;
   
   double cos_phi = GetNormal().X()/GetNormal().Perp();
   double sin_phi = GetNormal().Y()/GetNormal().Perp();
@@ -71,6 +92,13 @@ TVector3 ILDParallelStripPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
   
   double z = vht(0,0) * sin_theta + this->GetXc().Z() + dz;
 
+//  std::cout << "\t ILDParallelStripPlanarMeasLayer::HitToXv: "
+//  << " x = " << x 
+//  << " y = " << y 
+//  << " z = " << z 
+//  << std::endl;
+  
+  
   this->IsOnSurface(TVector3(x,y,z));
   
   return TVector3(x,y,z);
@@ -101,13 +129,30 @@ void ILDParallelStripPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
   Int_t hdim = TMath::Max(5,sdim-1);
   
   // Set H = (@h/@a) = (@d/@a, @z/@a)^t
+
+  double dudx =  cos_theta * sin_phi;
+  double dudy = -cos_theta * cos_phi;
+  double dudz =  sin_theta;
+
+  double dvdx = -sin_theta * sin_phi;
+  double dvdy =  sin_theta * cos_phi;
+  double dvdz =  cos_theta;
+
+  
+//  std::cout << "\t ILDParallelStripPlanarMeasLayer::CalcDhDa: dudx = " << dudx << " dudy = " << dudy << " dudz = " << dudz << std::endl ;
+//  if (ILDPlanarStripHit_DIM == 2) std::cout << "\t ILDParallelStripPlanarMeasLayer::CalcDhDa: dvdx = " << dvdx << " dvdy = " << dvdy << " dvdz = " << dvdz << std::endl ;
   
   for (Int_t i=0; i<hdim; i++) {
     
-    H(0,i) =  cos_theta * sin_phi * dxphiada(0,i) - cos_theta * cos_phi * dxphiada(1,i) + sin_theta * dxphiada(2,i) ;   
+    H(0,i) =  dudx * dxphiada(0,i) + dudy * dxphiada(1,i) + dudz * dxphiada(2,i) ;   
+
+//    std::cout  << " H(0,"<< i <<") = " << H(0,i)  ;
 
     if (ILDPlanarStripHit_DIM == 2) {
-      H(1,i) = -sin_theta * sin_phi * dxphiada(0,i) + sin_theta * cos_phi * dxphiada(1,i) + cos_theta * dxphiada(2,i);
+
+      H(1,i) = dvdx * dxphiada(0,i) + dvdy * dxphiada(1,i) + dvdz * dxphiada(2,i);
+//      std::cout  << " H(1,"<< i <<") = " << H(1,i);
+
     }
     
   }
@@ -117,21 +162,22 @@ void ILDParallelStripPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
       H(1,sdim-1) = 0.;
     }
   }  
+  
+//  std::cout << std::endl;
+  
 }
 
 ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
 
-  if( plane_hit == NULL )  return NULL; // SJA:FIXME: should be replaced with an exception  
+  if( plane_hit == NULL )  { 
+    streamlog_out(ERROR) << "ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit dynamic_cast to ILDPlanarStripHit failed " << std::endl; 
+    return NULL; // SJA:FIXME: should be replaced with an exception  
+  }
   
   gear::Vector3D U(1.0,plane_hit->getU()[1],plane_hit->getU()[0],gear::Vector3D::spherical);
   gear::Vector3D Z(0.0,0.0,1.0);
-  
-  const float eps = 1.0e-07;
-
-
-  if( plane_hit == NULL )  return NULL; // SJA:FIXME: should be replaced with an exception  
   
   // remember here the "position" of the hit in fact defines the origin of the plane it defines so u and v are per definition 0. 
   // this is still the case for a 1-dimentional measurement, and is then used to calculate the u coordinate according to the origin of the actual measurement plane.
@@ -158,16 +204,20 @@ ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
   << " Layer phi = " << this->GetXc().Phi() 
   << " Layer z0 = " << this->GetXc().Z() 
   << " u = "  <<  x[0]
-  //  << " v = "  <<  x[1]
-  << " du = " << dx[0]
-  //  << " dv = " << dx[1]
-  << " x = " << plane_hit->getPosition()[0]
+  << " du = " << dx[0];
+
+  if(ILDPlanarStripHit_DIM == 2)  streamlog_out(DEBUG0) << " v = "  <<  x[1] << " dv = " << dx[1];
+
+  streamlog_out(DEBUG0) << " x = " << plane_hit->getPosition()[0]
   << " y = " << plane_hit->getPosition()[1]
   << " z = " << plane_hit->getPosition()[2]
   << " r = " << sqrt( plane_hit->getPosition()[0]*plane_hit->getPosition()[0] + plane_hit->getPosition()[1]*plane_hit->getPosition()[1])
   << " onSurface = " << hit_on_surface
   << std::endl ;
   
+  ILDPlanarStripHit hh( *this , x, dx, this->GetBz(),trkhit);
+  
+  this->HitToXv(hh);
   
   return hit_on_surface ? new ILDPlanarStripHit( *this , x, dx, this->GetBz(),trkhit) : NULL; 
   

@@ -83,6 +83,12 @@ TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVector3 &xv) const
   //    mv(0,0) = xi 
   //     (1,0) = zeta
   
+//  std::cout << "\t ILDPlanarMeasLayer::XvToMv: "
+//  << " x = " << xv.X() 
+//  << " y = " << xv.Y() 
+//  << " z = " << xv.Z() 
+//  << std::endl;
+  
   TKalMatrix mv(kMdim,1);
   
   double cos_phi = GetNormal().X()/GetNormal().Perp();
@@ -98,6 +104,12 @@ TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVector3 &xv) const
 
   mv(1,0) = delta_z ;
   
+//  std::cout << "\t ILDPlanarMeasLayer::XvToMv: "
+//  << " mv(0,0) = " << mv(0,0)
+//  << " mv(1,0) = " << mv(1,0)
+//  << std::endl;
+
+  
   return mv;
 }
 
@@ -110,6 +122,13 @@ TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVTrackHit &,
 TVector3 ILDPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
  
+  
+//  std::cout << "\t ILDPlanarMeasLayer::HitToXv: "
+//  << " vht(0,0) = " << vht(0,0)
+//  << " vht(1,0) = " << vht(1,0)
+//  << std::endl;
+  
+
   //const ILDPlanarHit &ht = dynamic_cast<const ILDPlanarHit &>(vht);
   
   double cos_phi = GetNormal().X()/GetNormal().Perp();
@@ -122,6 +141,12 @@ TVector3 ILDPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
   
   double z =  vht(1,0) + this->GetXc().Z();
   
+//  std::cout << "\t ILDPlanarMeasLayer::HitToXv: "
+//  << " x = " << x 
+//  << " y = " << y 
+//  << " z = " << z 
+//  << std::endl;
+
   
   return TVector3(x,y,z);
 }
