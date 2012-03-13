@@ -67,9 +67,7 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& 
     }
   }
   
-#ifdef HARDCODEDGEAR
   
-  // FTD still has hardcode values
   if( _paramFTD ){
     
     const gear::FTDLayerLayout& ftdLayers = _paramFTD->getFTDLayerLayout() ;
@@ -83,7 +81,7 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& 
       
       if (ftdLayers.getSensorType(layer) ==  gear::FTDParameters::STRIP ){ 
         
-        double strip_angle_deg = 0.0 ;// _paramFTD->getDoubleVal("strip_angle_deg");
+        double strip_angle_deg = _paramFTD->getDoubleVal("strip_angle_deg");
         
         for( unsigned sensor=1; sensor <= nSensors; sensor++ ){
           
@@ -105,7 +103,7 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& 
       
     }
   }
-#endif
+  //#endif
   
 }
 
@@ -125,7 +123,7 @@ void ILDMeasurementSurfaceStoreFiller::getMeasurementSurfaces( std::vector<Measu
   
   if( _paramFTD ) 
     this->storeFTD( _paramFTD , surface_list);
-  
+ 
 }
 
 
@@ -283,15 +281,13 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
       
       //TODO: should on back to back strip detectors of the FTD the w-vectors point in opposite directions or the same?
       for ( unsigned sensor = 1; sensor <=nSensors; sensor++ ){
-        
-        streamlog_out(DEBUG1) << "layer = " << layer << "\tpetal = " << petal << "\tsensor = " << sensor << "\n";
-        
+                
         double stripAngle = 0.; 
         
         // TODO: this should come from gear and not be hardcoded
-#ifdef HARDCODEDGEAR
         stripAngle = _FTDStripAngles[layer][sensor-1];   // NOTE HERE WE ARE COUNTING FROM 1!!!!    
-#endif
+        
+        //        streamlog_out(DEBUG1) << "FTD layer = " << layer << "\tpetal = " << petal << "\tsensor = " << sensor << " stripAngle = " << stripAngle << "\n";
         
         cellID[ lcio::ILDCellID0::side   ] = -1 ;                    
         cellID[ lcio::ILDCellID0::sensor ] = sensor ;

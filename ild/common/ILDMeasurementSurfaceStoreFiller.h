@@ -55,13 +55,8 @@ class ILDMeasurementSurfaceStoreFiller : public MeasurementSurfaceStoreFiller{
   std::vector< int > _SETNSensors;
 
   
-  //#define HARDCODEDGEAR 
-#ifdef HARDCODEDGEAR
-  
   /** the strip angles for every layer and sensor */
   std::vector< std::vector< double > > _FTDStripAngles;
-
-#endif
   
   unsigned _nVTXLayers;
   unsigned _nSITLayers;
