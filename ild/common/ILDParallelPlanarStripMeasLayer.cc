@@ -1,5 +1,5 @@
 
-#include "ILDParallelStripPlanarMeasLayer.h"
+#include "ILDParallelPlanarStripMeasLayer.h"
 #include "ILDPlanarStripHit.h"
 #include "TVTrack.h"
 #include "TVTrackHit.h"
@@ -11,10 +11,10 @@
 #include "streamlog/streamlog.h"
 
 
-TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVector3 &xv) const
+TKalMatrix ILDParallelPlanarStripMeasLayer::XvToMv(const TVector3 &xv) const
 {
  
-//  std::cout << "\t ILDParallelStripPlanarMeasLayer::XvToMv: "
+//  std::cout << "\t ILDParallelPlanarStripMeasLayer::XvToMv: "
 //  << " x = " << xv.X() 
 //  << " y = " << xv.Y() 
 //  << " z = " << xv.Z() 
@@ -43,7 +43,7 @@ TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVector3 &xv) const
     mv(1,0) = delta_z * cos_theta - delta_t * sin_theta;
   }
   
-//  std::cout << "\t ILDParallelStripPlanarMeasLayer::XvToMv: " 
+//  std::cout << "\t ILDParallelPlanarStripMeasLayer::XvToMv: " 
 //  << " mv(0,0) = " << mv(0,0) ;
 //  if (ILDPlanarStripHit_DIM == 2) {
 //    std::cout << " mv(1,0) = " << mv(1,0);
@@ -55,16 +55,16 @@ TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVector3 &xv) const
 
 }
 
-TKalMatrix ILDParallelStripPlanarMeasLayer::XvToMv(const TVTrackHit &,
+TKalMatrix ILDParallelPlanarStripMeasLayer::XvToMv(const TVTrackHit &,
                                  const TVector3   &xv) const
 {
   return XvToMv(xv);
 }
 
-TVector3 ILDParallelStripPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
+TVector3 ILDParallelPlanarStripMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
 
-//  std::cout << "\t ILDParallelStripPlanarMeasLayer::HitToXv: "
+//  std::cout << "\t ILDParallelPlanarStripMeasLayer::HitToXv: "
 //  << " vht(0,0) = " << vht(0,0);
 //  if (ILDPlanarStripHit_DIM == 2) {
 //    std::cout << " vht(1,0) = " << vht(1,0);
@@ -92,7 +92,7 @@ TVector3 ILDParallelStripPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
   
   double z = vht(0,0) * sin_theta + this->GetXc().Z() + dz;
 
-//  std::cout << "\t ILDParallelStripPlanarMeasLayer::HitToXv: "
+//  std::cout << "\t ILDParallelPlanarStripMeasLayer::HitToXv: "
 //  << " x = " << x 
 //  << " y = " << y 
 //  << " z = " << z 
@@ -105,7 +105,7 @@ TVector3 ILDParallelStripPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
 
 }
 
-void ILDParallelStripPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
+void ILDParallelPlanarStripMeasLayer::CalcDhDa(const TVTrackHit &vht,
                              const TVector3   &xxv,
                              const TKalMatrix &dxphiada,
                              TKalMatrix &H)  const
@@ -139,8 +139,8 @@ void ILDParallelStripPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
   double dvdz =  cos_theta;
 
   
-//  std::cout << "\t ILDParallelStripPlanarMeasLayer::CalcDhDa: dudx = " << dudx << " dudy = " << dudy << " dudz = " << dudz << std::endl ;
-//  if (ILDPlanarStripHit_DIM == 2) std::cout << "\t ILDParallelStripPlanarMeasLayer::CalcDhDa: dvdx = " << dvdx << " dvdy = " << dvdy << " dvdz = " << dvdz << std::endl ;
+//  std::cout << "\t ILDParallelPlanarStripMeasLayer::CalcDhDa: dudx = " << dudx << " dudy = " << dudy << " dudz = " << dudz << std::endl ;
+//  if (ILDPlanarStripHit_DIM == 2) std::cout << "\t ILDParallelPlanarStripMeasLayer::CalcDhDa: dvdx = " << dvdx << " dvdy = " << dvdy << " dvdz = " << dvdz << std::endl ;
   
   for (Int_t i=0; i<hdim; i++) {
     
@@ -167,12 +167,12 @@ void ILDParallelStripPlanarMeasLayer::CalcDhDa(const TVTrackHit &vht,
   
 }
 
-ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
+ILDVTrackHit* ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
 
   if( plane_hit == NULL )  { 
-    streamlog_out(ERROR) << "ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit dynamic_cast to ILDPlanarStripHit failed " << std::endl; 
+    streamlog_out(ERROR) << "ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit dynamic_cast to ILDPlanarStripHit failed " << std::endl; 
     return NULL; // SJA:FIXME: should be replaced with an exception  
   }
   
@@ -198,7 +198,7 @@ ILDVTrackHit* ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "ILDParallelStripPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarStripHit created" 
+  streamlog_out(DEBUG0) << "ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit ILDPlanarStripHit created" 
   << " for CellID " << trkhit->getCellID0()
   << " Layer R = " << this->GetXc().Perp() 
   << " Layer phi = " << this->GetXc().Phi() 

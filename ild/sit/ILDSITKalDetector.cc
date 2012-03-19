@@ -3,8 +3,7 @@
 
 #include "MaterialDataBase.h"
 
-#include "ILDParallelPlanarMeasLayer.h"
-#include "ILDParallelStripPlanarMeasLayer.h"
+#include "ILDParallelPlanarStripMeasLayer.h"
 
 #include "ILDPlanarHit.h"
 
@@ -114,7 +113,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
           double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
           
           // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelStripPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
+          Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
 
           streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with CellID = "
           << CellID
@@ -152,7 +151,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
           double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
 
           // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelStripPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
+          Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
         
           streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with CellID = "
           << CellID

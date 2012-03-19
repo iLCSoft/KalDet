@@ -1,7 +1,7 @@
-#ifndef __ILDParallelStripPlanarMeasLayer__
-#define __ILDParallelStripPlanarMeasLayer__
+#ifndef __ILDParallelPlanarStripMeasLayer__
+#define __ILDParallelPlanarStripMeasLayer__
 
-/** ILDParallelStripPlanarMeasLayer: User defined KalTest measurement layer class 
+/** ILDParallelPlanarStripMeasLayer: User defined KalTest measurement layer class 
  *
  * @author S.Aplin DESY
  */
@@ -13,12 +13,12 @@
 
 #include "ILDParallelPlanarMeasLayer.h"
 
-class ILDParallelStripPlanarMeasLayer : public ILDParallelPlanarMeasLayer {
+class ILDParallelPlanarStripMeasLayer : public ILDParallelPlanarMeasLayer {
   
 public:
   
   /** Constructor Taking inner and outer materials, distance and phi of plane pca to origin, B-Field, Sorting policy, plane transverse witdth and offset of centre, longitudinal width, whether the layer is sensitive, Cell ID, and an optional name */
-  ILDParallelStripPlanarMeasLayer(TMaterial &min,
+  ILDParallelPlanarStripMeasLayer(TMaterial &min,
                              TMaterial &mout,
                              Double_t   r,
                              Double_t   phi,
@@ -31,7 +31,7 @@ public:
                              Double_t   UOrigin,
                              Double_t   stripAngle,
                              Int_t      CellID = -1,
-                             const Char_t    *name = "ILDParallelStripPlanarMeasLayer")
+                             const Char_t    *name = "ILDParallelPlanarStripMeasLayer")
   :
   ILDParallelPlanarMeasLayer(min,mout,r,phi,Bz,SortingPolicy,xiwidth,zetawidth,xioffset,zoffset,UOrigin,true,CellID,name), _stripAngle(stripAngle)
   
