@@ -33,7 +33,7 @@ public:
     bool z = (xx.Z() >= GetZmin() && xx.Z() <= GetZmax());
     bool r = std::fabs( (xx-this->GetXc()).Perp() - this->GetR() ) < 1.e-4;
 
-//    std::cout << "ILDCylinderMeasLayer IsOnSurface for " << this->TVMeasLayer::GetName() << " R =  " << this->GetR() << "  GetZmin() = " << GetZmin() << " GetZmax() = " << GetZmax()  
+//    streamlog_out(DEBUG0) << "ILDCylinderMeasLayer IsOnSurface for " << this->TVMeasLayer::GetName() << " R =  " << this->GetR() << "  GetZmin() = " << GetZmin() << " GetZmax() = " << GetZmax()  
 //    << " dr = " << std::fabs( (xx-this->GetXc()).Perp() - this->GetR() )
 //    << std::endl;
     
