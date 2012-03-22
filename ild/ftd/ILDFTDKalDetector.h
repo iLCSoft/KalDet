@@ -56,10 +56,14 @@ private:
     double senThickness;
     double supThickness;
     
+    double stripAngle;
+    
     double senZPos_even_front;
     double senZPos_odd_front;
     
     bool isDoubleSided;
+    bool isStripReadout;
+    
     int nSensors;
     
     

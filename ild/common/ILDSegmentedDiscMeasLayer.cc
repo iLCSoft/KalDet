@@ -118,12 +118,62 @@ TKalMatrix ILDSegmentedDiscMeasLayer::XvToMv(const TVector3 &xv) const
   
   // Calculate measurement vector (hit coordinates) from global coordinates:
   
-  TKalMatrix mv(kMdim,1);
+//  TKalMatrix mv(kMdim,1);
+//  
+//  mv(0,0)  = xv.X() ;
+//  
+//  
+//  mv(1,0)  = xv.Y() ;
+
+  streamlog_out(DEBUG0) << "\t ILDSegmentedDiscMeasLayer::XvToMv: "
+  << " x = " << xv.X() 
+  << " y = " << xv.Y() 
+  << " z = " << xv.Z() 
+  << std::endl;
+
   
-  mv(0,0)  = xv.X() ;
+  // coordinate matrix to return
+  TKalMatrix mv(ILDPlanarHit_DIM,1);
+
+  int segmentIndex = get_segment_index(xv.Phi()) ;
+  
+  TVector3 XC = this->get_segment_centre(segmentIndex);
+  
+  double sensor_x0 = XC.X();
+  double sensor_y0 = XC.Y();
+  
+  // here we are assuming that there is no offset of the centre of the sensor in the x-y plane. 
+  
+  double phi_sensor = XC.Phi();
+  
+  // for ILDSegmentedDiscMeasLayer the Normal is pointing from the IP to the Plane
+  double sign_z = GetNormal().Z() < 0 ? -1.0 : 1.0 ;
+  
+  double phi = phi_sensor + sign_z*M_PI/2 ;
+  
+  double cos_phi = cos(phi);
+  double sin_phi = sin(phi);
+  
+  double delta_x = xv.X() - sensor_x0;
+  double delta_y = xv.Y() - sensor_y0;
+  
+    
+  double cos_theta = -sign_z;
+  
+  double u = delta_x * cos_phi + delta_y * sin_phi ; 
+  mv(0,0) = u ;
+  
+  double v =   ( cos_theta * delta_y * cos_phi - cos_theta * delta_x * sin_phi) ; 
+  mv(1,0) = v ;
   
   
-  mv(1,0)  = xv.Y() ;
+  streamlog_out(DEBUG0) << "\t ILDSegmentedDiscMeasLayer::XvToMv: phi_sensor = " << phi_sensor << " phi = " << phi << " sign_z = " << sign_z<< std::endl;
+  
+  streamlog_out(DEBUG0) << "\t ILDSegmentedDiscMeasLayer::XvToMv: "
+  << " mv(0,0) = " << mv(0,0) 
+  << " mv(1,0) = " << mv(1,0) 
+  << std::endl;
+
   return mv;
   
 }
@@ -131,16 +181,59 @@ TKalMatrix ILDSegmentedDiscMeasLayer::XvToMv(const TVector3 &xv) const
 
 TVector3 ILDSegmentedDiscMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
+  
+  streamlog_out(DEBUG0) << "\t ILDSegmentedDiscMeasLayer::HitToXv: "
+  << " vht(0,0) = " << vht(0,0) << " vht(1,0) = " << vht(1,0) << std::endl;
+  
   const ILDPlanarHit &mv = dynamic_cast<const ILDPlanarHit &>(vht);
+    
+//  double x =   mv(0,0) ;
+//  double y =   mv(1,0) ;
+//  
+//  double z = this->GetXc().Z() ;
+
+  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ;
+  EVENT::TrackerHit* hit = mv.getLCIOTrackerHit();
+  encoder.setValue(hit->getCellID0());
+  int segmentIndex = encoder[lcio::ILDCellID0::module] / 2 ;
   
-  //SJA:FIXME: in order to use real local coordinates we would have to get the CELLID from the ILDPlanarHit, this would tell us in which segment the hit was in 
   
-  double x =   mv(0,0) ;
-  double y =   mv(1,0) ;
+  TVector3 XC = this->get_segment_centre(segmentIndex);
   
-  double z = this->GetXc().Z() ;
+  double sensor_x0 = XC.X();
+  double sensor_y0 = XC.Y();
+  double sensor_z0 = XC.Z();
   
+  double phi_sensor = XC.Phi();
+  // for ILDSegmentedDiscMeasLayer the Normal is pointing from the IP to the Plane
+  double sign_z = GetNormal().Z() < 0 ? -1.0 : 1.0 ;;
+
+  double phi = phi_sensor + sign_z*M_PI/2 ;
+  
+  double cos_phi = cos(phi);
+  double sin_phi = sin(phi);
+  
+  double cos_theta = -sign_z;
+  
+  double u = mv(0,0);
+  double v = mv(1,0);
+
+  double delta_x =  (u * cos_phi - cos_theta * v * sin_phi) ;
+  double delta_y =  (u * sin_phi + cos_theta * v * cos_phi) ;
+
+  double x = delta_x + sensor_x0; 
+  double y = delta_y + sensor_y0; 
+  
+  double z = sensor_z0 ;
+  
+  streamlog_out(DEBUG0) << "\t ILDSegmentedDiscMeasLayer::HitToXv: "
+  << " x = " << x 
+  << " y = " << y 
+  << " z = " << z 
+  << std::endl;
+
   return TVector3(x,y,z);
+
 }
 
 void ILDSegmentedDiscMeasLayer::CalcDhDa(const TVTrackHit &vht,
@@ -155,21 +248,80 @@ void ILDSegmentedDiscMeasLayer::CalcDhDa(const TVTrackHit &vht,
   //        a = (drho, phi0, kappa, dz, tanl, t0)
   //
   
+//  Int_t sdim = H.GetNcols();
+//  Int_t hdim = TMath::Max(5,sdim-1);
+//  
+//  // Set H = (@h/@a) = (@d/@a, @z/@a)^t
+//  
+//  for (Int_t i=0; i<hdim; i++) {
+//    
+//    H(0,i) = dxphiada(0,i);
+//    H(1,i) = dxphiada(1,i) ;
+//    
+//  }
+//  if (sdim == 6) {
+//    H(0,sdim-1) = 0.;
+//    H(1,sdim-1) = 0.;
+//  }
+
+  
+  int segmentIndex = get_segment_index(xxv.Phi()) ;
+  
+  TVector3 XC = this->get_segment_centre(segmentIndex);
+  
+  double phi_sensor = XC.Phi();
+  // for ILDSegmentedDiscMeasLayer the Normal is pointing from the IP to the Plane 
+  double sign_z = GetNormal().Z() < 0 ? -1.0 : 1.0 ;
+  
+  double phi = phi_sensor + sign_z*M_PI/2 ;
+  
+  double cos_phi = cos(phi);
+  double sin_phi = sin(phi);
+  
+  double cos_theta = -sign_z;
+  
   Int_t sdim = H.GetNcols();
   Int_t hdim = TMath::Max(5,sdim-1);
   
   // Set H = (@h/@a) = (@d/@a, @z/@a)^t
   
+  
+  double dudx =   cos_phi;
+  double dudy =   sin_phi;
+  
+  double dvdx =  -cos_theta * sin_phi;
+  double dvdy =   cos_theta * cos_phi;
+  
+  streamlog_out(DEBUG0) << "\t ILDSegmentedDiscMeasLayer::CalcDhDa: "
+  << " dudx = " << dudx 
+  << " dudy = " << dudy
+  << " dvdx = " << dvdx 
+  << " dvdy = " << dvdy 
+  << std::endl;
+  
   for (Int_t i=0; i<hdim; i++) {
     
-    H(0,i) = dxphiada(0,i);
-    H(1,i) = dxphiada(1,i) ;
-    
+    H(0,i) = dudx * dxphiada(0,i) + dudy * dxphiada(1,i) ;
+    H(1,i) = dvdx * dxphiada(0,i) + dvdy * dxphiada(1,i) ;
+
   }
   if (sdim == 6) {
-    H(0,sdim-1) = 0.;
+
+    H(0,sdim-1) = 0.0;
     H(1,sdim-1) = 0.;
+
   }
+  
+ 
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
 }
 
@@ -259,11 +411,11 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 Bool_t ILDSegmentedDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
 {
   
-  //  std::cout << "IsOnSurface " << std::endl;  
+  //  streamlog_out(DEBUG0) << "IsOnSurface " << std::endl;  
   
   bool onSurface = false ;
   
-  TKalMatrix mv = XvToMv(xx);
+  //  TKalMatrix mv = XvToMv(xx);
   
   // check whether the hit lies in the same plane as the surface, here we are resticted to planes perpendicular to z
   
@@ -316,17 +468,25 @@ Bool_t ILDSegmentedDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
 
 ILDVTrackHit* ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
+  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit: " << std::endl;
+  
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
   
-  if( plane_hit == NULL )  return NULL; // SJA:FIXME: should be replaced with an exception  
+  if( plane_hit == NULL )  { 
+    streamlog_out(ERROR) << "ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit dynamic_cast to TrackerHitPlane failed " << std::endl; 
+    return NULL; // SJA:FIXME: should be replaced with an exception  
+  }
   
+  // remember here the "position" of the hit in fact defines the origin of the plane it defines so u and v are per definition 0. 
   const TVector3 hit( plane_hit->getPosition()[0], plane_hit->getPosition()[1], plane_hit->getPosition()[2]) ;
   
   // convert to layer coordinates       
-  TKalMatrix h    = this->XvToMv(hit);
+  TKalMatrix h(ILDPlanarHit_DIM,1); 
   
-  double  x[2] ;
-  double dx[2] ;
+  h    = this->XvToMv(hit);
+  
+  double  x[ILDPlanarHit_DIM] ;
+  double dx[ILDPlanarHit_DIM] ;
   
   x[0] = h(0, 0);
   x[1] = h(1, 0);
@@ -336,7 +496,8 @@ ILDVTrackHit* ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* t
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
+  streamlog_out(DEBUG0) << "\t ILDPlanarHit created" 
+  << " for CellID " << trkhit->getCellID0()
   << " u = "  <<  x[0]
   << " v = "  <<  x[1]
   << " du = " << dx[0]
@@ -346,6 +507,10 @@ ILDVTrackHit* ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* t
   << " z = " << plane_hit->getPosition()[2]
   << " onSurface = " << hit_on_surface
   << std::endl ;
+  
+  ILDPlanarHit hh( *this , x, dx, this->GetBz(),trkhit);
+  
+  this->HitToXv(hh);
   
   return hit_on_surface ? new ILDPlanarHit( *this , x, dx, this->GetBz(),trkhit) : NULL; 
   
@@ -369,16 +534,14 @@ int ILDSegmentedDiscMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
   
   unsigned int segment = this->get_segment_index( xx.Phi() );
   
+  const std::vector<int>& cellIds = this->getCellIDs();
+  
   lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
   bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
 
-  bf[lcio::ILDCellID0::module] = segment;
+  bf[lcio::ILDCellID0::module] = cellIds.at(segment);
   CellID = bf.lowWord();
   
-//  // now set the Cell ID using the sensor index 
-//  std::cout << "ILDSegmentedDiscMeasLayer::getIntersectionAndCellID NOTIMPLEMENTED " << __FILE__ << std::endl;  
-//  exit(1);
-
   return error_code;
   
 }
@@ -390,6 +553,37 @@ unsigned int ILDSegmentedDiscMeasLayer::get_segment_index(double phi) const {
   
 }
 
+double ILDSegmentedDiscMeasLayer::get_segment_phi(unsigned int index) const{
+
+  return angular_range_2PI(_start_phi + 0.5*_segment_dphi + index * _segment_dphi);
+
+}
+
+
+TVector3 ILDSegmentedDiscMeasLayer::get_segment_centre(unsigned int index) const{
+  
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::get_segment_centre index = " << index << std::endl; 
+  
+  double phi = this->get_segment_phi(index);
+
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::get_segment_centre phi = " << phi << std::endl; 
+   
+  
+  double rc = _trap_rmin + _trap_height/2;
+
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::get_segment_centre rc = " << rc << std::endl; 
+  
+  double xc = rc * cos(phi);
+  double yc = rc * sin(phi);;
+
+  double zc = this->GetXc().Z();
+
+  TVector3 XC(xc,yc,zc);
+
+  
+  return XC;
+  
+}
 
 double ILDSegmentedDiscMeasLayer::angular_range_2PI( double phi ) const {
   

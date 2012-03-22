@@ -114,10 +114,14 @@ public:
   /** Get sorting policy for this plane  */
   double GetSortingPolicy() const { return _sortingPolicy; }
   
-private:
+protected:
   
-  double angular_range_2PI( double phi ) const;
+  double          angular_range_2PI( double phi ) const;
   unsigned int    get_segment_index(double phi) const;
+  double          get_segment_phi(unsigned int index) const;
+  TVector3        get_segment_centre(unsigned int index) const;
+  
+private:
   
   double _sortingPolicy;
   int    _nsegments;
@@ -130,6 +134,8 @@ private:
   double _rmax;
   double _start_phi; // trailing edge of the first sector
   double _segment_dphi;
+  
+  
   
 };
 
