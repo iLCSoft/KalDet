@@ -10,18 +10,19 @@
 
 #include "ILDVTrackHit.h"
 
+#define ILDPlanarHit_DIM 2
 
 class ILDPlanarHit : public ILDVTrackHit {
   
 public:
   
   /** Constructor Taking u and v coordinates and associated measurement layer, with bfield */
-  ILDPlanarHit(const TVMeasLayer &ms,
-               Double_t       *x,
-               Double_t       *dx,
-               Double_t        bfield,
+  ILDPlanarHit(const TVMeasLayer  &ms,
+               Double_t           *x,
+               Double_t           *dx,
+               Double_t           bfield,
                EVENT::TrackerHit* trkhit) 
-  : ILDVTrackHit(ms, x, dx, bfield, 2,trkhit)
+  : ILDVTrackHit(ms, x, dx, bfield, ILDPlanarHit_DIM,trkhit)
   { /* no op */ } 
   
   // TVTrackHit's pure virtuals that must be implemented
