@@ -41,7 +41,11 @@ public:
   // Parent's pure virtuals that must be implemented
 
   TKalMatrix XvToMv(const TVector3 &xv) const;
-  TKalMatrix XvToMv(const TVTrackHit &, const TVector3   &xv) const;
+
+  TKalMatrix XvToMv(const TVTrackHit &, const TVector3   &xv) const {
+    return XvToMv(xv);
+  }
+
   TVector3 HitToXv(const TVTrackHit &vht) const ;
   
   void CalcDhDa(const TVTrackHit &vht, const TVector3   &xxv, const TKalMatrix &dxphiada, TKalMatrix &H)  const;

@@ -14,7 +14,7 @@
 TKalMatrix ILDParallelPlanarStripMeasLayer::XvToMv(const TVector3 &xv) const
 {
  
-//  std::cout << "\t ILDParallelPlanarStripMeasLayer::XvToMv: "
+//  streamlog_out(DEBUG0) << "\t ILDParallelPlanarStripMeasLayer::XvToMv: "
 //  << " x = " << xv.X() 
 //  << " y = " << xv.Y() 
 //  << " z = " << xv.Z() 
@@ -43,33 +43,28 @@ TKalMatrix ILDParallelPlanarStripMeasLayer::XvToMv(const TVector3 &xv) const
     mv(1,0) = delta_z * cos_theta - delta_t * sin_theta;
   }
   
-//  std::cout << "\t ILDParallelPlanarStripMeasLayer::XvToMv: " 
+//  streamlog_out(DEBUG0) << "\t ILDParallelPlanarStripMeasLayer::XvToMv: " 
 //  << " mv(0,0) = " << mv(0,0) ;
 //  if (ILDPlanarStripHit_DIM == 2) {
-//    std::cout << " mv(1,0) = " << mv(1,0);
+//    streamlog_out(DEBUG0) << " mv(1,0) = " << mv(1,0);
 //  }
-//  std::cout << std::endl;
+//  streamlog_out(DEBUG0) << std::endl;
 
   
   return mv;
 
 }
 
-TKalMatrix ILDParallelPlanarStripMeasLayer::XvToMv(const TVTrackHit &,
-                                 const TVector3   &xv) const
-{
-  return XvToMv(xv);
-}
 
 TVector3 ILDParallelPlanarStripMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
 
-//  std::cout << "\t ILDParallelPlanarStripMeasLayer::HitToXv: "
+//  streamlog_out(DEBUG0) << "\t ILDParallelPlanarStripMeasLayer::HitToXv: "
 //  << " vht(0,0) = " << vht(0,0);
 //  if (ILDPlanarStripHit_DIM == 2) {
-//    std::cout << " vht(1,0) = " << vht(1,0);
+//    streamlog_out(DEBUG0) << " vht(1,0) = " << vht(1,0);
 //  }
-//  std::cout << std::endl;
+//  streamlog_out(DEBUG0) << std::endl;
   
   double cos_phi = GetNormal().X()/GetNormal().Perp();
   double sin_phi = GetNormal().Y()/GetNormal().Perp();
@@ -92,7 +87,7 @@ TVector3 ILDParallelPlanarStripMeasLayer::HitToXv(const TVTrackHit &vht) const
   
   double z = vht(0,0) * sin_theta + this->GetXc().Z() + dz;
 
-//  std::cout << "\t ILDParallelPlanarStripMeasLayer::HitToXv: "
+//  streamlog_out(DEBUG0) << "\t ILDParallelPlanarStripMeasLayer::HitToXv: "
 //  << " x = " << x 
 //  << " y = " << y 
 //  << " z = " << z 
@@ -139,19 +134,19 @@ void ILDParallelPlanarStripMeasLayer::CalcDhDa(const TVTrackHit &vht,
   double dvdz =  cos_theta;
 
   
-//  std::cout << "\t ILDParallelPlanarStripMeasLayer::CalcDhDa: dudx = " << dudx << " dudy = " << dudy << " dudz = " << dudz << std::endl ;
-//  if (ILDPlanarStripHit_DIM == 2) std::cout << "\t ILDParallelPlanarStripMeasLayer::CalcDhDa: dvdx = " << dvdx << " dvdy = " << dvdy << " dvdz = " << dvdz << std::endl ;
+//  streamlog_out(DEBUG0) << "\t ILDParallelPlanarStripMeasLayer::CalcDhDa: dudx = " << dudx << " dudy = " << dudy << " dudz = " << dudz << std::endl ;
+//  if (ILDPlanarStripHit_DIM == 2) streamlog_out(DEBUG0) << "\t ILDParallelPlanarStripMeasLayer::CalcDhDa: dvdx = " << dvdx << " dvdy = " << dvdy << " dvdz = " << dvdz << std::endl ;
   
   for (Int_t i=0; i<hdim; i++) {
     
     H(0,i) =  dudx * dxphiada(0,i) + dudy * dxphiada(1,i) + dudz * dxphiada(2,i) ;   
 
-//    std::cout  << " H(0,"<< i <<") = " << H(0,i)  ;
+//    streamlog_out(DEBUG0)  << " H(0,"<< i <<") = " << H(0,i)  ;
 
     if (ILDPlanarStripHit_DIM == 2) {
 
       H(1,i) = dvdx * dxphiada(0,i) + dvdy * dxphiada(1,i) + dvdz * dxphiada(2,i);
-//      std::cout  << " H(1,"<< i <<") = " << H(1,i);
+//      streamlog_out(DEBUG0)  << " H(1,"<< i <<") = " << H(1,i);
 
     }
     
@@ -163,7 +158,7 @@ void ILDParallelPlanarStripMeasLayer::CalcDhDa(const TVTrackHit &vht,
     }
   }  
   
-//  std::cout << std::endl;
+//  streamlog_out(DEBUG0) << std::endl;
   
 }
 
@@ -176,8 +171,6 @@ ILDVTrackHit* ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
     return NULL; // SJA:FIXME: should be replaced with an exception  
   }
   
-  gear::Vector3D U(1.0,plane_hit->getU()[1],plane_hit->getU()[0],gear::Vector3D::spherical);
-  gear::Vector3D Z(0.0,0.0,1.0);
   
   // remember here the "position" of the hit in fact defines the origin of the plane it defines so u and v are per definition 0. 
   // this is still the case for a 1-dimentional measurement, and is then used to calculate the u coordinate according to the origin of the actual measurement plane.
