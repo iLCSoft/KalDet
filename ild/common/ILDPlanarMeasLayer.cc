@@ -83,7 +83,7 @@ TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVector3 &xv) const
   //    mv(0,0) = xi 
   //     (1,0) = zeta
   
-//  std::cout << "\t ILDPlanarMeasLayer::XvToMv: "
+//  streamlog_out(DEBUG0) << "\t ILDPlanarMeasLayer::XvToMv: "
 //  << " x = " << xv.X() 
 //  << " y = " << xv.Y() 
 //  << " z = " << xv.Z() 
@@ -104,7 +104,7 @@ TKalMatrix ILDPlanarMeasLayer::XvToMv(const TVector3 &xv) const
 
   mv(1,0) = delta_z ;
   
-//  std::cout << "\t ILDPlanarMeasLayer::XvToMv: "
+//  streamlog_out(DEBUG0) << "\t ILDPlanarMeasLayer::XvToMv: "
 //  << " mv(0,0) = " << mv(0,0)
 //  << " mv(1,0) = " << mv(1,0)
 //  << std::endl;
@@ -123,7 +123,7 @@ TVector3 ILDPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
 {
  
   
-//  std::cout << "\t ILDPlanarMeasLayer::HitToXv: "
+//  streamlog_out(DEBUG0) << "\t ILDPlanarMeasLayer::HitToXv: "
 //  << " vht(0,0) = " << vht(0,0)
 //  << " vht(1,0) = " << vht(1,0)
 //  << std::endl;
@@ -141,7 +141,7 @@ TVector3 ILDPlanarMeasLayer::HitToXv(const TVTrackHit &vht) const
   
   double z =  vht(1,0) + this->GetXc().Z();
   
-//  std::cout << "\t ILDPlanarMeasLayer::HitToXv: "
+//  streamlog_out(DEBUG0) << "\t ILDPlanarMeasLayer::HitToXv: "
 //  << " x = " << x 
 //  << " y = " << y 
 //  << " z = " << z 

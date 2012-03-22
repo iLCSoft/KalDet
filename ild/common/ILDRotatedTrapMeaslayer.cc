@@ -119,7 +119,7 @@ void ILDRotatedTrapMeaslayer::CalcDhDa(const TVTrackHit &vht,
 Bool_t ILDRotatedTrapMeaslayer::IsOnSurface(const TVector3 &xx) const
 {
   
-  //  std::cout << "IsOnSurface " << std::endl;  
+  //  streamlog_out(DEBUG0) << "IsOnSurface " << std::endl;  
   
   bool onSurface = false ;
   
