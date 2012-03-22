@@ -5,7 +5,6 @@
 
 #include "ILDParallelPlanarStripMeasLayer.h"
 
-#include "ILDPlanarHit.h"
 
 #include <UTIL/BitField64.h>
 #include <UTIL/ILDConf.h>
