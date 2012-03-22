@@ -1,6 +1,5 @@
 
 #include "ILDPolygonBarrelMeasLayer.h"
-#include "ILDPlanarHit.h"
 
 #include <UTIL/BitField64.h>
 #include <UTIL/ILDConf.h>
@@ -128,7 +127,7 @@ Int_t ILDPolygonBarrelMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 Bool_t ILDPolygonBarrelMeasLayer::IsOnSurface(const TVector3 &xx) const
 {
   
-  //  std::cout << "IsOnSurface " << std::endl;  
+  //  streamlog_out(DEBUG0) << "IsOnSurface " << std::endl;  
   int index = this->get_plane_index(xx.Phi());
   
   return _planes[index].IsOnSurface(xx); 
@@ -187,7 +186,7 @@ int ILDPolygonBarrelMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
   CellID = bf.lowWord();
   
   //  // now set the Cell ID using the sensor index 
-  //  std::cout << "ILDSegmentedDiscMeasLayer::getIntersectionAndCellID NOTIMPLEMENTED " << __FILE__ << std::endl;  
+  //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::getIntersectionAndCellID NOTIMPLEMENTED " << __FILE__ << std::endl;  
   //  exit(1);
   
   return error_code;
