@@ -77,6 +77,18 @@ make install
 
 
  --------
+| v01-07 |  
+ -------- 
+
+ 	- ild 
+	  - Added Strip Measurements for Segmented Disc Measurement Layers. 
+	  - Added proper local coordinates for segments in ILDSegmentedDiscMeasLayer, so that it is no longer restricted to global X and Y. 
+          - Corrected getIntersectionAndCellID so that it returns the correct module ID, previously it was returning the Nth segment in the segmented disk, so in the case of odd and even disks, it was returning moduleID/2. 
+	  - In ILDMeasurementSurfaceStoreFiller FTD now reads from GEAR parameters. Fixed counting problem for sensor. std::vector access out of range.
+	  - Renamed ILDParallelStripPlanarMeasLayer as ILDParallelPlanarStripMeasLayer.
+	  - Cleaned up use of cout and removed unnecessary includes.
+
+ --------
 | v01-06 |  
  -------- 
 
