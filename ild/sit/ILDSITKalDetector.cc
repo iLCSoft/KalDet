@@ -28,7 +28,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
   
   
   streamlog_out(DEBUG4) << "ILDSITKalDetector building SIT detector using GEAR " << std::endl ;
-  
+
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
   TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon");
@@ -114,7 +114,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
           // measurement plane defined as the middle of the sensitive volume 
           Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
 
-          streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with CellID = "
+          streamlog_out(DEBUG0) << "ILDSITKalDetector add surface with CellID = "
           << CellID
           << std::endl ;
           
@@ -152,7 +152,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
           // measurement plane defined as the middle of the sensitive volume 
           Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
         
-          streamlog_out(DEBUG3) << "ILDSITKalDetector add surface with CellID = "
+          streamlog_out(DEBUG0) << "ILDSITKalDetector add surface with CellID = "
           << CellID
           << std::endl ;
 
