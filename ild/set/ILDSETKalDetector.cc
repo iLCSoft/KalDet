@@ -118,7 +118,7 @@ ILDSETKalDetector::ILDSETKalDetector( const gear::GearMgr& gearMgr )
           // usefull for debugging
 //          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, active,CellID,"SETMeaslayer" )) ;
           
-          streamlog_out(DEBUG3) << "ILDSETKalDetector add surface with CellID = "
+          streamlog_out(DEBUG0) << "ILDSETKalDetector add surface with CellID = "
           << CellID
           << std::endl ;
           
@@ -161,7 +161,7 @@ ILDSETKalDetector::ILDSETKalDetector( const gear::GearMgr& gearMgr )
           //          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, active,CellID,"SETMeaslayer" )) ;
 
           
-          streamlog_out(DEBUG3) << "ILDSETKalDetector add surface with CellID = "
+          streamlog_out(DEBUG0) << "ILDSETKalDetector add surface with CellID = "
           << CellID
           << std::endl ;
 
