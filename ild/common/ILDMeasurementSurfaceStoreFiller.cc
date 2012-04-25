@@ -279,12 +279,12 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
       
       cellID[ lcio::ILDCellID0::module ] = petal ;
       
-      //TODO: should on back to back strip detectors of the FTD the w-vectors point in opposite directions or the same?
+      
       for ( unsigned sensor = 1; sensor <=nSensors; sensor++ ){
                 
         double stripAngle = 0.; 
         
-        // TODO: this should come from gear and not be hardcoded
+        
         stripAngle = _FTDStripAngles[layer][sensor-1];   // NOTE HERE WE ARE COUNTING FROM 1!!!!    
         
         //        streamlog_out(DEBUG1) << "FTD layer = " << layer << "\tpetal = " << petal << "\tsensor = " << sensor << " stripAngle = " << stripAngle << "\n";
@@ -361,10 +361,6 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
         CartesianCoordinateSystem* cartesian2 = new CartesianCoordinateSystem( T, R );
         MeasurementSurface* ms2 = new MeasurementSurface( cellID0, cartesian2, b2);
         surface_list.push_back(ms2);
-        
-        
-        
-        //TODO: do we need alpha in here?
         
         
       }
