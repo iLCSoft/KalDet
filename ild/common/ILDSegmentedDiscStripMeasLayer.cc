@@ -273,7 +273,7 @@ ILDVTrackHit* ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerH
     
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "\t ILDPlanarStripHit created" 
+  streamlog_out(DEBUG1) << "\t ILDPlanarStripHit created" 
   << " for CellID " << trkhit->getCellID0()
   << " Disc Z = " << this->GetXc().Z() 
   << " u = "  <<  x[0]

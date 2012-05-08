@@ -14,7 +14,6 @@
 #include "MaterialDataBase.h"
 
 #include <sstream>
-#include <iomanip>
 #include <cmath>
 
 #include "gear/GEAR.h"
@@ -39,7 +38,7 @@ TVKalDetector(10)
   const std::vector<double> rInner = pBeamPipe.getDoubleVals("RInner"); //inner radius of the cone
   const std::vector<double> rOuter = pBeamPipe.getDoubleVals("ROuter"); //outer radius of the cone
   
-  
+  MaterialDataBase::Instance().registerForService(gearMgr);
   TMaterial & beam      = *MaterialDataBase::Instance().getMaterial("beam");
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   //  TMaterial & aluminium = *MaterialDataBase::Instance().getMaterial("aluminium");

@@ -177,7 +177,7 @@ ILDVTrackHit* ILDRotatedTrapMeaslayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trk
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "ILDRotatedTrapMeaslayer::ConvertLCIOTrkHit ILDPlanarHit created" 
+  streamlog_out(DEBUG1) << "ILDRotatedTrapMeaslayer::ConvertLCIOTrkHit ILDPlanarHit created" 
   << " u = "  <<  x[0]
   << " v = "  <<  x[1]
   << " du = " << dx[0]

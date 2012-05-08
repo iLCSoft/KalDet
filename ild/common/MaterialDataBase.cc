@@ -5,9 +5,13 @@
 #include <vector>
 #include <algorithm>
 
+#include <gear/GEAR.h>
+#include "gearimpl/Util.h"
+#include <gear/SimpleMaterial.h>
+
 #include "TMaterial.h"
 
-bool MaterialDataBase::_isInitialised = false ;
+
 
 MaterialDataBase::~MaterialDataBase(){
   
@@ -24,6 +28,11 @@ MaterialDataBase::~MaterialDataBase(){
 
 TMaterial* MaterialDataBase::getMaterial(std::string mat_name){
   
+  if (_isInitialised == false) {    
+    MaterialDataBaseException exp;
+    throw exp;
+  }
+  
   std::map<std::string,TMaterial* >::iterator it = _material_map.find(mat_name) ;        
   
   if ( it == _material_map.end() ) { 
@@ -36,12 +45,31 @@ TMaterial* MaterialDataBase::getMaterial(std::string mat_name){
   
 }
 
-void MaterialDataBase::initialise(){
+void MaterialDataBase::initialise( const gear::GearMgr& gearMgr ){
   
-  this->createMaterials(); 
-  _isInitialised = true ;
+  if( !_isInitialised ){
+    this->createMaterials(gearMgr); 
+    _isInitialised = true ;
+    _gearMgr = &gearMgr;
+  }
   
 }
+
+void MaterialDataBase::registerForService(const gear::GearMgr& gearMgr) {
+  
+  if( !_isInitialised ){
+    this->initialise(gearMgr);
+  }
+  
+  else {
+    if ( _gearMgr != &gearMgr ) {
+      MaterialDataBaseException exp;
+      throw exp;
+    }
+  }
+  
+}
+
 
 void MaterialDataBase::addMaterial(TMaterial* mat, std::string name) {
   std::map<std::string, TMaterial*>::iterator it = _material_map.find(name) ; 
@@ -57,7 +85,7 @@ void MaterialDataBase::addMaterial(TMaterial* mat, std::string name) {
 }
 
 
-void MaterialDataBase::createMaterials(){
+void MaterialDataBase::createMaterials(const gear::GearMgr& gearMgr){
   
   Double_t A, Z, density, radlen ;
   std::string name;
@@ -142,6 +170,21 @@ void MaterialDataBase::createMaterials(){
   
   TMaterial &tpcfieldcage = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
   this->addMaterial(&tpcfieldcage, name);
+  
+  
+  
+  // VXD Support Material
+  
+  const gear::SimpleMaterial& vxd_sup_mat = gearMgr.getSimpleMaterial("VXDSupportMaterial");
+  
+  A       = vxd_sup_mat.getA();
+  Z       = vxd_sup_mat.getZ();
+  density = vxd_sup_mat.getDensity() * (1000.0/ 1000000.0); // kg/m^3 -> g/cm^3
+  radlen  = vxd_sup_mat.getRadLength() / 10.0 ; // mm -> cm
+  name    = vxd_sup_mat.getName() ;
+  
+  TMaterial &vxdsupport = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
+  this->addMaterial(&vxdsupport, name);
 
   
   

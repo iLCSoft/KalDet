@@ -29,6 +29,8 @@ ILDSETKalDetector::ILDSETKalDetector( const gear::GearMgr& gearMgr )
   
   streamlog_out(DEBUG4) << "ILDSETKalDetector building SET detector using GEAR " << std::endl ;
   
+  MaterialDataBase::Instance().registerForService(gearMgr);
+  
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
   TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon");

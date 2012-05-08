@@ -496,7 +496,7 @@ ILDVTrackHit* ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* t
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "\t ILDPlanarHit created" 
+  streamlog_out(DEBUG1) << "\t ILDPlanarHit created" 
   << " for CellID " << trkhit->getCellID0()
   << " u = "  <<  x[0]
   << " v = "  <<  x[1]

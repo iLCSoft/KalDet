@@ -9,7 +9,6 @@
 #include "MaterialDataBase.h"
 
 #include <sstream>
-#include <iomanip>
 
 #include "gear/GEAR.h"
 #include "gear/BField.h"
@@ -50,7 +49,8 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   
   static const Double_t inthick   =  tpcParams.getDoubleVal("tpcInnerWallThickness")  ;   // thickness of inner shell
   static const Double_t outthick  =  tpcParams.getDoubleVal("tpcOuterWallThickness")  ;   // thickness of outer shell
-  
+
+  MaterialDataBase::Instance().registerForService(gearMgr);
   TMaterial & air          = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & tpcgas       = *MaterialDataBase::Instance().getMaterial("tpcgas");
   //  TMaterial & aluminium    = *MaterialDataBase::Instance().getMaterial("aluminium");

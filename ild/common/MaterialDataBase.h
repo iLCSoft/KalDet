@@ -12,6 +12,10 @@
 
 class TMaterial;
 
+namespace gear{
+  class GearMgr ;
+}
+
 class MaterialDataBaseException: public std::exception {
   virtual const char* what() const throw() {
     return "MaterialDataBaseException occurred";
@@ -27,11 +31,7 @@ public:
   static MaterialDataBase& Instance() {
     
     static MaterialDataBase singleton;
-    
-    if( ! _isInitialised ){
-      singleton.initialise() ;
-    }
-    
+        
     return singleton;
     
   }
@@ -46,23 +46,28 @@ public:
   /** Get Material via name */
   TMaterial* getMaterial(std::string mat_name) ;  
   
+  void registerForService(const gear::GearMgr& gearMgr) ;
+  
   
 private:
+ 
+  void initialise(const gear::GearMgr& gearMgr) ;
   
-  MaterialDataBase() { _material_map.clear() ;}                               // Private constructor
+  MaterialDataBase() { _material_map.clear(); _isInitialised = false ; _gearMgr = 0; }                               // Private constructor
   
-  void initialise() ;
   
   MaterialDataBase(const MaterialDataBase&) ;                 // Prevent copy-construction
   MaterialDataBase& operator=(const MaterialDataBase&) ;      // Prevent assignment
   
   void addMaterial(TMaterial* mat, std::string name); 
-  void createMaterials();
+  void createMaterials(const gear::GearMgr& gearMgr);
   
   // private member variables
   std::map<std::string,TMaterial* > _material_map;
   
-  static bool _isInitialised;
+  bool _isInitialised;
+  
+  const gear::GearMgr* _gearMgr;
   
 };
 

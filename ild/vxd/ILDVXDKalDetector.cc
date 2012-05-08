@@ -27,9 +27,11 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
   
   streamlog_out(DEBUG1) << "ILDVXDKalDetector building VXD detector using GEAR " << std::endl ;
   
+  MaterialDataBase::Instance().registerForService(gearMgr);
+  
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
-  TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon");
+  TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("VXDSupportMaterial");
   
   
   this->setupGearGeom(gearMgr) ;
@@ -81,14 +83,14 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
       
       int CellID = encoder.lowWord() ;
       
-      
+      // even layers have the senstive side facing the IP
       if(layer%2 == 0 ){ // overlap section of ladder0 is defined after the last ladder,
         
         
         double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps ;
         double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps ;
         double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps ;
-        double sup_back_sorting_policy          = ladder_distance     + (4 * ladder+4) * eps ;
+        double sup_back_sorting_policy          = sensitive_distance  + (4 * ladder+4) * eps ;
         
         
         if(ladder==0){   // bacause overlap section of ladder0 is further outer than the last ladder.
@@ -96,19 +98,19 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
           streamlog_out(DEBUG0) << "ILDVXDKalDetector add surface with CellID = "
           << CellID
           << std::endl ;
-          
+                            
           // non overlapping region
           // air - sensitive boundary
-          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSenFront" )) ;
+          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSenFront_non_overlap_even" )) ;
           
           // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, active, CellID, "VXDMeasLayer" )) ;          
+          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, active, CellID, "VXDMeasLayer_non_overlap_even" )) ;          
           
           // sensitive - support boundary 
-          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSenSuppportIntf" )) ; 
+          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSenSuppportIntf_non_overlap_even" )) ; 
           
           // support - air boundary
-          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSupRear" )) ;           
+          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSupRear_non_overlap_even" )) ;           
           
           
           // overlapping region
@@ -127,17 +129,17 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
           << std::endl ;
           
           // air - sensitive boundary
-          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, overlap_front_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, dummy,-1,"VXDSenFront")) ;
+          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, overlap_front_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, dummy,-1,"VXDSenFront_overlap_even")) ;
           
           // measurement plane defined as the middle of the sensitive volume
-          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, overlap_measurement_plane_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, active, CellID, "VXDMeasLayer" )) ;
+          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, overlap_measurement_plane_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, active, CellID, "VXDMeasLayer_overlap_even" )) ;
           
           
           // sensitive - support boundary 
-          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, overlap_back_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, dummy,-1,"VXDSenSuppportIntf")) ; 
+          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, overlap_back_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, dummy,-1,"VXDSenSuppportIntf_overlap_even")) ; 
           
           // support - air boundary
-          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, overlap_sup_back_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, dummy,-1,"VXDSupRear")) ; 
+          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, overlap_sup_back_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, dummy,-1,"VXDSupRear_overlap_even")) ; 
           
         }
         else{
@@ -146,17 +148,18 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
           << CellID
           << std::endl ;                                        
           
-          // air - sensitive boundary
-          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenFront")) ;
           
+          // air - sensitive boundary
+          Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, z_offset, offset, dummy,-1, "VXDSenFront_even")) ;
+                    
           // measurement plane defined as the middle of the sensitive volume
-          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, z_offset, offset, active, CellID, "VXDMeaslayer" )) ;
+          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, z_offset, offset, active, CellID, "VXDMeaslayer_even" )) ;
           
           // sensitive - support boundary 
-          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenSuppportIntf" )) ; 
+          Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenSuppportIntf_even" )) ; 
           
           // support - air boundary
-          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSupRear" )) ; 
+          Add(new ILDParallelPlanarMeasLayer(carbon, air, ladder_distance+ladder_thickness, currPhi, _bZ, sup_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSupRear_even" )) ; 
           
         }        
       }
@@ -170,18 +173,18 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
         streamlog_out(DEBUG0) << "ILDVXDKalDetector (ILDPlanarMeasLayer) add surface with CellID = "
         << CellID
         << std::endl ;
-        
+                
         // air - support boundary
-        Add(new ILDParallelPlanarMeasLayer(air, carbon, ladder_distance, currPhi, _bZ, sup_forward_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSupFront" )) ; 
+        Add(new ILDParallelPlanarMeasLayer(air, carbon, ladder_distance, currPhi, _bZ, sup_forward_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSupFront_odd" )) ; 
         
         // support - sensitive boundary 
-        Add(new ILDParallelPlanarMeasLayer(carbon, silicon, (ladder_distance+ladder_thickness), currPhi, _bZ, sup_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenSuppportIntf")) ; 
+        Add(new ILDParallelPlanarMeasLayer(carbon, silicon, (ladder_distance+ladder_thickness), currPhi, _bZ, sup_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenSuppportIntf_odd")) ; 
         
         // measurement plane defined as the middle of the sensitive volume
-        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, (sensitive_distance+sensitive_thickness*0.5), currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, z_offset, offset, active, CellID, "VXDMeaslayer")) ; 
+        Add(new ILDParallelPlanarMeasLayer(silicon, silicon, (sensitive_distance+sensitive_thickness*0.5), currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, z_offset, offset, active, CellID, "VXDMeaslayer_odd")) ; 
         
         // sensitive air - sensitive boundary
-        Add(new ILDParallelPlanarMeasLayer(silicon, air, (sensitive_distance+sensitive_thickness), currPhi, _bZ, sen_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenRear")) ;
+        Add(new ILDParallelPlanarMeasLayer(silicon, air, (sensitive_distance+sensitive_thickness), currPhi, _bZ, sen_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenRear_odd")) ;
         
         
       }

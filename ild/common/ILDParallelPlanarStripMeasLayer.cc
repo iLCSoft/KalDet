@@ -191,7 +191,7 @@ ILDVTrackHit* ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit ILDPlanarStripHit created" 
+  streamlog_out(DEBUG1) << "ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit ILDPlanarStripHit created" 
   << " for CellID " << trkhit->getCellID0()
   << " Layer R = " << this->GetXc().Perp() 
   << " Layer phi = " << this->GetXc().Phi() 
@@ -201,7 +201,7 @@ ILDVTrackHit* ILDParallelPlanarStripMeasLayer::ConvertLCIOTrkHit( EVENT::Tracker
 
   if(ILDPlanarStripHit_DIM == 2)  streamlog_out(DEBUG0) << " v = "  <<  x[1] << " dv = " << dx[1];
 
-  streamlog_out(DEBUG0) << " x = " << plane_hit->getPosition()[0]
+  streamlog_out(DEBUG1) << " x = " << plane_hit->getPosition()[0]
   << " y = " << plane_hit->getPosition()[1]
   << " z = " << plane_hit->getPosition()[2]
   << " r = " << sqrt( plane_hit->getPosition()[0]*plane_hit->getPosition()[0] + plane_hit->getPosition()[1]*plane_hit->getPosition()[1])

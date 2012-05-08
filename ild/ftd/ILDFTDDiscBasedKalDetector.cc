@@ -4,7 +4,6 @@
 #include "MaterialDataBase.h"
 
 #include <sstream>
-#include <iomanip>
 
 #include "gear/GEAR.h"
 #include "gear/BField.h"
@@ -26,6 +25,7 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
   
   streamlog_out(DEBUG1) << "ILDFTDDiscBasedKalDetector building Simple Disc Based FTD detector using GEAR " << std::endl ;
   
+  MaterialDataBase::Instance().registerForService(gearMgr);
   setupGearGeom( gearMgr ) ; 
   
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air") ;

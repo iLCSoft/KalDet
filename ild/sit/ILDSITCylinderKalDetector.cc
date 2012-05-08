@@ -6,7 +6,6 @@
 #include "MaterialDataBase.h"
 
 #include <sstream>
-#include <iomanip>
 #include <cstdlib>
 
 #include "gear/GEAR.h"
@@ -29,7 +28,7 @@ TVKalDetector(100)
   
   this->setupGearGeom(gearMgr);
   
-  
+  MaterialDataBase::Instance().registerForService(gearMgr);
   TMaterial & air      = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon  = *MaterialDataBase::Instance().getMaterial("silicon");
   TMaterial & carbon   = *MaterialDataBase::Instance().getMaterial("carbon");
