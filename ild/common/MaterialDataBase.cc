@@ -175,17 +175,23 @@ void MaterialDataBase::createMaterials(const gear::GearMgr& gearMgr){
   
   // VXD Support Material
   
-  const gear::SimpleMaterial& vxd_sup_mat = gearMgr.getSimpleMaterial("VXDSupportMaterial");
+  try{
   
-  A       = vxd_sup_mat.getA();
-  Z       = vxd_sup_mat.getZ();
-  density = vxd_sup_mat.getDensity() * (1000.0/ 1000000.0); // kg/m^3 -> g/cm^3
-  radlen  = vxd_sup_mat.getRadLength() / 10.0 ; // mm -> cm
-  name    = vxd_sup_mat.getName() ;
-  
-  TMaterial &vxdsupport = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
-  this->addMaterial(&vxdsupport, name);
-
+    const gear::SimpleMaterial& vxd_sup_mat = gearMgr.getSimpleMaterial("VXDSupportMaterial");
+    
+    A       = vxd_sup_mat.getA();
+    Z       = vxd_sup_mat.getZ();
+    density = vxd_sup_mat.getDensity() * (1000.0/ 1000000.0); // kg/m^3 -> g/cm^3
+    radlen  = vxd_sup_mat.getRadLength() / 10.0 ; // mm -> cm
+    name    = vxd_sup_mat.getName() ;
+    
+    TMaterial &vxdsupport = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
+    this->addMaterial(&vxdsupport, name);
+    
+  }
+  catch( gear::UnknownParameterException& e){   
+    
+  }
   
   
 }
