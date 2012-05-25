@@ -10,18 +10,18 @@
 #include <map>
 #include <exception>
 
+#include "lcio.h"
+#include "Exceptions.h"
+
 class TMaterial;
 
 namespace gear{
   class GearMgr ;
 }
 
-class MaterialDataBaseException: public std::exception {
-  virtual const char* what() const throw() {
-    return "MaterialDataBaseException occurred";
-  }
-} ;
-
+// fg: define the MaterialDataBaseException as an lcio Exception to allow for 
+//     messages to be printed in what() 
+typedef lcio::Exception MaterialDataBaseException ;
 
 class MaterialDataBase {
   

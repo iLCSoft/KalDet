@@ -29,14 +29,16 @@ MaterialDataBase::~MaterialDataBase(){
 TMaterial* MaterialDataBase::getMaterial(std::string mat_name){
   
   if (_isInitialised == false) {    
-    MaterialDataBaseException exp;
+    MaterialDataBaseException exp ( mat_name ) ;
+    
+    
     throw exp;
   }
   
   std::map<std::string,TMaterial* >::iterator it = _material_map.find(mat_name) ;        
   
   if ( it == _material_map.end() ) { 
-    MaterialDataBaseException exp;
+    MaterialDataBaseException exp( mat_name ) ;
     throw exp ; 
   } 
   else { 
@@ -63,7 +65,7 @@ void MaterialDataBase::registerForService(const gear::GearMgr& gearMgr) {
   
   else {
     if ( _gearMgr != &gearMgr ) {
-      MaterialDataBaseException exp;
+      MaterialDataBaseException exp( " MaterialDataBase::registerForService : _gearMgr != &gearMgr !  " ) ;
       throw exp;
     }
   }
@@ -74,7 +76,9 @@ void MaterialDataBase::registerForService(const gear::GearMgr& gearMgr) {
 void MaterialDataBase::addMaterial(TMaterial* mat, std::string name) {
   std::map<std::string, TMaterial*>::iterator it = _material_map.find(name) ; 
 
-  MaterialDataBaseException exp;
+  std::string what( name ) ;
+  what += " - already exists [MaterialDataBase::addMaterial() ] " ;
+  MaterialDataBaseException exp( what ) ;
 
   if ( it != _material_map.end() ) { 
     throw exp; 
