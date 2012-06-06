@@ -39,7 +39,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
   //--The Ladder structure (realistic ladder)--
   int nLadders;
   
-  Bool_t active = true;
+  //  Bool_t active = true;
   Bool_t dummy  = false;
   
   static const double eps_layer  = 1e-6; 

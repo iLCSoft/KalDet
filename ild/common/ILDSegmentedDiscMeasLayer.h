@@ -109,7 +109,7 @@ public:
   
   
   /** Check if global point is on surface  */
-  inline virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
+  virtual Bool_t   IsOnSurface (const TVector3 &xx) const;
   
   /** Get sorting policy for this plane  */
   double GetSortingPolicy() const { return _sortingPolicy; }

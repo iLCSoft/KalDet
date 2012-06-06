@@ -54,8 +54,8 @@ TVKalDetector(10)
      double zEnd = z[i+1];
      double rInnerStart = rInner[i];
      double rInnerEnd = rInner[i+1];
-     double rOuterStart = rOuter[i];
-     double rOuterEnd = rOuter[i+1];
+//     double rOuterStart = rOuter[i];
+//     double rOuterEnd = rOuter[i+1];
      
      std::stringstream sname;
      sname << "BeamPipeCone" << i;

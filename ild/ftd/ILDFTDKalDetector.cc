@@ -64,7 +64,7 @@ void ILDFTDKalDetector::build_staggered_design() {
     
     
     // check that the number of petals is divisible by 2
-    int nsegments = npetals/2.0;
+    int nsegments = npetals/2;
     
     // even segments forward
     this->create_segmented_disk_layers(idisk, nsegments, true, phi0,  senZPos_even_front );

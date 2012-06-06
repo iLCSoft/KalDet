@@ -549,7 +549,7 @@ int ILDSegmentedDiscMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
 unsigned int ILDSegmentedDiscMeasLayer::get_segment_index(double phi) const {
   
   phi = angular_range_2PI(phi-_start_phi);
-  return (floor(phi/_segment_dphi));
+  return unsigned(floor(phi/_segment_dphi));
   
 }
 

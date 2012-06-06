@@ -174,7 +174,7 @@ void ILDMeasurementSurfaceStoreFiller::storeZPlanar( const gear::ZPlanarParamete
     
     for( unsigned ladderNumber = 0; ladderNumber < nLadders; ladderNumber++ ){
       
-      for( unsigned sensorNumber = 0; sensorNumber < nsensors.at(layerNumber); sensorNumber++ ){
+      for( int sensorNumber = 0; sensorNumber < nsensors.at(layerNumber); sensorNumber++ ){
         
         // determine the CellID0 for the  ladder
         UTIL::BitField64  cellID( UTIL::ILDCellID0::encoder_string );

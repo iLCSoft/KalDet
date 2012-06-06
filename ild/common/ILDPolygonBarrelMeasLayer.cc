@@ -197,7 +197,7 @@ int ILDPolygonBarrelMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
 unsigned int ILDPolygonBarrelMeasLayer::get_plane_index(double phi) const {
 
   phi = angular_range_2PI(phi-_start_phi);
-  return (floor(phi/_segment_dphi));
+  return unsigned(floor(phi/_segment_dphi));
   
 }
 
