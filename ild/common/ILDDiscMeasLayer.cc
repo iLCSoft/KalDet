@@ -214,7 +214,7 @@ ILDVTrackHit* ILDDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) co
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "ILDDiscMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
+  streamlog_out(DEBUG1) << "ILDDiscMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
   << " u = "  <<  x[0]
   << " v = "  <<  x[1]
   << " du = " << dx[0]

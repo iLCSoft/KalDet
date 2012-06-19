@@ -244,7 +244,7 @@ void ILDSegmentedDiscStripMeasLayer::CalcDhDa(const TVTrackHit &vht,
 
 ILDVTrackHit* ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
-  streamlog_out(DEBUG0) << "ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit: " << std::endl;
+  streamlog_out(DEBUG1) << "ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit: " << std::endl;
   
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
   

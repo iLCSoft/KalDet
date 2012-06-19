@@ -145,7 +145,7 @@ ILDVTrackHit* ILDCylinderMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit
     
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG0) << "ILDCylinderMeasLayer::ConvertLCIOTrkHit ILDCylinderHit created" 
+  streamlog_out(DEBUG1) << "ILDCylinderMeasLayer::ConvertLCIOTrkHit ILDCylinderHit created" 
   << " R = " << hit.Perp()
   << " Layer R = " << this->GetR() 
   << " RPhi = "  <<  x[0]
