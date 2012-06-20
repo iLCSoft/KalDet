@@ -36,6 +36,13 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
   
   this->setupGearGeom(gearMgr) ;
   
+  if (_isStripDetector) {
+    streamlog_out(DEBUG4) << "\t\t building SIT detector as STRIP Detector." << std::endl ;    
+  } else {
+    streamlog_out(DEBUG4) << "\t\t building SIT detector as PIXEL Detector." << std::endl ;    
+  }
+
+  
   //--The Ladder structure (realistic ladder)--
   int nLadders;
   
@@ -111,10 +118,19 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
           double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps_layer + eps_sensor * isensor ;
           
           double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
-          
-          // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
 
+          
+          if (_isStripDetector) {
+          
+            // measurement plane defined as the middle of the sensitive volume 
+            Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
+            
+          } else {
+            // measurement plane defined as the middle of the sensitive volume
+            Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, true, CellID, "SITMeaslayer" )) ;
+          }
+          
+          
           streamlog_out(DEBUG0) << "ILDSITKalDetector add surface with CellID = "
           << CellID
           << std::endl ;
@@ -150,9 +166,18 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
 
           double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
 
+          
+          if (_isStripDetector) {
+            
           // measurement plane defined as the middle of the sensitive volume 
           Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SITMeaslayer" )) ;
-        
+            
+          } else {
+            // measurement plane defined as the middle of the sensitive volume
+            Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, true, CellID, "SITMeaslayer" )) ;
+          }
+
+                                    
           streamlog_out(DEBUG0) << "ILDSITKalDetector add surface with CellID = "
           << CellID
           << std::endl ;
@@ -160,9 +185,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
           
         }
 
-        
-
-        
+                
         // support - air boundary
         Add(new ILDParallelPlanarMeasLayer(silicon, air, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset,z_centre_support, offset, dummy,-1,"SITSenRear" )) ;  
       }
@@ -200,15 +223,15 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   }
 
   double strip_angle_deg = 0.0;
-  bool strip_angle_present = true;
   
   try {
     
     strip_angle_deg = pSITDetMain.getDoubleVal("strip_angle_deg");
+    _isStripDetector = true;
     
   } catch (gear::UnknownParameterException& e) {
     
-    strip_angle_present = false;
+    _isStripDetector = false;
     
   }
   
@@ -242,7 +265,7 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _SITgeo[layer].sensorLength = _SITgeo[layer].length / _SITgeo[layer].nSensorsPerLadder;
     
     
-    if (strip_angle_present) {
+    if (_isStripDetector) {
       _SITgeo[layer].stripAngle = strip_angle_deg * M_PI/180 ;
     } else {
       _SITgeo[layer].stripAngle = 0.0 ;
@@ -252,6 +275,7 @@ void ILDSITKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     streamlog_out(DEBUG0) << " nSensorsPerLadder  = " << _SITgeo[layer].nSensorsPerLadder << std::endl;
     streamlog_out(DEBUG0) << " sensorLength  = " << _SITgeo[layer].sensorLength << std::endl;
     streamlog_out(DEBUG0) << " stripAngle  = " << _SITgeo[layer].stripAngle << std::endl;
+    streamlog_out(DEBUG0) << " _isStripDetector  = " << _isStripDetector << std::endl;
     
   }
   
