@@ -44,26 +44,50 @@ void ILDMeasurementSurfaceStoreFiller::get_gear_parameters(const gear::GearMgr& 
   if( _paramSIT ){
     
     unsigned nSITLayers = _paramSIT->getZPlanarLayerLayout().getNLayers();
-    double strip_angle_deg = _paramSIT->getDoubleVal("strip_angle_deg");
 
-    for( unsigned i=0; i<nSITLayers; i++) {
+    try {
       
-      _SITStripAngles.push_back( pow(-1,i) * strip_angle_deg * M_PI/180 ); // alternately + and - 5° 
-      _SITNSensors.push_back(_paramSIT->getIntVals("n_sensors_per_ladder")[i]);
-      
+      double strip_angle_deg = _paramSIT->getDoubleVal("strip_angle_deg");
+
+      for( unsigned i=0; i<nSITLayers; i++) {
+        
+        _SITStripAngles.push_back( pow(-1,i) * strip_angle_deg * M_PI/180 ); // alternately + and - 5° 
+        _SITNSensors.push_back(_paramSIT->getIntVals("n_sensors_per_ladder")[i]);
+        
+      }
+    
+    } catch (gear::UnknownParameterException& e) {
+
+      for( unsigned i=0; i<nSITLayers; i++) {
+        _SITStripAngles.push_back( 0. );
+        _SITNSensors.push_back(_paramSIT->getIntVals("n_sensors_per_ladder")[i]);
+      }
+
     }
   }    
   
   if( _paramSET ){
     
     unsigned nSETLayers = _paramSET->getZPlanarLayerLayout().getNLayers();
-    double strip_angle_deg = _paramSET->getDoubleVal("strip_angle_deg");
         
-    for( unsigned i=0; i<nSETLayers; i++) {
+    try {
+
+      double strip_angle_deg = _paramSET->getDoubleVal("strip_angle_deg");
       
-      _SETStripAngles.push_back( pow(-1,i) * strip_angle_deg * M_PI/180 ); // alternately + and - 5°
-      _SETNSensors.push_back(_paramSET->getIntVals("n_sensors_per_ladder")[i]);
+      for( unsigned i=0; i<nSETLayers; i++) {
+        
+        _SETStripAngles.push_back( pow(-1,i) * strip_angle_deg * M_PI/180 ); // alternately + and - 5° 
+        _SETNSensors.push_back(_paramSET->getIntVals("n_sensors_per_ladder")[i]);
+        
+      }
       
+    } catch (gear::UnknownParameterException& e) {
+
+      for( unsigned i=0; i<nSETLayers; i++) {
+        _SETStripAngles.push_back( 0. );
+        _SETNSensors.push_back(_paramSET->getIntVals("n_sensors_per_ladder")[i]);
+
+      }
     }
   }
   
