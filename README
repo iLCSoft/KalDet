@@ -83,6 +83,7 @@ make install
  	  - Re-worked MaterialDataBase registerForService will need to be called at least once, triggering initialisation from the gear manager, subsequent calls will check that the gear managers are the same as those which was used to initialise. 
 	  - VXD support material added. 
 	  - Optimisation of Debug verbosity.
+	  - Allow SIT to be pixel based instead of strip. Switch acts on reading strip_angle_deg from GEAR File.
 
  --------
 | v01-08 |  
