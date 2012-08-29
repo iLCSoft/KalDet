@@ -244,8 +244,6 @@ void ILDSegmentedDiscStripMeasLayer::CalcDhDa(const TVTrackHit &vht,
 
 ILDVTrackHit* ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
-  streamlog_out(DEBUG1) << "ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit: " << std::endl;
-  
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
   
   if( plane_hit == NULL )  { 
@@ -273,7 +271,7 @@ ILDVTrackHit* ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerH
     
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG1) << "\t ILDPlanarStripHit created" 
+  streamlog_out(DEBUG1) << "ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit ILDPlanarStripHit created" 
   << " for CellID " << trkhit->getCellID0()
   << " Disc Z = " << this->GetXc().Z() 
   << " u = "  <<  x[0]

@@ -468,7 +468,6 @@ Bool_t ILDSegmentedDiscMeasLayer::IsOnSurface(const TVector3 &xx) const
 
 ILDVTrackHit* ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) const {
   
-  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit: " << std::endl;
   
   EVENT::TrackerHitPlane* plane_hit = dynamic_cast<EVENT::TrackerHitPlane*>( trkhit ) ;
   
@@ -496,7 +495,7 @@ ILDVTrackHit* ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* t
   
   bool hit_on_surface = IsOnSurface(hit);
   
-  streamlog_out(DEBUG1) << "\t ILDPlanarHit created" 
+  streamlog_out(DEBUG1) << "ILDSegmentedDiscMeasLayer::ConvertLCIOTrkHit: ILDPlanarHit created" 
   << " for CellID " << trkhit->getCellID0()
   << " u = "  <<  x[0]
   << " v = "  <<  x[1]
