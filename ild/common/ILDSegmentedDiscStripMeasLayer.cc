@@ -279,9 +279,9 @@ ILDVTrackHit* ILDSegmentedDiscStripMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerH
   << " u = "  <<  x[0]
   << " du = " << dx[0];
   
-  if(ILDPlanarStripHit_DIM == 2)  streamlog_out(DEBUG0) << " v = "  <<  x[1] << " dv = " << dx[1];
+  if(ILDPlanarStripHit_DIM == 2)  streamlog_out(DEBUG1) << " v = "  <<  x[1] << " dv = " << dx[1];
   
-  streamlog_out(DEBUG0) << " x = " << plane_hit->getPosition()[0]
+  streamlog_out(DEBUG1) << " x = " << plane_hit->getPosition()[0]
   << " y = " << plane_hit->getPosition()[1]
   << " z = " << plane_hit->getPosition()[2]
   << " r = " << sqrt( plane_hit->getPosition()[0]*plane_hit->getPosition()[0] + plane_hit->getPosition()[1]*plane_hit->getPosition()[1])
