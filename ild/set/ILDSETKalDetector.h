@@ -31,7 +31,9 @@ private:
   
   int _nLayers ;
   double _bZ ;
-  
+
+  bool _isStripDetector;
+    
   struct SET_Layer {
     int nLadders;
     int nSensorsPerLadder;

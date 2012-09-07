@@ -37,6 +37,13 @@ ILDSETKalDetector::ILDSETKalDetector( const gear::GearMgr& gearMgr )
   
   this->setupGearGeom(gearMgr) ;
   
+  if (_isStripDetector) {
+    streamlog_out(DEBUG4) << "\t\t building SET detector as STRIP Detector." << std::endl ;
+  } else {
+    streamlog_out(DEBUG4) << "\t\t building SET detector as PIXEL Detector." << std::endl ;
+  }
+
+  
   //--The Ladder structure (realistic ladder)--
   int nLadders;
   
@@ -113,12 +120,17 @@ ILDSETKalDetector::ILDSETKalDetector( const gear::GearMgr& gearMgr )
           
           double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
           
-          // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SETMeaslayer" )) ;
           
-          // comment out the above and uncomment here to use ILDParallelPlanarMeasLayer. 
-          // usefull for debugging
-//          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, active,CellID,"SETMeaslayer" )) ;
+          if (_isStripDetector) {
+            
+            // measurement plane defined as the middle of the sensitive volume
+            Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SETMeaslayer" )) ;
+            
+          } else {
+            // measurement plane defined as the middle of the sensitive volume
+            Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, true, CellID, "SETMeaslayer" )) ;
+          }
+
           
           streamlog_out(DEBUG0) << "ILDSETKalDetector add surface with CellID = "
           << CellID
@@ -155,12 +167,16 @@ ILDSETKalDetector::ILDSETKalDetector( const gear::GearMgr& gearMgr )
 
           double z_centre_sensor = -0.5*length + (0.5*sensor_length) + (isensor*sensor_length) ;
 
-          // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SETMeaslayer" )) ;
-
-          // comment out the above and uncomment here to use ILDParallelPlanarMeasLayer. 
-          // usefull for debugging
-          //          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, active,CellID,"SETMeaslayer" )) ;
+          
+          if (_isStripDetector) {
+            
+            // measurement plane defined as the middle of the sensitive volume
+            Add(new ILDParallelPlanarStripMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, stripAngle, CellID, "SETMeaslayer" )) ;
+            
+          } else {
+            // measurement plane defined as the middle of the sensitive volume
+            Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, sensor_length, offset, z_centre_sensor, offset, true, CellID, "SETMeaslayer" )) ;
+          }
 
           
           streamlog_out(DEBUG0) << "ILDSETKalDetector add surface with CellID = "
@@ -169,8 +185,6 @@ ILDSETKalDetector::ILDSETKalDetector( const gear::GearMgr& gearMgr )
 
           
         }
-
-        
 
         
         // support - air boundary
@@ -210,15 +224,15 @@ void ILDSETKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   }
 
   double strip_angle_deg = 0.0;
-  bool strip_angle_present = true;
   
   try {
     
     strip_angle_deg = pSETDetMain.getDoubleVal("strip_angle_deg");
+    _isStripDetector = true;
     
   } catch (gear::UnknownParameterException& e) {
     
-    strip_angle_present = false;
+    _isStripDetector = false;
     
   }
   
@@ -252,7 +266,7 @@ void ILDSETKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _SETgeo[layer].sensorLength = _SETgeo[layer].length / _SETgeo[layer].nSensorsPerLadder;
     
     
-    if (strip_angle_present) {
+    if (_isStripDetector) {
       _SETgeo[layer].stripAngle = strip_angle_deg * M_PI/180 ;
     } else {
       _SETgeo[layer].stripAngle = 0.0 ;
@@ -262,7 +276,8 @@ void ILDSETKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     streamlog_out(DEBUG0) << " nSensorsPerLadder  = " << _SETgeo[layer].nSensorsPerLadder << std::endl;
     streamlog_out(DEBUG0) << " sensorLength  = " << _SETgeo[layer].sensorLength << std::endl;
     streamlog_out(DEBUG0) << " stripAngle  = " << _SETgeo[layer].stripAngle << std::endl;
-    
+    streamlog_out(DEBUG0) << " _isStripDetector  = " << _isStripDetector << std::endl;
+
   }
   
   
