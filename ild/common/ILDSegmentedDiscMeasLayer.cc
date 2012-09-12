@@ -338,9 +338,6 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
   
 //  
-//  TVector3 xx_n;
-//  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
-//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;   
   
   // get helix parameters
   Double_t dr     = hel.GetDrho();
@@ -348,7 +345,6 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   Double_t kappa  = hel.GetKappa();
   Double_t rho    = hel.GetRho();
   Double_t omega  = 1.0 / rho;
-  Double_t r      = TMath::Abs(rho);
   Double_t z0     = hel.GetDz();
   Double_t tanl   = hel.GetTanLambda();
   
@@ -377,8 +373,19 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 
   const double s = ( z - z_pca ) / tanl ;
   
-  const double delta_phi_half = (omega*s)/2.0 ;
+//  
+//
+//  
+//  TVector3 xx_n;
+//  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;
+//
+//  
+  phi = -omega * s;
   
+  const double delta_phi_half = phi/2.0 ;
+
+
   double x;
   double y;
   
@@ -389,19 +396,20 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   else{
     x = x_pca;
     y = y_pca;
+    phi = 0.0;
   }
-  
-  
-  // check if intersection with plane is within boundaries
+
   
   xx.SetXYZ(x, y, z);
-  
-
-  phi = s / r ;
  
-//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith                    :  x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << std::endl; 
-//  
+  
+//  int cut_here = (IsOnSurface(xx) ? 1 : 0);
+  
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith            : cuts = " << cut_here << " x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << std::endl;
+//
 //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith :  xdiff = " << xx.x() - xx_n.x() << " ydiff = "<< xx.y() - xx_n.y() << " zdiff = " << xx.z() - xx_n.z() << std::endl;
+
+  // check if intersection with plane is within boundaries
   
   return (IsOnSurface(xx) ? 1 : 0);
   

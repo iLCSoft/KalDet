@@ -92,7 +92,6 @@ Int_t ILDDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   Double_t kappa  = hel.GetKappa();
   Double_t rho    = hel.GetRho();
   Double_t omega  = 1.0 / rho;
-  Double_t r      = TMath::Abs(rho);
   Double_t z0     = hel.GetDz();
   Double_t tanl   = hel.GetTanLambda();
   
@@ -122,7 +121,9 @@ Int_t ILDDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   
   const double s = ( z - z_pca ) / tanl ;
   
-  const double delta_phi_half = (omega*s)/2.0 ;
+  phi = -omega * s;
+  
+  const double delta_phi_half = phi/2.0 ;
   
   double x;
   double y;
@@ -134,15 +135,13 @@ Int_t ILDDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   else{
     x = x_pca;
     y = y_pca;
+    phi = 0;
   }
   
   
   // check if intersection with plane is within boundaries
   
   xx.SetXYZ(x, y, z);
-  
-  
-  phi = -s / r ;
   
   return (IsOnSurface(xx) ? 1 : 0);  
   

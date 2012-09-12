@@ -16,9 +16,6 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
   
   
-//  TVector3 xx_n;
-//  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
-//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;   
   
   // This assumes nonzero B field.
   //
@@ -283,15 +280,27 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
     }
   }
   
+
+
+//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith dr = " << dr << " dz = " << z0 << " x = " << ref_point.x() << " y = "<< ref_point.y() << " z = " << ref_point.z() << " r = " << ref_point.Perp() << std::endl;
+  
+//  TVector3 xx_n;
+//  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
+//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;
+
   xx.SetXYZ(x_ins, y_ins, z_pca + s_ins * tanl);
   
-//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith: " 
+  phi = -s_ins * omega ;
+  
+//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith:                     "
 //  << " x = " << xx.X()
 //  << " y = " << xx.Y()
 //  << " z = " << xx.Z()
+//  << " r = " << xx.Perp()
+//  << " phi = " << xx.Phi()
+//  << " dphi = " <<  phi
 //  << std::endl;
-  
-  phi = s_ins / r ;
+
   
   return (IsOnSurface(xx) ? 1 : 0);
   
