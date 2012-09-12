@@ -112,6 +112,8 @@ void ILDFTDKalDetector::build_staggered_design() {
       
       double sort_policy = rInner+height + eps1 * idisk + eps2 * 2 ; // we need to be after the even and odd
       
+      streamlog_out(DEBUG) << "ILDFTDKalDetector::create air support disk at " << xc_fwd.z() << " sort_policy = " << sort_policy << std::endl;
+      
       Add(new ILDDiscMeasLayer( air, air, xc_fwd, normal_fwd, _bZ, sort_policy,
                                 rInner, rInner+height, dummy,-1, "FTDAirSupportDiscFront" ) );
       
@@ -122,9 +124,9 @@ void ILDFTDKalDetector::build_staggered_design() {
       // offset needed for rear disks 
       sort_policy += eps4 ;
       
-      
+      streamlog_out(DEBUG) << "ILDFTDKalDetector::create air support disk at " <<  xc_bwd.z() << " sort_policy = " << sort_policy << std::endl;
       Add(new ILDDiscMeasLayer( air, air, xc_bwd, normal_bwd, _bZ, sort_policy,
-                                rInner, rInner+height, dummy,-1, "FTDAirSupportDiscRear" ) );
+                               rInner, rInner+height, dummy,-1, "FTDAirSupportDiscRear" ) );
       
       
       
@@ -223,7 +225,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   if( z < 0 ) sort_policy += eps4 ; 
   const char *name1 = z > 0 ? "FTDSenFrontPositiveZ" : "FTDSenFrontNegativeZ";  
 
-  streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add front face of sensitive at " << z << std::endl;
+  streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add front face of sensitive at " << z << " sort_policy = " << sort_policy << std::endl;
   Add( new ILDSegmentedDiscMeasLayer(air, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name1) );
   
   // measurement plane
@@ -237,7 +239,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
     sort_policy += eps2;
  
     const char *name2 = z > 0 ? "FTDMeasLayerFrontPositiveZOdd" : "FTDMeasLayerFrontNegativeZOdd";
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_front.size();
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " sort_policy = " << sort_policy << " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_front.size();
     if (isStripReadout) {
       Add( new ILDSegmentedDiscStripMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, stripAngle, active, module_ids_front,name2));
       streamlog_out(DEBUG) << " stripAngle = " << stripAngle ; 
@@ -249,7 +251,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   }
   else{
     const char *name2 = z > 0 ? "FTDMeasLayerFrontPositiveZEven" : "FTDMeasLayerFrontNegativeZEven";
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_front.size();
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " sort_policy = " << sort_policy << " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_front.size();
     if (isStripReadout) {
       Add( new ILDSegmentedDiscStripMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, stripAngle, active, module_ids_front,name2));
       streamlog_out(DEBUG) << " stripAngle = " << stripAngle ; 
@@ -268,7 +270,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   
   const char *name3 = z > 0 ? "FTDSenSupportIntfPositiveZ" : "FTDSenSupportIntfNegativeZ";
   
-  streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add interface between sensitive and support at " << z << std::endl;
+  streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add interface between sensitive and support at " << z << " sort_policy = " << sort_policy << std::endl;
   Add( new ILDSegmentedDiscMeasLayer(silicon, carbon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name3));
   
   if( isDoubleSided ){
@@ -282,7 +284,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
     
     const char *name4 = z > 0 ? "FTDSupportSenIntfPositiveZ" : "FTDSupportSenIntfNegativeZ";
     
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add interface between support and sensitive at " << z << std::endl;
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add interface between support and sensitive at " << z << " sort_policy = " << sort_policy << std::endl;
     Add( new ILDSegmentedDiscMeasLayer(carbon, silicon , _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name4));
     
     
@@ -296,7 +298,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
       sort_policy += eps2;
       
       const char *name5 = z > 0 ? "FTDMeasLayerBackPositiveZOdd" : "FTDMeasLayerBackNegativeZOdd";
-      streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_back.size() ;
+      streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " sort_policy = " << sort_policy << " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_back.size() ;
       if (isStripReadout) {
         Add( new ILDSegmentedDiscStripMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, -stripAngle,active, module_ids_back,name5));
         streamlog_out(DEBUG) << " stripAngle = " << -stripAngle ; 
@@ -309,7 +311,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
     }
     else{
       const char *name5 = z > 0 ? "FTDMeasLayerBackPositiveZEven" : "FTDMeasLayerBackNegativeZEven";
-      streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_back.size();
+      streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add measurement plane at " << z << " sort_policy = " << sort_policy<< " Strip Readout = " << isStripReadout << " number of module_ids = " << module_ids_back.size();
       if (isStripReadout) {
         Add( new ILDSegmentedDiscStripMeasLayer(silicon, silicon, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, -stripAngle,active, module_ids_back,name5));
         streamlog_out(DEBUG) << " stripAngle = " << -stripAngle ; 
@@ -322,13 +324,13 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
     // rear face of sensitive
     z += zsign*0.5*senThickness;  
     //  sort_policy = fabs(z) ;
-    sort_policy = rInner+height + eps1 * idisk + eps3 * 4 ;
+    sort_policy = rInner+height + eps1 * idisk + eps3 * 6 ;
     if( z < 0 ) sort_policy += eps4 ;
     if ( ! even_petals ) sort_policy += eps2;
     
     const char *name6 = z > 0 ? "FTDSenRearPositiveZ" : "FTDSenRearNegativeZ";
     
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of sensitive at " << z << std::endl;
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of sensitive at " << z << " sort_policy = " << sort_policy <<  std::endl;
     Add( new ILDSegmentedDiscMeasLayer(silicon, air, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name6));
     
     
@@ -345,7 +347,7 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
     
     const char *name4 = z > 0 ? "FTDSupRearPositiveZ" : "FTDSupRearNegativeZ";
     
-    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of support at " << z << std::endl;
+    streamlog_out(DEBUG) << "ILDFTDKalDetector::create_segmented_disk_layers add rear face of support at " << z << " sort_policy = " << sort_policy << std::endl;
     Add( new ILDSegmentedDiscMeasLayer(carbon, air, _bZ, sort_policy, nsegments, z, phi0, rInner, height, innerBaseLength, outerBaseLength, dummy,name4));
     
   }
