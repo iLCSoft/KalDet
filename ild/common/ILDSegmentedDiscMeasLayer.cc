@@ -334,6 +334,12 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 
   //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith" << std::endl;
   
+  phi = 0.0;
+  
+  xx.SetX(0.0);
+  xx.SetY(0.0);
+  xx.SetZ(0.0);
+  
   // check that direction has one of the correct values
   if( !( mode == 0 || mode == 1 || mode == -1) ) return -1 ;
   
@@ -356,7 +362,7 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   
   Int_t    chg = (Int_t)TMath::Sign(1.1,kappa);
   if (!chg) {
-    streamlog_out(ERROR) << ">>>> Error >>>> ILDParallelPlanarMeasLayer::CalcXingPointWith" << std::endl
+    streamlog_out(ERROR) << ">>>> Error >>>> ILDSegmentedDiscMeasLayer::CalcXingPointWith" << std::endl
     << "      Kappa = 0 is invalid for a helix "          << std::endl;
     return -1;
   }
@@ -373,27 +379,37 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 
   const double s = ( z - z_pca ) / tanl ;
   
-//  
-//
+  
+//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith "
+//  << " ref_point.z()  = " << ref_point.z()
+//  << " z = " << z 
+//  << " z0  = " << z0
+//  << " z_pca  = " << z_pca
+//  << " tanl  = " << tanl
+//  << " z - z_pca  = " << z - z_pca
+//  << std::endl;
 //  
 //  TVector3 xx_n;
 //  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
 //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith from Newton: cuts = " << cuts << " x = " << xx_n.x() << " y = "<< xx_n.y() << " z = " << xx_n.z() << " r = " << xx_n.Perp() << " phi = " << xx_n.Phi() << " dphi = " <<  phi << std::endl;
-//
-//  
+
+  
   phi = -omega * s;
   
-  const double delta_phi_half = phi/2.0 ;
-
+  const double delta_phi_half = -phi/2.0 ;
 
   double x;
   double y;
   
   if( fabs(s) > FLT_MIN ){ // protect against starting on the plane
+
     x = x_pca - s * ( sin(delta_phi_half) / delta_phi_half ) *  sin( phi0 - delta_phi_half ) ;
+    
     y = y_pca + s * ( sin(delta_phi_half) / delta_phi_half ) *  cos( phi0 - delta_phi_half ) ;
+  
   }
   else{
+    streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith Using PCA values " << std::endl;
     x = x_pca;
     y = y_pca;
     phi = 0.0;
@@ -403,9 +419,9 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   xx.SetXYZ(x, y, z);
  
   
-//  int cut_here = (IsOnSurface(xx) ? 1 : 0);
+  int cut_here = (IsOnSurface(xx) ? 1 : 0);
   
-//  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith            : cuts = " << cut_here << " x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << std::endl;
+  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith            : cuts = " << cut_here << " x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << " s = " << s << " " << this->TVMeasLayer::GetName() << std::endl;
 //
 //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith :  xdiff = " << xx.x() - xx_n.x() << " ydiff = "<< xx.y() - xx_n.y() << " zdiff = " << xx.z() - xx_n.z() << std::endl;
 
