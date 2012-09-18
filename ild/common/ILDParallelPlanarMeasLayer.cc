@@ -282,7 +282,7 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   
 
 
-//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith dr = " << dr << " dz = " << z0 << " x = " << ref_point.x() << " y = "<< ref_point.y() << " z = " << ref_point.z() << " r = " << ref_point.Perp() << std::endl;
+//  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith mode = " << mode << " dr = " << dr << " dz = " << z0 << " x = " << ref_point.x() << " y = "<< ref_point.y() << " z = " << ref_point.z() << " r = " << ref_point.Perp() << std::endl;
   
 //  TVector3 xx_n;
 //  int cuts = TVSurface::CalcXingPointWith(hel, xx_n, phi, mode, eps);
@@ -292,7 +292,7 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   
   phi = -s_ins * omega ;
   
-  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith:                     "
+  streamlog_out(DEBUG0) << "ILDParallelPlanarMeasLayer::CalcXingPointWith:             cuts = " << (IsOnSurface(xx) && (chg*phi*mode)<0)
   << " x = " << xx.X()
   << " y = " << xx.Y()
   << " z = " << xx.Z()
@@ -302,7 +302,12 @@ Int_t ILDParallelPlanarMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   << " " << this->TVMeasLayer::GetName() 
   << std::endl;
 
-  
+  if( mode!=0 ){ // (+1,-1) = (fwd,bwd)
+    if( chg*phi*mode > 0){
+      return 0;
+    }
+  }
+    
   return (IsOnSurface(xx) ? 1 : 0);
   
 }
