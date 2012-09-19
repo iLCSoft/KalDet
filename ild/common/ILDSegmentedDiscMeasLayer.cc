@@ -419,13 +419,18 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   xx.SetXYZ(x, y, z);
  
   
-  int cut_here = (IsOnSurface(xx) ? 1 : 0);
-  
-  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith            : cuts = " << cut_here << " x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << " s = " << s << " " << this->TVMeasLayer::GetName() << std::endl;
+  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith            : cuts = " << (IsOnSurface(xx) && (chg*phi*mode)<0) << " x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << " s = " << s << " " << this->TVMeasLayer::GetName() << std::endl;
 //
 //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::CalcXingPointWith :  xdiff = " << xx.x() - xx_n.x() << " ydiff = "<< xx.y() - xx_n.y() << " zdiff = " << xx.z() - xx_n.z() << std::endl;
 
   // check if intersection with plane is within boundaries
+  
+  if( mode!=0 ){ // (+1,-1) = (fwd,bwd)
+    if( chg*phi*mode > 0){
+      return 0;
+    }
+  }
+
   
   return (IsOnSurface(xx) ? 1 : 0);
   
@@ -549,23 +554,24 @@ int ILDSegmentedDiscMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
                                      Double_t  eps) const {
   
   
-  int error_code = this->CalcXingPointWith(hel, xx, phi, mode, eps);
+  int crosses = this->CalcXingPointWith(hel, xx, phi, mode, eps);
   
-  if ( error_code != 0 ) {
-    return error_code;
+  if ( crosses != 0 ) {
+    
+    unsigned int segment = this->get_segment_index( xx.Phi() );
+    
+    const std::vector<int>& cellIds = this->getCellIDs();
+    
+    lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
+    bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
+    
+    bf[lcio::ILDCellID0::module] = cellIds.at(segment);
+    CellID = bf.lowWord();
+    
   }
   
-  unsigned int segment = this->get_segment_index( xx.Phi() );
   
-  const std::vector<int>& cellIds = this->getCellIDs();
-  
-  lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
-  bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
-
-  bf[lcio::ILDCellID0::module] = cellIds.at(segment);
-  CellID = bf.lowWord();
-  
-  return error_code;
+  return crosses;
   
 }
 

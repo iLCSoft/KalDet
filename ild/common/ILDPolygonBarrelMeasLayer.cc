@@ -113,15 +113,17 @@ Int_t ILDPolygonBarrelMeasLayer::CalcXingPointWith(const TVTrack  &hel,
                                                     Int_t     mode,
                                                     Double_t  eps) const{
 
-  _enclosing_cylinder->CalcXingPointWith(hel, xx, phi, mode);
+  int crosses = _enclosing_cylinder->CalcXingPointWith(hel, xx, phi, mode);
+  
+  if (crosses == 0) {
+    return 0;
+  }
   
   int index = this->get_plane_index(xx.Phi());
   
-  _planes[index].CalcXingPointWith(hel,xx,phi,mode,eps);
-  
-  return (IsOnSurface(xx) ? 1 : 0);
-  
-  
+  return _planes[index].CalcXingPointWith(hel,xx,phi,mode,eps);
+
+    
 }
 
 Bool_t ILDPolygonBarrelMeasLayer::IsOnSurface(const TVector3 &xx) const
@@ -171,25 +173,21 @@ int ILDPolygonBarrelMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
                                                         Double_t  eps) const {
   
   
-  int error_code = this->CalcXingPointWith(hel, xx, phi, mode, eps);
+  int crosses = this->CalcXingPointWith(hel, xx, phi, mode, eps);
   
-  if ( error_code != 0 ) {
-    return error_code;
+  if ( crosses != 0 ) {
+    
+    unsigned int plane = this->get_plane_index( xx.Phi() );
+    
+    lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
+    bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
+    
+    bf[lcio::ILDCellID0::module] = plane;
+    CellID = bf.lowWord();
+    
   }
   
-  unsigned int plane = this->get_plane_index( xx.Phi() );
-  
-  lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
-  bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
-  
-  bf[lcio::ILDCellID0::module] = plane;
-  CellID = bf.lowWord();
-  
-  //  // now set the Cell ID using the sensor index 
-  //  streamlog_out(DEBUG0) << "ILDSegmentedDiscMeasLayer::getIntersectionAndCellID NOTIMPLEMENTED " << __FILE__ << std::endl;  
-  //  exit(1);
-  
-  return error_code;
+  return crosses;
   
 }
 
