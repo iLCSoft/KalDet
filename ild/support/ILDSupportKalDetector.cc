@@ -160,7 +160,7 @@ TVKalDetector(10)
   
   Add (new ILDDiscMeasLayer(air, air, front_face_centre_fwd,front_face_normal_fwd, bz, z_min_ecal_ecap, 0., r_max_ecal_ecap/cos(M_PI/8.0), true, encoder.lowWord(),"ECalEndcapFace+Z") );
   
-  streamlog_out( DEBUG0 )   << " *** adding ECalEndcapFace+Z Measurement layer at Zmin = " << z_min_ecal_ecap << " and Rmax = " << r_max_ecal_ecap/cos(M_PI/8.0) << std::endl ;
+  streamlog_out( DEBUG0 )   << " *** adding ECalEndcapFace+Z Measurement layer at Zmin = " << front_face_centre_fwd.z() << " and Rmax = " << r_max_ecal_ecap/cos(M_PI/8.0) << std::endl ;
   
   encoder[lcio::ILDCellID0::side] = lcio::ILDDetID::bwd;
   TVector3 front_face_centre_bwd( -front_face_centre_fwd ); // for -z  
@@ -169,7 +169,7 @@ TVKalDetector(10)
   
   Add (new ILDDiscMeasLayer(air, air, front_face_centre_bwd,front_face_normal_bwd, bz, z_min_ecal_ecap+1.0e-06, 0., r_max_ecal_ecap/cos(M_PI/8.0), true, encoder.lowWord(),"ECalEndcapFace-Z"));
 
-  streamlog_out( DEBUG0 )   << " *** adding ECalEndcapFace-Z Measurement layer at Zmin = " << z_min_ecal_ecap << " and Rmax = " << r_max_ecal_ecap/cos(M_PI/8.0) << std::endl ;
+  streamlog_out( DEBUG0 )   << " *** adding ECalEndcapFace-Z Measurement layer at Zmin = " << front_face_centre_bwd.z() << " and Rmax = " << r_max_ecal_ecap/cos(M_PI/8.0) << std::endl ;
   
   SetOwner();
 }
