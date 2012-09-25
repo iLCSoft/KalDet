@@ -82,9 +82,10 @@ make install
  	- ild
 	  - Reduced the tolerance for the is on surface to 1micron in ILDCylinderMeasLayer.
 	  - Corrected sign of phi in CalcXingPointWith. ILDDiscMeasLayer, ILDSegmentedDiscMeasLayer, ILDParallelPlanarMeasLayer.
-	  -Added necessary mode check for determining intersection correctly based on the direction of travel, i.e. fwd or bwd mode =+1 or -1
+	  - Added necessary mode check for determining intersection correctly based on the direction of travel, i.e. fwd or bwd mode =+1 or -1
 	    ILDConeMeasLayer, ILDDiscMeasLayer, ILDPolygonBarrelMeasLayer, ILDSegmentedDiscMeasLayer, ILDParallelPlanarMeasLayer.
-
+	  - Tolerance fix for CalcXingPointWith to guard against unphysical values of phi when considering intersection forward or backwards with mod=+/-1.
+	  - Final changes to the material description to match ILD_oX_XX tracking geometry. 
  --------
 | v01-09 |  
  -------- 
