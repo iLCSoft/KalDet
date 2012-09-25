@@ -54,7 +54,8 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   TMaterial & air          = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & tpcgas       = *MaterialDataBase::Instance().getMaterial("tpcgas");
   //  TMaterial & aluminium    = *MaterialDataBase::Instance().getMaterial("aluminium");
-  TMaterial & tpcfieldcage = *MaterialDataBase::Instance().getMaterial("tpcfieldcage");
+  TMaterial & tpcinnerfieldcage = *MaterialDataBase::Instance().getMaterial("tpcinnerfieldcage");
+  TMaterial & tpcouterfieldcage = *MaterialDataBase::Instance().getMaterial("tpcouterfieldcage");
   
   Bool_t active = true;
   Bool_t dummy  = false;
@@ -62,18 +63,18 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   std::string name = "TPC";
   
   // add inner field cage
-  Add( new ILDCylinderMeasLayer(air, tpcfieldcage , rtub, lhalf, bz, dummy,-1,"TPCInnerFCInr" ) );
+  Add( new ILDCylinderMeasLayer(air, tpcinnerfieldcage , rtub, lhalf, bz, dummy,-1,"TPCInnerFCInr" ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub
-  << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  tpcfieldcage.GetRadLength()    
+  << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  tpcinnerfieldcage.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(tpcfieldcage , tpcgas, rtub+inthick, lhalf, bz, dummy,-1,"TPCInnerFCOtr" ) );
+  Add( new ILDCylinderMeasLayer(tpcinnerfieldcage , tpcgas, rtub+inthick, lhalf, bz, dummy,-1,"TPCInnerFCOtr" ) );
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ inner field cage ] at R = " << rtub+inthick
-  << " X0_in = " << tpcfieldcage.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
+  << " X0_in = " << tpcinnerfieldcage.GetRadLength() << "  X0_out = " <<  tpcgas.GetRadLength()    
   << std::endl ;  
   
   
-  streamlog_out( DEBUG0 )   << " *** Inner Field Cage =  " << int( (inthick/(tpcfieldcage.GetRadLength()*10.0) /*cm*/ )*1000) / 10.0  << "% of a radiation length " << std::endl ;  
+  streamlog_out( DEBUG0 )   << " *** Inner Field Cage =  " << int( (inthick/(tpcinnerfieldcage.GetRadLength()*10.0) /*cm*/ )*1000) / 10.0  << "% of a radiation length " << std::endl ;  
   
   // create measurement layers
   Double_t r = rmin;
@@ -108,19 +109,19 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   }
   
   // add outer field cage
-  Add( new ILDCylinderMeasLayer(tpcgas, tpcfieldcage, outerr-outthick, lhalf, bz, dummy,-1,"TPCOuterFCInr") ) ;
+  Add( new ILDCylinderMeasLayer(tpcgas, tpcouterfieldcage, outerr-outthick, lhalf, bz, dummy,-1,"TPCOuterFCInr") ) ;
 
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr-outthick
-  << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcfieldcage.GetRadLength()    
+  << " X0_in = " << tpcgas.GetRadLength() << "  X0_out = " <<  tpcouterfieldcage.GetRadLength()    
   << std::endl ;  
   
-  Add( new ILDCylinderMeasLayer(tpcfieldcage, air, outerr, lhalf, bz, dummy,-1,"TPCOuterFCOtr") ) ;
+  Add( new ILDCylinderMeasLayer(tpcouterfieldcage, air, outerr, lhalf, bz, dummy,-1,"TPCOuterFCOtr") ) ;
 
   streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: [ outer field cage ] at R = " << outerr
-  << " X0_in = " << tpcfieldcage.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
+  << " X0_in = " << tpcouterfieldcage.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    
   << std::endl ;  
   
-  streamlog_out( DEBUG0 )   << " *** Outer Field Cage =  " << int( (outthick/(tpcfieldcage.GetRadLength()*10.0) /*cm*/ )*1000) / 10.0  << "% of a radiation length " << std::endl ; 
+  streamlog_out( DEBUG0 )   << " *** Outer Field Cage =  " << int( (outthick/(tpcouterfieldcage.GetRadLength()*10.0) /*cm*/ )*1000) / 10.0  << "% of a radiation length " << std::endl ; 
   
   
   SetOwner();

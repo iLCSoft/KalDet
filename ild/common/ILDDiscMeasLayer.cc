@@ -172,7 +172,7 @@ Int_t ILDDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
   
   streamlog_out(DEBUG0) << "ILDDiscMeasLayer::CalcXingPointWith            : cuts = " << (IsOnSurface(xx) ? 1 : 0) << " x = " << xx.x() << " y = "<< xx.y() << " z = " << xx.z() << " r = " << xx.Perp() << " phi = " << xx.Phi() << " dphi = " <<  phi << " s = " << s << " " << this->TVMeasLayer::GetName() << std::endl;  
 
-  if( mode!=0 ){ // (+1,-1) = (fwd,bwd)
+  if( mode!=0 && fabs(phi)>1.e-10 ){ // (+1,-1) = (fwd,bwd)
     if( chg*phi*mode > 0){
       return 0;
     }

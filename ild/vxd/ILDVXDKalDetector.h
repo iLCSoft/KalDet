@@ -45,6 +45,24 @@ private:
   };
   std::vector<VXD_Layer> _VXDgeo;
   
+  
+   struct VXD_Cryostat {
+     double alRadius;
+     double alThickness;
+     double alInnerR;
+     double alZEndCap;
+     double alHalfZ;
+     double shellRadius;
+     double shellThickness;
+     double shellInnerR;
+     double shellZEndCap;
+     double shelllHalfZ;
+
+     bool   exists;
+   };
+
+  VXD_Cryostat _vxd_Cryostat;
+  
 };
 
 

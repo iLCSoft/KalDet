@@ -425,7 +425,7 @@ Int_t ILDSegmentedDiscMeasLayer::CalcXingPointWith(const TVTrack  &hel,
 
   // check if intersection with plane is within boundaries
   
-  if( mode!=0 ){ // (+1,-1) = (fwd,bwd)
+  if( mode!=0 && fabs(phi)>1.e-10 ){ // (+1,-1) = (fwd,bwd)
     if( chg*phi*mode > 0){
       return 0;
     }

@@ -158,8 +158,9 @@ void MaterialDataBase::createMaterials(const gear::GearMgr& gearMgr){
   // TPC Gas
   A       = 39.948*0.9+(12.011*0.2+1.00794*0.8)*0.1;
   Z       = 16.4;
-  density = 0.749e-3 ;
-  radlen  =  1.196e4*2;
+  density = 1.749e-3 ;
+//  radlen  =  1.196e4*2;
+  radlen  =  0.5*1.196e4*2; // SJA:FIXME: reduce by a factor of 10%
   name    = "tpcgas" ;
   
   TMaterial &tpcgas = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
@@ -169,13 +170,21 @@ void MaterialDataBase::createMaterials(const gear::GearMgr& gearMgr){
   A       = air.GetA()*0.97 + aluminium.GetA()*0.03 ; // SJA:FIXME just use this simple approximation for now
   Z       = air.GetZ()*0.97 + aluminium.GetZ()*0.03 ; // SJA:FIXME just use this simple approximation for now 
   density = 0.0738148 ;
-  radlen  =  489.736;
-  name    = "tpcfieldcage" ;
+  radlen  =  489.736 * 0.5 ; // SJA:FIXME just use factor of two for now as the amount differs by ~ factor of 2 from observation in GEANT4 
+  name    = "tpcinnerfieldcage" ;
   
-  TMaterial &tpcfieldcage = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
-  this->addMaterial(&tpcfieldcage, name);
+  TMaterial &tpcinnerfieldcage = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
+  this->addMaterial(&tpcinnerfieldcage, name);
   
+  // TPC Field Cage
+  A       = air.GetA()*0.97 + aluminium.GetA()*0.03 ; // SJA:FIXME just use this simple approximation for now
+  Z       = air.GetZ()*0.97 + aluminium.GetZ()*0.03 ; // SJA:FIXME just use this simple approximation for now
+  density = 0.0738148 ;
+  radlen  =  489.736 ; 
+  name    = "tpcouterfieldcage" ;
   
+  TMaterial &tpcouterfieldcage = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
+  this->addMaterial(&tpcouterfieldcage, name);
   
   // VXD Support Material
   

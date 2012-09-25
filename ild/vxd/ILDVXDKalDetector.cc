@@ -4,6 +4,7 @@
 #include "MaterialDataBase.h"
 
 #include "ILDParallelPlanarMeasLayer.h"
+#include "ILDCylinderMeasLayer.h"
 
 #include <UTIL/BitField64.h>
 #include <UTIL/ILDConf.h>
@@ -32,7 +33,13 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
   TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air");
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon");
   TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("VXDSupportMaterial");
+  TMaterial & beryllium = *MaterialDataBase::Instance().getMaterial("beryllium");
+
+  // needed for cryostat
   
+  TMaterial & aluminium = *MaterialDataBase::Instance().getMaterial("aluminium");
+  
+  _vxd_Cryostat.exists = false;
   
   this->setupGearGeom(gearMgr) ;
   
@@ -90,7 +97,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
         double sen_front_sorting_policy         = sensitive_distance  + (4 * ladder+0) * eps ;
         double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps ;
         double sen_back_sorting_policy          = sensitive_distance  + (4 * ladder+2) * eps ;
-        double sup_back_sorting_policy          = sensitive_distance  + (4 * ladder+4) * eps ;
+        double sup_back_sorting_policy          = sensitive_distance  + (4 * ladder+3) * eps ;
         
         
         if(ladder==0){   // bacause overlap section of ladder0 is further outer than the last ladder.
@@ -164,7 +171,9 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
         }        
       }
       else{ // counting from 0, odd numbered layers are placed with the support closer to the IP than the sensitive
-                                                                
+                                
+        
+        
         double sup_forward_sorting_policy        = ladder_distance + (4 * ladder+0) * eps ;
         double sup_back_sorting_policy           = ladder_distance + (4 * ladder+1) * eps ;
         double measurement_plane_sorting_policy  = ladder_distance + (4 * ladder+2) * eps ;
@@ -191,6 +200,58 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
     }
   }
   
+  if (_vxd_Cryostat.exists) {
+    // build Cryostat according to mokka driver vxd04.cc
+    
+    // beryllium shell
+    
+    double rtub  = _vxd_Cryostat.shellInnerR;
+    double halfz = _vxd_Cryostat.shelllHalfZ;
+    
+    // beryllium cylinder inner wall
+    Add( new ILDCylinderMeasLayer(air, beryllium , rtub, halfz, _bZ, dummy,-1,"VXDShellInnerWall" ) );
+    
+    streamlog_out( DEBUG0 )   << " *** adding " << "VXDShellInnerWall" << " Measurement layer using CellID: [ VXDShellInnerWall ] at R = " << rtub
+    << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  beryllium.GetRadLength()
+    << std::endl;
+    
+
+    rtub  += _vxd_Cryostat.shellThickness;
+    
+    // beryllium cylinder outer wall
+    Add( new ILDCylinderMeasLayer(beryllium, air , rtub, halfz, _bZ, dummy,-1,"VXDShellOuterWall" ) );
+    
+    streamlog_out( DEBUG0 )   << " *** adding " << "VXDShellOuterWall" << " Measurement layer using CellID: [ VXDShellOuterWall ] at R = " << rtub
+    << " X0_in = " << beryllium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()
+    << std::endl;
+
+    
+    rtub  = _vxd_Cryostat.alRadius;
+    halfz = _vxd_Cryostat.alHalfZ;
+
+    
+    // aluminum cylinder inner wall
+    Add( new ILDCylinderMeasLayer(air, aluminium , _vxd_Cryostat.alRadius, halfz, _bZ, dummy,-1,"VXDCryoAlInnerWall" ) );
+
+
+    streamlog_out( DEBUG0 )   << " *** adding " << "VXDCryoAlInnerWall" << " Measurement layer using CellID: [ VXDCryoAlInnerWall ] at R = " << rtub
+    << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  aluminium.GetRadLength()
+    << std::endl;
+    
+    rtub  += 1.1 * _vxd_Cryostat.alThickness; // SJA:FIXME: increase the thickness as we don't have the information on the foam in the GEAR file.
+
+    // aluminum cylinder outer wall
+    Add( new ILDCylinderMeasLayer(aluminium, air , rtub, halfz, _bZ, dummy,-1,"VXDCryoAlOuterWall" ) );
+
+    
+    streamlog_out( DEBUG0 )   << " *** adding " << "VXDCryoAlOuterWall" << " Measurement layer using CellID: [ VXDCryoAlOuterWall ] at R = " << rtub
+    << " X0_in = " << aluminium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()
+    << std::endl;
+    
+
+    
+  }
+  
   SetOwner();                   
 }
 
@@ -209,7 +270,7 @@ void ILDVXDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   
   //SJA:FIXME: for now the support is taken as the same size the sensitive
   //           if this is not done then the exposed areas of the support would leave a carbon - air boundary,
-  //           which if traversed in the reverse direction to the next boundary then the track be propagated through carbon
+  //           which if traversed in the reverse direction to the next boundary then the track will be propagated through carbon
   //           for a significant distance 
   
   for( int layer=0; layer < _nLayers; ++layer){
@@ -225,8 +286,35 @@ void ILDVXDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _VXDgeo[layer].supThickness = pVXDLayerLayout.getLadderThickness(layer); 
   }
   
+  // Cryostat
   
   
+  
+  try {
+    
+    const gear::GearParameters& pVXDInfra = gearMgr.getGearParameters("VXDInfra");
+    
+    _vxd_Cryostat.alRadius    = pVXDInfra.getDoubleVal( "CryostatAlRadius"  );
+    _vxd_Cryostat.alThickness = pVXDInfra.getDoubleVal( "CryostatAlThickness"  );
+    _vxd_Cryostat.alInnerR    = pVXDInfra.getDoubleVal( "CryostatAlInnerR"  );
+    _vxd_Cryostat.alZEndCap   = pVXDInfra.getDoubleVal( "CryostatAlZEndCap"  );
+    _vxd_Cryostat.alHalfZ     = pVXDInfra.getDoubleVal( "CryostatAlHalfZ"  );
+    
+    _vxd_Cryostat.shellInnerR    = pVXDDetMain.getShellInnerRadius();
+    _vxd_Cryostat.shellThickness = pVXDDetMain.getShellOuterRadius() - _vxd_Cryostat.shellInnerR;    
+    _vxd_Cryostat.shelllHalfZ    = pVXDDetMain.getShellHalfLength();
+    
+    
+    _vxd_Cryostat.exists = true;
+    
+  } catch (gear::UnknownParameterException& e) {
+    streamlog_out( WARNING ) << "ILDVXDKalDetector Cryostat values not found in GEAR file " << std::endl ;
+    
+    _vxd_Cryostat.exists = false;
+  
+  }
+  
+
   
   
 }
