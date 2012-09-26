@@ -146,10 +146,10 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   Bool_t active = true ;
   Bool_t dummy  = false ;
   
-  TMaterial & air       = *MaterialDataBase::Instance().getMaterial("air") ;
-  TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon") ;
-  TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon") ;
-  
+  TMaterial & air          = *MaterialDataBase::Instance().getMaterial("air") ;
+  TMaterial & silicon      = *MaterialDataBase::Instance().getMaterial("silicon") ;
+  TMaterial & carbon       = *MaterialDataBase::Instance().getMaterial("carbon") ;
+  TMaterial & stripsupport   = *MaterialDataBase::Instance().getMaterial("FTDSupportMaterial") ;
   
   double senThickness = _FTDgeo[idisk].senThickness ;
   double supThickness = _FTDgeo[idisk].supThickness ;
@@ -164,13 +164,13 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   bool isStripReadout = _FTDgeo[idisk].isStripReadout ;
   
   //SJA:FIXME: due to the space frame design of the strip layers there is far too much support so just leave it out for now ...
-  TMaterial & support   = isStripReadout == false ? carbon : air;
+  TMaterial & support   = isStripReadout == false ? carbon : stripsupport;
   
   UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
   encoder.reset() ;  // reset to 0
   
   encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
-  encoder[lcio::ILDCellID0::side] = zsign ;
+  encoder[lcio::ILDCellID0::side]   = zsign ;
   encoder[lcio::ILDCellID0::layer]  = idisk ;
   
   int start_index = even_petals ? 0 : 1 ;

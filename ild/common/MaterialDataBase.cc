@@ -186,6 +186,21 @@ void MaterialDataBase::createMaterials(const gear::GearMgr& gearMgr){
   TMaterial &tpcouterfieldcage = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.);
   this->addMaterial(&tpcouterfieldcage, name);
   
+  
+  // FTD Support Material
+  // Needed because of the lack of space frame in the Tracking Geometry description
+  // Carbon with density and rad-length changed by a factor of 2
+  
+  A       = 12.01 ;
+  Z       = 6.0 ;
+  density = 0.5 * 2.00 ; // g/cm^3
+  radlen  = 2.0 * 21.3485 ;   // cm
+  name    = "FTDSupportMaterial" ;
+  
+  TMaterial &ftdsupport = *new TMaterial(name.c_str(), "", A, Z, density, radlen, 0.) ;
+  this->addMaterial(&ftdsupport, name);
+
+  
   // VXD Support Material
   
   try{

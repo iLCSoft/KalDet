@@ -58,6 +58,11 @@ TVKalDetector(10)
   
   double epsilon = 1.e-6;
   
+  double rInnerStart_last = -DBL_MAX;
+  double rInnerEnd_last   = -DBL_MAX;
+  double rOuterStart_last = -DBL_MAX;
+  double rOuterEnd_last   = -DBL_MAX;
+  
   // add beam pipe cones
   for( unsigned i=0; i<z.size()-1; i++){
 
@@ -67,6 +72,13 @@ TVKalDetector(10)
     double rInnerEnd = rInner[i+1];
     double rOuterStart = rOuter[i];
     double rOuterEnd = rOuter[i+1];
+    
+    
+    //SJA:FIXME: HERE WE NEED TO MAKE SURE THAT THE BEAM PIPE IS NEVER DECREASING IN RADII OTHERWISE THE SORTING GOES WRONG
+    if ( rInnerStart < rInnerStart_last ) rInnerStart = rInnerStart_last; rInnerStart_last = rInnerStart;
+    if ( rInnerEnd   < rInnerEnd_last   ) rInnerEnd   = rInnerEnd_last  ; rInnerEnd_last   = rInnerEnd;
+    if ( rOuterStart < rOuterStart_last ) rOuterStart = rOuterStart_last; rOuterStart_last = rOuterStart;
+    if ( rOuterEnd   < rOuterEnd_last   ) rOuterEnd   = rOuterEnd_last;   rOuterEnd_last   = rOuterEnd;
     
     
     std::stringstream sname;
