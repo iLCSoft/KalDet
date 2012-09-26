@@ -21,6 +21,7 @@ ILDConeMeasLayer::ILDConeMeasLayer(TMaterial &min,
                                      Double_t   z2,
                                      Double_t   r2,
                                      Double_t   Bz,
+                                     Double_t   SortingPolicy,
                                      Bool_t     is_active,
                                      Int_t      CellID,
                                const Char_t    *name)
@@ -32,7 +33,8 @@ ILDConeMeasLayer::ILDConeMeasLayer(TMaterial &min,
                    fZ1(z1),
                    fR1(r1),
                    fZ2(z2),
-                   fR2(r2)                   
+                   fR2(r2),
+                   fsortingPolicy(SortingPolicy)
 {
 }
 
@@ -123,10 +125,10 @@ Bool_t ILDConeMeasLayer::IsOnSurface(const TVector3 &xx) const
     const Double_t kTol = 1.e-8;
 
 #if 0
-    std::cerr << GetMLName() << ":" << std::endl;
-    std::cerr << "s=" << s << " xx=(" << xx.X() << "," << xx.Y() << "," << xx.Z() << ")" << std::endl;
-    std::cerr << "bool=" << (TMath::Abs(s) < kTol && ((xx.Z()-fZ1)*(xx.Z()-fZ2) <= 0.)) << std::endl;
-    std::cerr << "fZ1=" << fZ1 << " fZ2=" << fZ2 << std::endl;
+    std::cout << this->TVMeasLayer::GetName() << ":" << this->GetIndex() << ":" << std::endl;
+    std::cout << "s=" << s << " xx=(" << xx.X() << "," << xx.Y() << "," << xx.Z() << ")" << std::endl;
+    std::cout << "bool=" << (TMath::Abs(s) < kTol && ((xx.Z()-fZ1)*(xx.Z()-fZ2) <= 0.)) << std::endl;
+    std::cout << "fZ1=" << fZ1 << " fZ2=" << fZ2 << std::endl;
 #endif
 
     return (TMath::Abs(s) < kTol && ((xx.Z()-fZ1)*(xx.Z()-fZ2) <= 0.));

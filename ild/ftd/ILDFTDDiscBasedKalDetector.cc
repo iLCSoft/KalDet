@@ -32,6 +32,7 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
   TMaterial & silicon   = *MaterialDataBase::Instance().getMaterial("silicon") ;
   TMaterial & carbon    = *MaterialDataBase::Instance().getMaterial("carbon") ;
   
+  
   Bool_t active = true ;
   Bool_t dummy  = false ;
   

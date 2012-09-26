@@ -31,6 +31,7 @@ public:
                      Double_t   z2,
                      Double_t   r2,
                      Double_t   Bz,
+                     Double_t   SortingPolicy,
                      Bool_t     is_active,
                      Int_t      CellID = -1,
                const Char_t    *name = "BPCONEML");
@@ -74,15 +75,20 @@ public:
      return this->CalcXingPointWith(hel,xx,phi,0,eps);
                                            
                                            
-                                        }
+   }
 
+  /** Get sorting policy for this plane  */
+  virtual double GetSortingPolicy() const { return fsortingPolicy; }
+
+
+  
    
 private:
-   Double_t fZ1;      // z of front face
-   Double_t fR1;      // r of front face
-   Double_t fZ2;      // z of back end
-   Double_t fR2;      // r of back end
-
+  Double_t fZ1;      // z of front face
+  Double_t fR1;      // r of front face
+  Double_t fZ2;      // z of back end
+  Double_t fR2;      // r of back end
+  Double_t fsortingPolicy; // used for sorting the layers in to out
 
   
 };

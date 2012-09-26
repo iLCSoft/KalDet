@@ -52,7 +52,11 @@ TVKalDetector(100)
     double rad   = _SITgeo[ilayer].radius - 0.5 * _SITgeo[ilayer].senThickness;
     double lhalf = _SITgeo[ilayer].half_length;
     
-    Add( new ILDCylinderMeasLayer(air, silicon , rad, lhalf, _bZ, dummy,-1,"SITSenFront" ) );
+    const double x0 = 0.0;
+    const double y0 = 0.0;
+    const double z0 = 0.0;
+    
+    Add( new ILDCylinderMeasLayer(air, silicon , rad, lhalf, x0, y0, z0, _bZ, dummy,-1,"SITSenFront" ) );
 
     streamlog_out( DEBUG0 )   << " *** adding " << name << " Front face Measurement layer at R = " << rad << " and half length = " << lhalf 
     << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  silicon.GetRadLength()    
@@ -60,7 +64,7 @@ TVKalDetector(100)
     
     rad += 0.5 * _SITgeo[ilayer].senThickness;
     
-    Add( new ILDCylinderMeasLayer(silicon , silicon, rad, lhalf, _bZ, active,CellID,"SITMeaslayer" ) );
+    Add( new ILDCylinderMeasLayer(silicon , silicon, rad, lhalf, x0, y0, z0, _bZ, active,CellID,"SITMeaslayer" ) );
     
     streamlog_out( DEBUG0 )   << " *** adding " << name << " Measurement layer using CellID: " << CellID << " at R = " << rad << " and half length = " << lhalf 
     << " X0_in = " << silicon.GetRadLength() << "  X0_out = " <<  silicon.GetRadLength()    
@@ -68,7 +72,7 @@ TVKalDetector(100)
 
     rad += 0.5 * _SITgeo[ilayer].senThickness;
 
-    Add( new ILDCylinderMeasLayer(silicon , carbon, rad, lhalf, _bZ, dummy, -1,"SITSenSupInterFace" ) );
+    Add( new ILDCylinderMeasLayer(silicon , carbon, rad, lhalf, x0, y0, z0, _bZ, dummy, -1,"SITSenSupInterFace" ) );
     
     streamlog_out( DEBUG0 )   << " *** adding " << name << " Interface between senstive and support Measurement layer at R = " << rad << " and half length = " << lhalf 
     << " X0_in = " << silicon.GetRadLength() << "  X0_out = " <<  carbon.GetRadLength()    
@@ -76,7 +80,7 @@ TVKalDetector(100)
 
     rad += _SITgeo[ilayer].supThickness;
     
-    Add( new ILDCylinderMeasLayer(carbon , air, rad, lhalf, _bZ, dummy, -1,"SITSupRear" ) );
+    Add( new ILDCylinderMeasLayer(carbon , air, rad, lhalf, x0, y0, z0, _bZ, dummy, -1,"SITSupRear" ) );
     
     streamlog_out( DEBUG0 )   << " *** adding " << name << " Rear face Measurement layer using at R = " << rad << " and half length = " << lhalf 
     << " X0_in = " << carbon.GetRadLength() << "  X0_out = " <<  air.GetRadLength()    

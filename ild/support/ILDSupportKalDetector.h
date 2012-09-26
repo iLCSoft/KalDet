@@ -29,6 +29,8 @@ private:
   
   ILDCylinderMeasLayer* _ipLayer;
   
+  std::vector<std::string> _surface_names;
+  
 };
 
 #endif

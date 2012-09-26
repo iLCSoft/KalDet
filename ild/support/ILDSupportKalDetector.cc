@@ -45,119 +45,189 @@ TVKalDetector(10)
   TMaterial & beryllium = *MaterialDataBase::Instance().getMaterial("beryllium");
   
   Bool_t dummy  = false;
+    
+  double eps_side    = 1.0e-8;
+  double eps_section = 1.0e-6;
   
-  double max_beam_pipe_z  = -FLT_MAX;
-  double min_beam_pipe_z  =  FLT_MAX;
-  double min_beam_pipe_r  =  FLT_MAX;
-  double min_beam_pipe_dr =  FLT_MAX;
+  // first check the sizes of the beam-pipe values r_in r_out and z
+
+  if ( ( z.size() != rInner.size() ) || ( z.size() != rOuter.size() ) ) {
+    streamlog_out(ERROR) << "ILDSupportKalDetector::ILDSupportKalDetector miss-match in number of double values for beam-pipe: Z = " << z.size() << " RInner = " << rInner.size() << " ROuter = " << rOuter.size()  << " exit(1) called from "<< __FILE__ << "   line " << __LINE__ << std::endl;
+    exit(1);
+  }
+  
+  double epsilon = 1.e-6;
   
   // add beam pipe cones
   for( unsigned i=0; i<z.size()-1; i++){
-    
+
     double zStart = z[i];
     double zEnd = z[i+1];
     double rInnerStart = rInner[i];
     double rInnerEnd = rInner[i+1];
     double rOuterStart = rOuter[i];
     double rOuterEnd = rOuter[i+1];
-    double dr_start = rOuterStart - rInnerStart;
-    double dr_end = rOuterEnd - rInnerEnd;
+    
     
     std::stringstream sname;
-    sname << "BeamPipeCone" << i;
-    std::string name = sname.str();
-    
-    if (zStart > max_beam_pipe_z ) {
-      max_beam_pipe_z = zStart;
-    }
 
-    if (zEnd > max_beam_pipe_z ) {
-      max_beam_pipe_z = zStart;
-    }
+    const double x0 = 0.0;
+    const double y0 = 0.0;
+    const double z0 = 0.0;
 
-    if (zStart < min_beam_pipe_z ) {
-      min_beam_pipe_z = zStart;
-    }
-    
-    if (zEnd < min_beam_pipe_z ) {
-      min_beam_pipe_z = zStart;
-    }
+       
+    // central part has to be treated separately as it should not be composed of two halves but a single section.
+    if (i==0) {
+      // check that z values start a zero
+      if (fabs(zStart) > epsilon) {
+        streamlog_out(ERROR) << "ILDSupportKalDetector::ILDSupportKalDetector first z value for beam-pipe must equal zero: Z = " << zStart << " exit(1) called from "<< __FILE__ << "   line " << __LINE__ << std::endl;
+        exit(1);
+      }
+      
+      // just make a minimal beam pipe (tube) no cone for now as the sorting policy does not works as expected
+      
+      double zhalf = zEnd;      
 
-    if (rInnerStart < min_beam_pipe_r ) {
-      min_beam_pipe_r = rInnerStart;
-    }
-    
-    if (rInnerEnd < min_beam_pipe_r ) {
-      min_beam_pipe_r = rInnerEnd;
-    }
+           
+      sname << "BeamPipeInnerWallCentralSection_" << i;
+      _surface_names.push_back(sname.str());
+      
+      
+      Add( new ILDCylinderMeasLayer(beam, beryllium , rInnerStart , zhalf, x0, y0, z0, bz, dummy,-1, _surface_names.back().c_str() ));
+      
+      streamlog_out( DEBUG0 )   << " *** adding " << _surface_names.back() << " Measurement layer using CellID: [ beampipe ] at R = " << rInnerStart
+      << " zHalf = " << zhalf << " X0_in = " << beam.GetRadLength() << "  X0_out = " <<  beryllium.GetRadLength()
+      << std::endl ;
+      
+      sname.str(std::string());
+      sname << "BeamPipeOuterWallCentralSection_" << i;
+      _surface_names.push_back(sname.str());
+      
+      Add( new ILDCylinderMeasLayer(beryllium, air , rOuterStart , zhalf, x0, y0, z0, bz, dummy,-1, _surface_names.back().c_str() ));
+      
+      streamlog_out( DEBUG0 )   << " *** adding " << _surface_names.back() << " Measurement layer using CellID: [ beampipe ] at R = " << rOuterStart
+      << " zHalf = " << zhalf << " X0_in = " << beryllium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()
+      << std::endl ;
 
+      
     
-    if (dr_start < min_beam_pipe_dr ) {
-      min_beam_pipe_dr = dr_start;
+    } else {
+      
+      
+      if( fabs( zEnd-zStart ) > epsilon ){
+        
+                
+        double SortingPolicy = rInnerStart+i*eps_section;
+         
+        if (fabs(rInnerEnd-rInnerStart) > epsilon) { // use cone 
+
+          sname.str(std::string());
+          sname << "BeamPipeConeInnerFwd" << i;
+          _surface_names.push_back(sname.str());
+          
+          Add( new ILDConeMeasLayer(beam, beryllium ,  zStart, rInnerStart,  zEnd, rInnerEnd, bz, SortingPolicy,          dummy,-1, _surface_names.back().c_str() ) );
+          
+          sname.str(std::string());
+          sname << "BeamPipeConeInnerBwd" << i;
+          _surface_names.push_back(sname.str());
+          
+          Add( new ILDConeMeasLayer(beam, beryllium , -zStart, rInnerStart, -zEnd, rInnerEnd, bz, SortingPolicy+eps_side, dummy,-1, _surface_names.back().c_str() ) );
+
+        } else { // use cylinder
+          
+          sname.str(std::string());
+          sname << "BeamPipeCylindeInnerFwd" << i;
+          _surface_names.push_back(sname.str());
+          
+          const double zhalf   = fabs(zEnd-zStart);
+          
+          const double zoffset = zStart + zhalf;
+          
+          Add( new ILDCylinderMeasLayer(beam, beryllium , rInnerStart+i*eps_section          , zhalf, x0, y0,  zoffset, bz, dummy,-1, _surface_names.back().c_str() ));
+          
+          sname.str(std::string());
+          sname << "BeamPipeCylindeInnerBwd" << i;
+          _surface_names.push_back(sname.str());
+          
+          Add( new ILDCylinderMeasLayer(beam, beryllium , rInnerStart+i*eps_section+eps_side , zhalf, x0, y0, -zoffset, bz, dummy,-1, _surface_names.back().c_str() ));
+          
+          
+        }
+        
+        
+        streamlog_out( DEBUG0 )   << " *** adding inner " << _surface_names[_surface_names.size()-2] << " and " << _surface_names.back() << " Measurement layer using CellID: [ beampipe ] at"
+        << " z1 = +-" << zStart
+        << " z2 = +-" << zEnd
+        << " r1 = " << rInnerStart
+        << " r2 = " << rInnerEnd
+        << " X0_in = " << beam.GetRadLength() << "  X0_out = " <<  beryllium.GetRadLength()
+        << std::endl ;
+        
+        SortingPolicy = rOuterStart+i*eps_section;
+
+        if (fabs(rOuterEnd-rOuterStart) > epsilon) { // use cone
+        
+          sname.str(std::string());
+          sname << "BeamPipeConeOuterFwd" << i;
+          _surface_names.push_back(sname.str());
+          
+          Add( new ILDConeMeasLayer(beryllium , air ,  zStart, rOuterStart,  zEnd, rOuterEnd, bz, SortingPolicy,          dummy,-1, _surface_names.back().c_str() ) );
+          
+          sname.str(std::string());
+          sname << "BeamPipeConeOuterBwd" << i;
+          _surface_names.push_back(sname.str());
+          
+          Add( new ILDConeMeasLayer(beryllium , air , -zStart, rOuterStart, -zEnd, rOuterEnd, bz, SortingPolicy+eps_side, dummy,-1, _surface_names.back().c_str() ) );
+                    
+          
+        } else { // use cylinder
+          
+          sname.str(std::string());
+          sname << "BeamPipeCylindeOuterFwd" << i;
+          _surface_names.push_back(sname.str());
+        
+          const double zhalf   = fabs(zEnd-zStart);
+          
+          const double zoffset = zStart + zhalf;
+          
+          Add( new ILDCylinderMeasLayer(beryllium, air , rOuterStart+i*eps_section          , zhalf, x0, y0,  zoffset, bz, dummy,-1, _surface_names.back().c_str() ));
+          
+          sname.str(std::string());
+          sname << "BeamPipeCylindeOuterBwd" << i;
+          _surface_names.push_back(sname.str());
+          
+          Add( new ILDCylinderMeasLayer(beryllium, air , rOuterStart+i*eps_section+eps_side , zhalf, x0, y0, -zoffset, bz, dummy,-1, _surface_names.back().c_str() ));
+                  
+        }
+
+        
+        streamlog_out( DEBUG0 )   << " *** adding outer " << _surface_names[_surface_names.size()-2] << " and " << _surface_names.back() << " Measurement layer using CellID: [ beampipe ] at"
+        << " z1 = +-" << zStart
+        << " z2 = +-" << zEnd
+        << " r1 = " << rOuterStart
+        << " r2 = " << rOuterEnd
+        << " X0_in = " << beryllium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()
+        << std::endl ;
+        
+      }
+      
     }
     
-    if (dr_end < min_beam_pipe_dr ) {
-      min_beam_pipe_dr = dr_end;
-    }
-    
-    
-    
-//    double epsilon = 0.001;
-//    if( fabs( zEnd-zStart ) > epsilon ){
-//      
-//      Add( new ILDConeMeasLayer(beam, beryllium , zStart, rInnerStart, zEnd, rInnerEnd, bz, dummy,-1, name.c_str() ) );
-//      Add( new ILDConeMeasLayer(beam, beryllium , -zStart, rInnerStart, -zEnd, rInnerEnd, bz, dummy,-1, name.c_str() ) );
-//      
-//      streamlog_out( DEBUG0 )   << " *** adding inner " << name << " Measurement layer using CellID: [ beampipe ] at"
-//      << " z1 = +-" << zStart
-//      << " z2 = +-" << zEnd
-//      << " r1 = " << rInnerStart
-//      << " r2 = " << rInnerEnd
-//      << " X0_in = " << beam.GetRadLength() << "  X0_out = " <<  beryllium.GetRadLength()
-//      << std::endl ;  
-//       
-//      
-//      Add( new ILDConeMeasLayer(beryllium , air , zStart, rOuterStart, zEnd, rOuterEnd, bz, dummy,-1, name.c_str() ) );
-//      Add( new ILDConeMeasLayer(beryllium , air , -zStart, rOuterStart, -zEnd, rOuterEnd, bz, dummy,-1, name.c_str() ) );
-//      streamlog_out( DEBUG0 )   << " *** adding outer " << name << " Measurement layer using CellID: [ beampipe ] at"
-//      << " z1 = +-" << zStart
-//      << " z2 = +-" << zEnd
-//      << " r1 = " << rInnerStart
-//      << " r2 = " << rInnerEnd
-//      << " X0_in = " << beryllium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()
-//      << std::endl ;
-//      
-//    }
-//    
-  
   }
 
-  // just make a minimal beam pipe (tube) no cone for now as the sorting policy does not works as expected
-  
-  double zhalf = (max_beam_pipe_z - min_beam_pipe_z)*0.5;
-  
-  Add( new ILDCylinderMeasLayer(beam, beryllium , min_beam_pipe_r , zhalf, bz, dummy,-1,"BeamPipeInnerWall" ));
-  
-  streamlog_out( DEBUG0 )   << " *** adding " << "BeamPipeInnerWall" << " Measurement layer using CellID: [ beampipe ] at R = " << min_beam_pipe_r
-  << " zHalf = " << zhalf << " X0_in = " << beam.GetRadLength() << "  X0_out = " <<  beryllium.GetRadLength()
-  << std::endl ;
-  
-  
-  Add( new ILDCylinderMeasLayer(beryllium, air , min_beam_pipe_r+min_beam_pipe_dr , zhalf, bz, dummy,-1,"BeamPipeOuterWall" ));
-  
-  streamlog_out( DEBUG0 )   << " *** adding " << "BeamPipeOuterWall" << " Measurement layer using CellID: [ beampipe ] at R = " << min_beam_pipe_r+min_beam_pipe_dr
-  << " zHalf = " << zhalf << " X0_in = " << beryllium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()
-  << std::endl ;
-
-  
   
   // add vacuum layer 1mm inside the beam pipe to assist propagation to the IP
   // therefore make a cylinder that is 1mm smaller than the lowest RInner value of the cones
   // and make it so long that it gets as long as the beamtube
   const double rvacuum = *min_element(rInner.begin(), rInner.end()) - 1.0; 
   const double zHalfVacuum = z.back();
+
+  const double x0 = 0.0;
+  const double y0 = 0.0;
+  const double z0 = 0.0;
+
   
-  _ipLayer = new ILDCylinderMeasLayer(beam, beam , rvacuum , zHalfVacuum, bz, dummy,-1,"IPLayer" );
+  _ipLayer = new ILDCylinderMeasLayer(beam, beam , rvacuum , zHalfVacuum, x0, y0, z0, bz, dummy,-1,"IPLayer" );
   
   Add( _ipLayer );
   streamlog_out( DEBUG0 )   << " *** adding " << "IPLayer" << " Measurement layer using CellID: [ beampipe ] at R = " << rvacuum

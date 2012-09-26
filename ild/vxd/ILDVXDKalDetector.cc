@@ -5,6 +5,7 @@
 
 #include "ILDParallelPlanarMeasLayer.h"
 #include "ILDCylinderMeasLayer.h"
+#include "ILDDiscMeasLayer.h"
 
 #include <UTIL/BitField64.h>
 #include <UTIL/ILDConf.h>
@@ -207,9 +208,14 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
     
     double rtub  = _vxd_Cryostat.shellInnerR;
     double halfz = _vxd_Cryostat.shelllHalfZ;
+
+    const double x0 = 0.0;
+    const double y0 = 0.0;
+    const double z0 = 0.0;
+
     
     // beryllium cylinder inner wall
-    Add( new ILDCylinderMeasLayer(air, beryllium , rtub, halfz, _bZ, dummy,-1,"VXDShellInnerWall" ) );
+    Add( new ILDCylinderMeasLayer(air, beryllium , rtub, halfz, x0, y0, z0, _bZ, dummy,-1,"VXDShellInnerWall" ) );
     
     streamlog_out( DEBUG0 )   << " *** adding " << "VXDShellInnerWall" << " Measurement layer using CellID: [ VXDShellInnerWall ] at R = " << rtub
     << " X0_in = " << air.GetRadLength() << "  X0_out = " <<  beryllium.GetRadLength()
@@ -219,7 +225,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
     rtub  += _vxd_Cryostat.shellThickness;
     
     // beryllium cylinder outer wall
-    Add( new ILDCylinderMeasLayer(beryllium, air , rtub, halfz, _bZ, dummy,-1,"VXDShellOuterWall" ) );
+    Add( new ILDCylinderMeasLayer(beryllium, air , rtub, halfz, x0, y0, z0, _bZ, dummy,-1,"VXDShellOuterWall" ) );
     
     streamlog_out( DEBUG0 )   << " *** adding " << "VXDShellOuterWall" << " Measurement layer using CellID: [ VXDShellOuterWall ] at R = " << rtub
     << " X0_in = " << beryllium.GetRadLength() << "  X0_out = " <<  air.GetRadLength()
@@ -231,7 +237,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
 
     
     // aluminum cylinder inner wall
-    Add( new ILDCylinderMeasLayer(air, aluminium , _vxd_Cryostat.alRadius, halfz, _bZ, dummy,-1,"VXDCryoAlInnerWall" ) );
+    Add( new ILDCylinderMeasLayer(air, aluminium , _vxd_Cryostat.alRadius, halfz, x0, y0, z0, _bZ, dummy,-1,"VXDCryoAlInnerWall" ) );
 
 
     streamlog_out( DEBUG0 )   << " *** adding " << "VXDCryoAlInnerWall" << " Measurement layer using CellID: [ VXDCryoAlInnerWall ] at R = " << rtub
@@ -241,7 +247,7 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
     rtub  += 1.1 * _vxd_Cryostat.alThickness; // SJA:FIXME: increase the thickness as we don't have the information on the foam in the GEAR file.
 
     // aluminum cylinder outer wall
-    Add( new ILDCylinderMeasLayer(aluminium, air , rtub, halfz, _bZ, dummy,-1,"VXDCryoAlOuterWall" ) );
+    Add( new ILDCylinderMeasLayer(aluminium, air , rtub, halfz, x0, y0, z0, _bZ, dummy,-1,"VXDCryoAlOuterWall" ) );
 
     
     streamlog_out( DEBUG0 )   << " *** adding " << "VXDCryoAlOuterWall" << " Measurement layer using CellID: [ VXDCryoAlOuterWall ] at R = " << rtub
@@ -249,6 +255,57 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
     << std::endl;
     
 
+    // aluminum endcaps
+   
+    
+    const double z_front_face = _vxd_Cryostat.alZEndCap;
+    const double z_rear_face = z_front_face + _vxd_Cryostat.alThickness;
+ 
+    double rOuter = _vxd_Cryostat.alRadius - 0.1 ; // make sure we don't collide with the aluminium cryostat cylinder
+    double rInner = _vxd_Cryostat.alInnerR ;
+
+    
+    double eps_face = 1.0e-06 ; // offset for forwards and backwards
+    double eps_side = 1.0e-08 ; // offset for forwards and backwards
+    
+    double sort_policy = rOuter ;
+
+    
+    TVector3 xc_fwd(0.0, 0.0, z_front_face) ;
+    TVector3 normal_fwd(xc_fwd) ;
+    normal_fwd.SetMag(1.0) ;
+    
+    streamlog_out(DEBUG) << "VXDCryoAleEndCap created disk at " << xc_fwd.z() << " sort_policy = " << sort_policy << std::endl;
+    
+    Add(new ILDDiscMeasLayer( air, aluminium, xc_fwd, normal_fwd, _bZ, sort_policy,
+                             rInner, rOuter, dummy,-1, "VXDCryoAleEndCapDiscFrontFwd" ) );
+    
+    sort_policy += eps_face;
+    xc_fwd.SetZ(z_rear_face);
+    
+    Add(new ILDDiscMeasLayer( aluminium, air, xc_fwd, normal_fwd, _bZ, sort_policy,
+                             rInner, rOuter, dummy,-1, "VXDCryoAleEndCapDiscBackFwd" ) );
+
+    
+    TVector3 xc_bwd(0.0, 0.0, -z_front_face) ;
+    TVector3 normal_bwd(xc_bwd) ;
+    normal_bwd.SetMag(1.0) ;
+    
+    // offset needed for rear disks
+    sort_policy = rOuter + eps_side ;
+    
+    streamlog_out(DEBUG) << "VXDCryoAleEndCap created disk at " <<  xc_bwd.z() << " sort_policy = " << sort_policy << std::endl;
+
+    Add(new ILDDiscMeasLayer( air, aluminium, xc_bwd, normal_bwd, _bZ, sort_policy,
+                             rInner, rOuter, dummy,-1, "VXDCryoAleEndCapDiscFrontBwd" ) );
+    
+    sort_policy += eps_face;
+    xc_fwd.SetZ(-z_rear_face);
+    
+    Add(new ILDDiscMeasLayer( aluminium, air, xc_bwd, normal_bwd, _bZ, sort_policy,
+                             rInner, rOuter, dummy,-1, "VXDCryoAleEndCapDiscFrontBwd" ) );
+
+    
     
   }
   
