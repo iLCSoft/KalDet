@@ -18,16 +18,16 @@
 //* $Id: EXVMeasLayer.h,v 1.1.1.1 2009-11-24 00:13:59 ikematsu Exp $
 //*************************************************************************
 //
-#include "TVector3.h"
-#include "TKalMatrix.h"
-#include "TCylinder.h"
-#include "TVMeasLayer.h"
-#include "TAttDrawable.h"
-#include "KalTrackDim.h"
-#include "TString.h"
+#include <TVector3.h>
+#include <TKalMatrix.h>
+#include <TCylinder.h>
+#include <TVMeasLayer.h>
+#include <TAttDrawable.h>
+#include <KalTrackDim.h>
+#include <TString.h>
 
 class TVTrackHit;
-class TNode;
+#include <TNode.h>
 
 class EXVMeasLayer : public TVMeasLayer, public TAttDrawable {
 
@@ -44,7 +44,7 @@ public:
   virtual ~EXVMeasLayer();
 
   virtual void ProcessHit(const TVector3 &xx,
-                          TObjArray &hits) = 0;
+                          TObjArray &hits) const = 0;
 
   inline TString  GetMLName () const { return fName;    }
   inline TNode   *GetNodePtr() const { return fNodePtr; }

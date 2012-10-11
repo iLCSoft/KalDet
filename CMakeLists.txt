@@ -30,11 +30,12 @@ INCLUDE( ilcsoft_default_settings )
 FIND_PACKAGE( Marlin 1.0 REQUIRED )
 FIND_PACKAGE( LCIO REQUIRED )
 FIND_PACKAGE( GEAR REQUIRED )
-FIND_PACKAGE( KalTest 1.2 REQUIRED )
+FIND_PACKAGE( KalTest 1.5 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
+FIND_PACKAGE( streamlog REQUIRED )
 
 #NB: need ROOT before KalTest (needed on case sensitive systems and classes that differ only in capitalization)
-FOREACH( pkg Marlin ROOT KalTest LCIO GEAR )
+FOREACH( pkg Marlin ROOT KalTest LCIO GEAR streamlog)
 
   IF( ${pkg}_FOUND )
     INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
@@ -59,7 +60,7 @@ INCLUDE( ${ROOT_DICT_MACROS_FILE} )
 
 
 # build KalDet library
-SET( lib_input_dirs gen kern lctpc/lp1jgem )
+SET( lib_input_dirs gen kern lctpc/gearTPC )
 
 FOREACH( lib_input_dir ${lib_input_dirs} )
     LIST( APPEND ROOT_DICT_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/${lib_input_dir} )

@@ -7,7 +7,7 @@
 
 class EXEventGen {
 public:
-   EXEventGen(TKalDetCradle &cradle, TObjArray &kalhits)
+   EXEventGen(TKalDetCradle const &cradle, TObjArray &kalhits)
              : fCradlePtr(&cradle), fHitBufPtr(&kalhits) {}
    virtual ~EXEventGen() {}
 
@@ -23,12 +23,11 @@ public:
    static Double_t GetT0()            { return fgT0; }
 
 private:
-   TKalDetCradle *fCradlePtr;     // pointer to detector system
+   TKalDetCradle const *fCradlePtr;     // pointer to detector system
    TObjArray     *fHitBufPtr;     // pointer to hit array
 
    static Double_t  fgT0;         // t0
 
-   ClassDef(EXEventGen,1)   // Event Generator
 };
 
 #endif

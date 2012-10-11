@@ -17,6 +17,7 @@
 //*************************************************************************
 //
 #include "EXVMeasLayer.h"
+#include <TNode.h>
 
 Bool_t EXVMeasLayer::kActive = kTRUE;
 Bool_t EXVMeasLayer::kDummy  = kFALSE;

@@ -6,6 +6,5 @@
 
 #pragma link C++ class EXVKalDetector+;
 #pragma link C++ class EXVMeasLayer+;
-#pragma link C++ class EXHYBTrack+;
 
 #endif
