@@ -18,7 +18,11 @@ class ILDMeasurementSurfaceStoreFiller : public MeasurementSurfaceStoreFiller{
   public:
 
    
-  ILDMeasurementSurfaceStoreFiller(const gear::GearMgr& gear_mgr) {
+  ILDMeasurementSurfaceStoreFiller(const gear::GearMgr& gear_mgr) :
+    _nVTXLayers(0),
+    _nSITLayers(0),
+    _nFTDLayers(0),
+    _nSETLayers(0) {
 
     this->get_gear_parameters(gear_mgr);
     
