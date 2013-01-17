@@ -35,7 +35,7 @@ ILDPolygonBarrelMeasLayer::ILDPolygonBarrelMeasLayer(TMaterial &min,
                                                      std::vector<int>      CellIDs,                                                     
                                                      bool     is_active,
                                                      const Char_t    *name) : 
-ILDVMeasLayer(min, mout, Bz, CellIDs, is_active, name),
+ILDVMeasLayer(min, mout, Bz, CellIDs, is_active, name), _sortingPolicy(0.),
 _r0(r0),_lhalf(lhalf),_nsides(nsides),_zpos(zpos),_phi0(phi0)
 
 {
