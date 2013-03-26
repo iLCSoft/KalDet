@@ -20,10 +20,6 @@
 #include <TRandom.h>
 #include <TMath.h>
 
-//#include "TTUBE.h"
-//#include "TNode.h"
-//#include "TVirtualPad.h"
-
 namespace kaldet
 {
 
@@ -68,7 +64,6 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
     = tpcParameters.getMaxDriftLength();     // half length
   
   // FIXME:: needed more careful B calculation ??
-  // Alex:: calculate the z component at one place
   const Double_t bz = gearMgr.getBField().at( gear::Vector3D( 0.,0.,0.)  ).z() ;
 
 //  gear::BField const & bField = gearMgr.getBField();
@@ -97,7 +92,6 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
   // do the bookkeeping manually :-(
   Int_t arrayIndex = 0;
 
-  // Alex::
   // ILD-type Encoder
   UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ;
 
@@ -110,39 +104,6 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
        moduleIter < tpcParameters.getModules().end(); ++moduleIter)
   {
     gear::TPCModule *module = *moduleIter;
-//    std::cout<<"Alex:: 3311: "<<"  "<<module->getNRows()<<std::endl;
-
-    // Alex:: loop over pads has no sense, since the pad ID is encoded as 32 bits (16 for row and 16 for pad)
-    // , not just goes from 0 to N
-    //    for (int i=0; i< module->getNPads(); i++)
-//    {
-//      std::cout<<"Alex:: 3322: "<<i<<"  "<<module->getRowNumber(i)<<std::endl;
-//    }
-
-    // The resolution parameters can vary from module to module.
-    // In case they are not there use the jgem values
-    Double_t sigmax0, sigmax1, sigmaz0, sigmaz1;
-    try{
-      sigmax0 = module->getDoubleVal("sigmax0");
-      sigmax1 = module->getDoubleVal("sigmax1");
-      sigmaz0 = module->getDoubleVal("sigmaz0");
-      sigmaz1 = module->getDoubleVal("sigmaz1");
-    }
-    catch( gear::UnknownParameterException & )
-    {
-      streamlog_out(MESSAGE) << "No resolution parameters found for module "
-                 << module->getModuleID()<<"."
-                 << " Using jgem settings." << std::endl;
-
-      // FIXME: n_eff of argon per distance, adapt to pad length. Or read from GEAR file?
-      Double_t neff    = 22.7;
-
-      // FIXME : I think the sqrt(10) is a leftover from the old cm units....
-      sigmax0 = 38.3e-3;
-      sigmax1 = 101.5e-3 / TMath::Sqrt(10.) / TMath::Sqrt(neff);
-      sigmaz0 = 500.e-3 ;
-      sigmaz1 = 154.e-3  / TMath::Sqrt(10.) / TMath::Sqrt(neff);
-    }
 
     // FIXME: Implementation for RectangularPadRowLayout missing
     switch (module->getLocalPadLayout().getCoordinateType())
@@ -180,14 +141,10 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
           throw gear::UnknownParameterException("Offset in y is not 0.");
         }
 
-//        TVector3 cylinderCentre(xOffset,
-//                yOffset,
-//                0.); // FIXME: cathode thickness
-
-        // Loop the pad rows and place one cylinder segement each
+        // Loop the pad rows and place one cylinder segment each
         for (int row = 0; row < module->getNRows(); ++row)
         {
-          // To get the radius we have to ask for the centre of one one the pads,
+          // To get the radius we have to ask for the center of one one the pads,
           // just take pad 0 in this row.
           int padIndex  = module->getPadIndex(row, 0);
 
@@ -198,10 +155,7 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
           std::map< std::pair<double, double> , Int_t >::iterator uniqueLayerIterator=
             uniqueLayerMap.find( std::pair<double, double>(xOffset, r) );
 
-          // Alex::
-          // for the time of development drop adding another segment of the pads to the existing layer
           if ( uniqueLayerIterator==uniqueLayerMap.end() )
-//          if ( 1 )
           {
             streamlog_out(DEBUG2) << "adding new layer "<<arrayIndex<< " (xOffset="<<xOffset
                       <<", r="<<r
@@ -225,14 +179,9 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
   		 */
         	tpcParameters.getModule(0).getNRows() + tpcParameters.getModule(2).getNRows() + row );
 
-//            std::cout<<"Alex:: "<<mod<<"  "<<std::endl;
-//            std::cout<<"Alex:: 4455 "<<row_global<<"  "<<std::endl;
             encoder[lcio::ILDCellID0::layer] = row_global ;
-//            encoder[lcio::ILDCellID0::layer] = row ;
-//            encoder[lcio::ILDCellID0::module] = module -> getModuleID() ;
 
             int CellID = encoder.lowWord() ;
-//            std::cout<<"Alex:: 3213 "<<CellID<<std::endl;
 
             Add(new ILDCylinderMeasLayer(gas, gas,
                     r, lhalf,
@@ -241,24 +190,7 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
                     true, // active
                     CellID,
                     "ILDCylinderMeasLayer"));
-//            Add(new LCTPCCylinderMeasLayer(gas, gas,
-//                    r, lhalf,
-//                    xOffset, yOffset, 0, // FIXME: cathode thickness?
-//                    bz,
-//                    true, // active
-//                    CellID,
-//                    "LCTPCCylinderMeasLayer",
-//
-//                             module->getModuleID(), row,
-//                             true, // perfect layer (full cylinder)
-//                             sigmax0, sigmax1, sigmaz0, sigmaz1));
-            // Alex:: Original code:
-//            Add(new GearTPCCylinderMeasLayer(gas, gas,
-//                    module->getModuleID(), row,
-//                    r, lhalf,
-//                    cylinderCentre,
-//                    true, true, // perfect and active
-//                    sigmax0, sigmax1, sigmaz0, sigmaz1));
+
             // add the moduleRow to the map with the array indices
             moduleRowToMeasurementLayerMap[ std::pair<int, int>(module->getModuleID(), row) ]
               = arrayIndex;
@@ -271,35 +203,8 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
           }
           else // layer already exists
           {
-            // FIXME: for now drop this functionality
             streamlog_out(WARNING)
-               // Alex:: old comment by me
-//                    << "support of adding of a module to the existing layer has been dropped "
-//                    <<"for the time of development"<< std::endl;
                     << "A new layer will not be added as the layer with the same parameters already exist"<< std::endl;
-//            Int_t existingIndex = uniqueLayerIterator->second;
-//            streamlog_out(DEBUG2) << "adding module "<< module->getModuleID()
-//                              <<", row "<<row <<" to existing layer " << existingIndex
-//                              << " (xOffset="<<xOffset<<", row="<<row<<")"
-//                              << std::endl;
-//
-//            GearTPCCylinderMeasLayer * measLayer =
-//                    dynamic_cast<GearTPCCylinderMeasLayer *>( At(existingIndex));
-//
-//            // If the cast fails something went terribly wrong. This layer should be a
-//            // GearTPCCylinderMeasLayers, otherwise we cannot add a cylindrical module
-//            if (measLayer==0)
-//            {
-//                streamlog_out(ERROR) << "Something went terribly wrong. Could not cast a member of "
-//                        << " GerTPCKalDetector to GearTPCCylinderMeasLayer" << std::endl;
-//                throw std::bad_cast();
-//            }
-//
-//            measLayer->AddModuleRow( module->getModuleID(), row );
-//
-//            moduleRowToMeasurementLayerMap[ std::pair<int, int>(module->getModuleID(), row) ]
-//                                            = existingIndex;
-
           }
 
         }// loop rows in module
@@ -344,41 +249,9 @@ ILDVMeasLayer const * LCTPCKalDetector::GetMeasLayer(int moduleID, int row) cons
   {
     streamlog_out(ERROR) << "LCTPCKalDetector::getMeasLayer: "
              << " cannot cast object this->At(" << indexIter->second
-             << ") to LCTPCMeasLayer const * " << std::endl;
+             << ") to ILDVMeasLayer const * " << std::endl;
   }
   return measurementLayer;
 }
-
-//_________________________________________________________________________
-//  --------------
-//  Utility Method
-//  --------------
-//_________________________________________________________________________
-//  --------------------------------------
-//  Draw: Drawing method for event display
-//  --------------------------------------
-//
-//void GearTPCKalDetector::Draw(Int_t color, const Char_t *opt)
-//{
-//  if (! gPad) return;
-//  TNode *nodep = GetNodePtr();
-//  nodep->cd();
-//
-//  if (! fNodePtr) {
-//    GearTPCMeasLayer *inp  = static_cast<GearTPCMeasLayer *>(First());
-//    GearTPCMeasLayer *outp = static_cast<GearTPCMeasLayer *>(Last());
-//    Double_t rin  = inp->GetR();
-//    Double_t rout = outp->GetR();
-//    Double_t hlen = outp->GetZmax();
-//    const Char_t *name  = "TPC";
-//    const Char_t *nname = "TPCNode";
-//    TTUBE *tubep = new TTUBE(name, name, "void", rin, rout, hlen);
-//    tubep->SetBit(kCanDelete);
-//    fNodePtr = new TNode(nname, nname, name);
-//    fNodePtr->SetLineColor(color);
-//    fNodePtr->SetLineWidth(1); // line width given in number of pixels
-//  }
-//  EXVKalDetector::Draw(color, opt);
-//}
 
 }//namespace kaldet
