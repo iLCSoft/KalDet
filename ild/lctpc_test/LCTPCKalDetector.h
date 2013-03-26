@@ -35,18 +35,6 @@ public:
     /// The destructor.
     virtual ~LCTPCKalDetector();
 
-    /**
-     * Get access to the measurement layers using moduleID and row.
-     * Do not directly access the measurement layers using At() 
-     * because the order depends on the order in the gear file.
-     * Throws a gear::Exception if the row on the module is not defined.
-     */
-    virtual ILDVMeasLayer const * GetMeasLayer(int moduleID, int row) const;
-
-protected:
-    /// Map which contains the information which measurement layer is stored
-    /// at which position in the array.
-    std::map< std::pair<int, int >, Int_t > moduleRowToMeasurementLayerMap;
 };
 
 }// namespace kaldet

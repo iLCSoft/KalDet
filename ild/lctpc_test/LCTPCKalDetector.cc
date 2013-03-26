@@ -191,10 +191,6 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
                     CellID,
                     "ILDCylinderMeasLayer"));
 
-            // add the moduleRow to the map with the array indices
-            moduleRowToMeasurementLayerMap[ std::pair<int, int>(module->getModuleID(), row) ]
-              = arrayIndex;
-
             // add the layer to the uniqueLayerMap
             uniqueLayerMap[std::pair<double, double>(xOffset, r)] = arrayIndex;
 
@@ -226,32 +222,6 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
 
 LCTPCKalDetector::~LCTPCKalDetector()
 {
-}
-
- 
-ILDVMeasLayer const * LCTPCKalDetector::GetMeasLayer(int moduleID, int row) const
-{
-  std::map< std::pair<int, int >, Int_t >::const_iterator indexIter = 
-    moduleRowToMeasurementLayerMap.find( std::pair<int, int>(moduleID, row) );
-
-  if (indexIter==moduleRowToMeasurementLayerMap.end())
-  {
-    streamlog_out(ERROR) << "LCTPCKalDetector::getMeasLayer: "
-             << "layer with moduleID=" << moduleID
-             << " and row=" << row << " not defined." << std::endl;
-    throw gear::Exception("Unknown row on moduleID");
-  }
-  
-  // second is the key of the iterator (the arrow dereferencing the iterator to a key-value pair)
-  ILDVMeasLayer const * measurementLayer =
-    dynamic_cast<ILDVMeasLayer const * >( At(indexIter->second) );
-  if (measurementLayer==0)
-  {
-    streamlog_out(ERROR) << "LCTPCKalDetector::getMeasLayer: "
-             << " cannot cast object this->At(" << indexIter->second
-             << ") to ILDVMeasLayer const * " << std::endl;
-  }
-  return measurementLayer;
 }
 
 }//namespace kaldet
