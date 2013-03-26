@@ -15,7 +15,7 @@
 #include <streamlog/streamlog.h>
 
 #include "LCTPCKalDetector.h"
-#include "LCTPCCylinderMeasLayer.h"
+#include "ILDCylinderMeasLayer.h"
 #include <TKalDetCradle.h>
 #include <TRandom.h>
 #include <TMath.h>
@@ -234,17 +234,24 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
             int CellID = encoder.lowWord() ;
 //            std::cout<<"Alex:: 3213 "<<CellID<<std::endl;
 
-            Add(new LCTPCCylinderMeasLayer(gas, gas,
+            Add(new ILDCylinderMeasLayer(gas, gas,
                     r, lhalf,
                     xOffset, yOffset, 0, // FIXME: cathode thickness?
                     bz,
                     true, // active
                     CellID,
-                    "LCTPCCylinderMeasLayer",
-
-                             module->getModuleID(), row,
-                             true, // perfect layer (full cylinder)
-                             sigmax0, sigmax1, sigmaz0, sigmaz1));
+                    "ILDCylinderMeasLayer"));
+//            Add(new LCTPCCylinderMeasLayer(gas, gas,
+//                    r, lhalf,
+//                    xOffset, yOffset, 0, // FIXME: cathode thickness?
+//                    bz,
+//                    true, // active
+//                    CellID,
+//                    "LCTPCCylinderMeasLayer",
+//
+//                             module->getModuleID(), row,
+//                             true, // perfect layer (full cylinder)
+//                             sigmax0, sigmax1, sigmaz0, sigmaz1));
             // Alex:: Original code:
 //            Add(new GearTPCCylinderMeasLayer(gas, gas,
 //                    module->getModuleID(), row,
