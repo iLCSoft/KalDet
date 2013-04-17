@@ -76,6 +76,17 @@ make install
 =====================================================================================
 
  --------
+| v01-12 |
+ --------
+       - added detector geometry for lctpc which is now based on ild classes. Notes:
+         - it is compatible with Clupatra/MarlinTrk
+         - the correspondence between row number and module is represented in a different way
+           compared to the original class GearTPCKalDetector. In the current implementation,
+           row numbers are global, i.e. rows of different modules but with the same center are
+           now the same rows! This is needed to unify the measurement layers that are
+           combinations of several modules.
+
+ --------
 | v01-11 |  
  -------- 
        - ild
