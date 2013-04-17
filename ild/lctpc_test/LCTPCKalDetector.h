@@ -5,8 +5,6 @@
 
 #include "ILDVMeasLayer.h"
 
-#include <map>
-
 namespace gear{
   class GearMgr ;
 }

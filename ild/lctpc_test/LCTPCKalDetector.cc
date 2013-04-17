@@ -16,9 +16,6 @@
 
 #include "LCTPCKalDetector.h"
 #include "ILDCylinderMeasLayer.h"
-#include <TKalDetCradle.h>
-#include <TRandom.h>
-#include <TMath.h>
 
 namespace kaldet
 {
