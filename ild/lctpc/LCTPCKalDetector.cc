@@ -196,7 +196,7 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
           }
           else // layer already exists
           {
-            streamlog_out(WARNING)
+            streamlog_out(DEBUG2)
                     << "A new layer will not be added as the layer with the same parameters already exist"<< std::endl;
           }
 
