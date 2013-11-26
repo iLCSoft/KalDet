@@ -30,7 +30,9 @@ private:
   
   int _nLayers ;
   double _bZ ;
-  
+
+  double _relative_position_of_measurement_surface ;
+
   struct VXD_Layer {
     int nLadders;
     double phi0;

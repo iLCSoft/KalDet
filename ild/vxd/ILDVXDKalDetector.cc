@@ -111,8 +111,8 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
           // air - sensitive boundary
           Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSenFront_non_overlap_even" )) ;
           
-          // measurement plane defined as the middle of the sensitive volume 
-          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, active, CellID, "VXDMeasLayer_non_overlap_even" )) ;          
+          // measurement plane defined as the middle of the sensitive volume  - unless "relative_position_of_measurement_surface" parameter given in GEAR
+          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*_relative_position_of_measurement_surface, currPhi, _bZ, measurement_plane_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, active, CellID, "VXDMeasLayer_non_overlap_even" )) ;          
           
           // sensitive - support boundary 
           Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, pos_xi_nonoverlap_width, length, 0.0, z_offset, offset, dummy,-1,"VXDSenSuppportIntf_non_overlap_even" )) ; 
@@ -139,8 +139,8 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
           // air - sensitive boundary
           Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, overlap_front_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, dummy,-1,"VXDSenFront_overlap_even")) ;
           
-          // measurement plane defined as the middle of the sensitive volume
-          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, overlap_measurement_plane_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, active, CellID, "VXDMeasLayer_overlap_even" )) ;
+          // measurement plane defined as the middle of the sensitive volume  - unless "relative_position_of_measurement_surface" parameter given in GEAR
+          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*_relative_position_of_measurement_surface, currPhi, _bZ, overlap_measurement_plane_sorting_policy, overlap_region_width, length, overlap_region_offset, z_offset, offset, active, CellID, "VXDMeasLayer_overlap_even" )) ;
           
           
           // sensitive - support boundary 
@@ -160,8 +160,9 @@ ILDVXDKalDetector::ILDVXDKalDetector( const gear::GearMgr& gearMgr )
           // air - sensitive boundary
           Add(new ILDParallelPlanarMeasLayer(air, silicon, sensitive_distance, currPhi, _bZ, sen_front_sorting_policy, width, length, offset, z_offset, offset, dummy,-1, "VXDSenFront_even")) ;
                     
-          // measurement plane defined as the middle of the sensitive volume
-          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*0.5, currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, z_offset, offset, active, CellID, "VXDMeaslayer_even" )) ;
+
+          // measurement plane defined as the middle of the sensitive volume  - unless "relative_position_of_measurement_surface" parameter given in GEAR - even layers face outwards ! 
+          Add(new ILDParallelPlanarMeasLayer(silicon, silicon, sensitive_distance+sensitive_thickness*( 1.-_relative_position_of_measurement_surface ), currPhi, _bZ, measurement_plane_sorting_policy, width, length, offset, z_offset, offset, active, CellID, "VXDMeaslayer_even" )) ;
           
           // sensitive - support boundary 
           Add(new ILDParallelPlanarMeasLayer(silicon, carbon, sensitive_distance+sensitive_thickness, currPhi, _bZ, sen_back_sorting_policy, width, length, offset, z_offset, offset, dummy,-1,"VXDSenSuppportIntf_even" )) ; 
@@ -343,10 +344,25 @@ void ILDVXDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     _VXDgeo[layer].supThickness = pVXDLayerLayout.getLadderThickness(layer); 
   }
   
+
+  // by default, we put the measurement surface in the middle of the sensitive
+  // layer, this can optionally be changed, e.g. in the case of the FPCCD where the 
+  // epitaxial layer is 15 mu thick (in a 50 mu wafer)
+  _relative_position_of_measurement_surface = 0.5 ;
+
+  try {
+
+    _relative_position_of_measurement_surface =  pVXDDetMain.getDoubleVal( "relative_position_of_measurement_surface"  ); 
+
+    streamlog_out(DEBUG) << " ILDVXDKalDetector::setupGearGeom:  relative_position_of_measurement_surface parameter is provided : " <<  _relative_position_of_measurement_surface << std::endl ;
+
+  } catch (gear::UnknownParameterException& e) {}
+
+
+
+
+
   // Cryostat
-  
-  
-  
   try {
     
     const gear::GearParameters& pVXDInfra = gearMgr.getGearParameters("VXDInfra");
