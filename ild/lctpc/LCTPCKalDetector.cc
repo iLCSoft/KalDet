@@ -178,6 +178,8 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
 
             encoder[lcio::ILDCellID0::layer] = row_global ;
 
+	    //	    encoder[lcio::ILDCellID0::module] = mod ;
+
             int CellID = encoder.lowWord() ;
 
             Add(new ILDCylinderMeasLayer(gas, gas,

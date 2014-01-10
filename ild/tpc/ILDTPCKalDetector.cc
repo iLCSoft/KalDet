@@ -31,7 +31,9 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   const gear::TPCParameters& tpcParams = gearMgr.getTPCParameters();
   
   const gear::PadRowLayout2D& pL = tpcParams.getPadLayout() ; 
-  
+
+  streamlog_out(DEBUG1) << "ILDTPCKalDetector - got padlayout with nLayers = " <<  pL.getNRows()  <<  std::endl ;
+
   const Double_t bz = gearMgr.getBField().at( gear::Vector3D( 0.,0.,0.)  ).z() ;
   
   static const Int_t    nlayers   =  pL.getNRows() ;   // n rows

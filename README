@@ -74,6 +74,19 @@ make install
   Release Notes:
 
 =====================================================================================
+  --------
+ | v01-13 |
+  --------
+
+ - modified ILDVXDKalDetector:
+  
+   - modified to optionally change the relative position of
+    the measurement surface within the sensitive layer
+     => needed for example in the FPCCD
+
+  - optionally users can add
+     <parameter name="relative_position_of_measurement_surface" type="double" value="0.15"/>
+   to the VXD parameter section in the GEAR file
 
  --------
 | v01-12 |
