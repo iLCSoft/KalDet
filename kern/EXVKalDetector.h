@@ -56,7 +56,7 @@ public:
   /// value, which means it is homogeneous and thus indepenent from the position.
   /// Currently it does the only reasonable thing: It ignores the argument and returns the 
   /// constant value given in the constructor.
-  virtual Double_t GetBfield (const TVector3 &xx = TVector3(0.)) const
+  virtual Double_t GetBfield (const TVector3 &xx = TVector3(0.,0.,0.)) const
                                           { return fBfield; }
 
 protected:
