@@ -184,8 +184,11 @@ void ILDMeasurementSurfaceStoreFiller::storeZPlanar( const gear::ZPlanarParamete
   
   for( unsigned layerNumber = 0; layerNumber < nLayers; layerNumber++ ){
     
+
     unsigned nLadders = layerLayout.getNLadders( layerNumber );
     
+    streamlog_out(DEBUG1) << "ILDMeasurementSurfaceStoreFiller::storeZPlanar :  nLadders = "  << nLadders  << std::endl ;
+
     double ladder_r            = layerLayout.getSensitiveDistance(layerNumber); // the distance of the ladders from (0,0,0)
     double sensitive_offset    = layerLayout.getSensitiveOffset(layerNumber); // the offset, see ZPlanarLayerLayout.h for more details
     double deltaPhi            = ( 2 * M_PI ) / nLadders ; // the phi difference between two ladders
@@ -256,6 +259,10 @@ void ILDMeasurementSurfaceStoreFiller::storeZPlanar( const gear::ZPlanarParamete
         // Finally we have to get the ladder in place w.r. to its number and the resulting phi angle
         R.rotateZ( deltaPhi * ladderNumber + phi0 );
         
+	streamlog_out(DEBUG1) << "ILDMeasurementSurfaceStoreFiller::storeZPlanar :  ladder : "  << ladderNumber << " sensor : " << sensorNumber  
+                          << " cellId: " << cellID  << std::endl ;
+
+
         CartesianCoordinateSystem* cartesian = new CartesianCoordinateSystem( T, R );
         
         BoundaryRectangle* b = new BoundaryRectangle( sensitive_width, sensor_length, 1., -stripAngle );
