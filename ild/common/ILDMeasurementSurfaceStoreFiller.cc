@@ -367,6 +367,13 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
         R.rotateZ( petal * deltaPhi + phi0 + stripAngle - M_PI/2. );
         //             printRotation( R );
         
+
+        streamlog_out( DEBUG3 ) << " create measurement surface for FTD " << cellID.valueString() 
+                                << " angle : " << ( petal * deltaPhi + phi0 + stripAngle - M_PI/2. ) / 3.141592 * 180.
+                                << "  translation: " << T.x() << ",  " <<  T.y() << ",  " <<  T.z()  
+				<< std::endl ;
+
+
         BoundaryTrapezoid* b1 = new BoundaryTrapezoid( baseInner, baseOuter, deltaX, 1., -stripAngle);
         CartesianCoordinateSystem* cartesian = new CartesianCoordinateSystem( T, R );
         MeasurementSurface* ms = new MeasurementSurface( cellID0, cartesian, b1);

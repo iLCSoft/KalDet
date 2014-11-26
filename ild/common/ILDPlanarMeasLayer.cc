@@ -29,8 +29,12 @@
 #include "gearimpl/Vector3D.h"
 
 #include <EVENT/TrackerHitPlane.h>
+#include <UTIL/Operators.h>
+#include <UTIL/BitField64.h>
 
 #include "streamlog/streamlog.h"
+
+using namespace UTIL;
 
 ILDPlanarMeasLayer::ILDPlanarMeasLayer(TMaterial &min,
                                        TMaterial &mout,
@@ -286,7 +290,7 @@ ILDVTrackHit* ILDPlanarMeasLayer::ConvertLCIOTrkHit( EVENT::TrackerHit* trkhit) 
   bool hit_on_surface = IsOnSurface(hit);
   
   streamlog_out(DEBUG1) << "ILDPlanarMeasLayer::ConvertLCIOTrkHit ILDPlanarHit created" 
-  << " for CellID " << trkhit->getCellID0()
+			<< *plane_hit 
   << " Layer R = " << this->GetXc().Perp() 
   << " Layer phi = " << this->GetXc().Phi() 
   << " Layer z0 = " << this->GetXc().Z() 
