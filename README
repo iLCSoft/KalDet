@@ -75,9 +75,16 @@ make install
 
 =====================================================================================
 
-  --------
+  -----------
+ | v01-13-02 |
+  -----------
+      - patch release with some additional 
+        debug output for diagnostics
+
+
+  -----------
  | v01-13-01 |
-  --------
+  ----------
 
   - fix for ROOT 5.34.18 (TVector3 c'tor) (F.Gaede)
 
