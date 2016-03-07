@@ -44,13 +44,16 @@ FOREACH( pkg Marlin ROOT KalTest LCIO GEAR streamlog)
 
 ENDFOREACH()
 
+#fg: for ROOT 6 we need the .src/cpp as include directory
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
+
 ### LIBRARY AND TOOLS ######################################################
  
 
 # require proper c++
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+#ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
 #----- need long long for int64 for now ------
-ADD_DEFINITIONS( "-Wno-long-long -fno-strict-aliasing" )
+#ADD_DEFINITIONS( "-Wno-long-long -fno-strict-aliasing" )
 
 
 # macros for generating root dict sources with rootcint
