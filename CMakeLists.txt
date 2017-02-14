@@ -87,7 +87,11 @@ FOREACH( lib_input_dir ${lib_input_dirs} )
 
     GEN_ROOT_DICT_SOURCES( ${lib_input_dir}Dict.cxx )
 
-    install(FILES ${ROOT_DICT_OUTPUT_DIR}/${lib_input_dir}Dict_rdict.pcm DESTINATION lib)
+    # "GEN_ROOT_DICT_SOURCES" generate the root dictinary name
+    # by replacing "/" with "_" for "lctpc/gearTPC".
+    # Follow the definition to install the same name "lctpc_gearTPCDict". 
+    STRING( REPLACE "/" "_" lib_root_dict_name ${lib_input_dir}Dict)
+    INSTALL(FILES ${ROOT_DICT_OUTPUT_DIR}/${lib_root_dict_name}_rdict.pcm DESTINATION lib)
 
     LIST( APPEND lib_sources ${ROOT_DICT_OUTPUT_SOURCES} )
 
