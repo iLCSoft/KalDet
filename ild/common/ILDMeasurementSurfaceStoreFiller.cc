@@ -1,7 +1,8 @@
 
 #include "ILDMeasurementSurfaceStoreFiller.h"
 
-#include "UTIL/ILDConf.h"
+#include "UTIL/LCTrackerConf.h"
+#include <UTIL/ILDConf.h>
 
 #include <gear/ZPlanarParameters.h>
 #include <gear/ZPlanarLayerLayout.h>
@@ -204,12 +205,12 @@ void ILDMeasurementSurfaceStoreFiller::storeZPlanar( const gear::ZPlanarParamete
       for( int sensorNumber = 0; sensorNumber < nsensors.at(layerNumber); sensorNumber++ ){
         
         // determine the CellID0 for the  ladder
-        UTIL::BitField64  cellID( UTIL::ILDCellID0::encoder_string );
-        cellID[ lcio::ILDCellID0::subdet ] = det_id ;
-        cellID[ lcio::ILDCellID0::side   ] = 0 ;
-        cellID[ lcio::ILDCellID0::layer  ] = layerNumber ;
-        cellID[ lcio::ILDCellID0::module ] = ladderNumber ;
-        cellID[ lcio::ILDCellID0::sensor ] = sensorNumber ;
+        UTIL::BitField64  cellID( UTIL::LCTrackerCellID::encoding_string() );
+        cellID[ lcio::LCTrackerCellID::subdet() ] = det_id ;
+        cellID[ lcio::LCTrackerCellID::side()   ] = 0 ;
+        cellID[ lcio::LCTrackerCellID::layer()  ] = layerNumber ;
+        cellID[ lcio::LCTrackerCellID::module() ] = ladderNumber ;
+        cellID[ lcio::LCTrackerCellID::sensor() ] = sensorNumber ;
         int cellID0 = cellID.lowWord();
         
         
@@ -283,13 +284,13 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
   const gear::FTDLayerLayout& ftdLayers = param->getFTDLayerLayout() ;
   unsigned nLayers = ftdLayers.getNLayers();
   
-  UTIL::BitField64  cellID( UTIL::ILDCellID0::encoder_string );
-  cellID[ lcio::ILDCellID0::subdet ] = UTIL::ILDDetID::FTD ;
+  UTIL::BitField64  cellID( UTIL::LCTrackerCellID::encoding_string() );
+  cellID[ lcio::LCTrackerCellID::subdet() ] = UTIL::ILDDetID::FTD ;
   
   for( unsigned layer = 0; layer < nLayers; layer++ ){
     
     
-    cellID[ lcio::ILDCellID0::layer  ] = layer ;
+    cellID[ lcio::LCTrackerCellID::layer()  ] = layer ;
     
     unsigned nPetals = ftdLayers.getNPetals( layer );
     double deltaPhi  = ( 2 * M_PI ) / nPetals;
@@ -308,7 +309,7 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
     for( unsigned petal=0; petal< nPetals; petal++ ){
       
       
-      cellID[ lcio::ILDCellID0::module ] = petal ;
+      cellID[ lcio::LCTrackerCellID::module() ] = petal ;
       
       
       for ( unsigned sensor = 1; sensor <=nSensors; sensor++ ){
@@ -320,8 +321,8 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
         
         //        streamlog_out(DEBUG1) << "FTD layer = " << layer << "\tpetal = " << petal << "\tsensor = " << sensor << " stripAngle = " << stripAngle << "\n";
         
-        cellID[ lcio::ILDCellID0::side   ] = -1 ;                    
-        cellID[ lcio::ILDCellID0::sensor ] = sensor ;
+        cellID[ lcio::LCTrackerCellID::side()   ] = -1 ;                    
+        cellID[ lcio::LCTrackerCellID::sensor() ] = sensor ;
         int cellID0 = cellID.lowWord();
         
         // We start with the Translation Vector T (=origin of new CoordinateSystem )
@@ -381,7 +382,7 @@ void ILDMeasurementSurfaceStoreFiller::storeFTD( const gear::FTDParameters* para
         
         
         // Once more for the other side
-        cellID[ lcio::ILDCellID0::side ] = 1 ;   
+        cellID[ lcio::LCTrackerCellID::side() ] = 1 ;   
         cellID0 = cellID.lowWord();
         
         T.setZ( -T.z() ); // switch to -z

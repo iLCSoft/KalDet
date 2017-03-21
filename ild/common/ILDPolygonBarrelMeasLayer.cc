@@ -2,7 +2,7 @@
 #include "ILDPolygonBarrelMeasLayer.h"
 
 #include <UTIL/BitField64.h>
-#include <UTIL/ILDConf.h>
+#include "UTIL/LCTrackerConf.h"
 
 #include "TVTrack.h"
 #include "TVector3.h"
@@ -179,10 +179,10 @@ int ILDPolygonBarrelMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
     
     unsigned int plane = this->get_plane_index( xx.Phi() );
     
-    lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
+    lcio::BitField64 bf(  UTIL::LCTrackerCellID::encoding_string() ) ;
     bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
     
-    bf[lcio::ILDCellID0::module] = plane;
+    bf[lcio::LCTrackerCellID::module()] = plane;
     CellID = bf.lowWord();
     
   }

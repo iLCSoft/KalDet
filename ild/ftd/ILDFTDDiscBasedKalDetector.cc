@@ -13,6 +13,7 @@
 #include "ILDDiscMeasLayer.h"
 
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 
 #include "streamlog/streamlog.h"
@@ -43,7 +44,7 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
   double eps4 = 1.0e-08 ; // forward or backwards
 
   
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   
   for (int idisk = 0; idisk < _nDisks; ++idisk) {
     
@@ -54,15 +55,15 @@ TVKalDetector(30), _nDisks(0) // SJA:FIXME initial size, 300 looks reasonable fo
     double supThickness = _FTDgeo[idisk].supThickness ;
     double zPos = _FTDgeo[idisk].zPos;
     
-    encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
-    encoder[lcio::ILDCellID0::side] = 1 ;
-    encoder[lcio::ILDCellID0::layer]  = idisk ;
-    encoder[lcio::ILDCellID0::module] = 0 ;
-    encoder[lcio::ILDCellID0::sensor] = 0 ;
+    encoder[lcio::LCTrackerCellID::subdet()] = lcio::ILDDetID::FTD ;
+    encoder[lcio::LCTrackerCellID::side()] = 1 ;
+    encoder[lcio::LCTrackerCellID::layer()]  = idisk ;
+    encoder[lcio::LCTrackerCellID::module()] = 0 ;
+    encoder[lcio::LCTrackerCellID::sensor()] = 0 ;
     
     int CellID_FWD = encoder.lowWord() ;
     
-    encoder[lcio::ILDCellID0::side] = -1 ;
+    encoder[lcio::LCTrackerCellID::side()] = -1 ;
     
     int CellID_BWD = encoder.lowWord() ;
     

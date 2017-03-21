@@ -2,7 +2,7 @@
 #include "ILDVMeasLayer.h"
 
 #include <UTIL/BitField64.h>
-#include <UTIL/ILDConf.h>
+#include "UTIL/LCTrackerConf.h"
 
 #include "streamlog/streamlog.h"
 
@@ -23,10 +23,10 @@ _isMultiLayer(false)
 {
   _cellIDs.push_back(cellID);
 
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   encoder.setValue(cellID);
-  encoder[lcio::ILDCellID0::module] = 0;
-  encoder[lcio::ILDCellID0::sensor] = 0;
+  encoder[lcio::LCTrackerCellID::module()] = 0;
+  encoder[lcio::LCTrackerCellID::sensor()] = 0;
 
   _layerID = encoder.lowWord();
   
@@ -49,10 +49,10 @@ _isMultiLayer(true)
     streamlog_out(ERROR) << __FILE__ << " line " << __LINE__ << " size of cellIDs == 0" << std::endl;
   }
 
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   encoder.setValue(cellIDs.at(0));
-  encoder[lcio::ILDCellID0::module] = 0;
-  encoder[lcio::ILDCellID0::sensor] = 0;
+  encoder[lcio::LCTrackerCellID::module()] = 0;
+  encoder[lcio::LCTrackerCellID::sensor()] = 0;
 
   _layerID = encoder.lowWord();
   

@@ -7,6 +7,7 @@
 
 
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 
 #include <gear/GEAR.h>
@@ -53,7 +54,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
   static const double eps_layer  = 1e-6; 
   static const double eps_sensor = 1e-8; 
   
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   
   for (int layer=0; layer<_nLayers; ++layer) {
     
@@ -94,10 +95,10 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
       
       encoder.reset() ;  // reset to 0
       
-      encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::SIT ;
-      encoder[lcio::ILDCellID0::side] = 0 ;
-      encoder[lcio::ILDCellID0::layer]  = layer ;
-      encoder[lcio::ILDCellID0::module] = ladder ;
+      encoder[lcio::LCTrackerCellID::subdet()] = lcio::ILDDetID::SIT ;
+      encoder[lcio::LCTrackerCellID::side()] = 0 ;
+      encoder[lcio::LCTrackerCellID::layer()]  = layer ;
+      encoder[lcio::LCTrackerCellID::module()] = ladder ;
       
       double z_centre_support = 0.0;
       
@@ -113,7 +114,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
         
         for (int isensor=0; isensor<nsensors; ++isensor) {
 
-          encoder[lcio::ILDCellID0::sensor] = isensor ;          
+          encoder[lcio::LCTrackerCellID::sensor()] = isensor ;          
           int CellID = encoder.lowWord() ;
           
           double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+1) * eps_layer + eps_sensor * isensor ;
@@ -160,7 +161,7 @@ ILDSITKalDetector::ILDSITKalDetector( const gear::GearMgr& gearMgr )
         
         for (int isensor=0; isensor<nsensors; ++isensor) {
 
-          encoder[lcio::ILDCellID0::sensor] = isensor ;          
+          encoder[lcio::LCTrackerCellID::sensor()] = isensor ;          
           int CellID = encoder.lowWord() ;
           
           double measurement_plane_sorting_policy = sensitive_distance  + (4 * ladder+2) * eps_layer + eps_sensor * isensor ;

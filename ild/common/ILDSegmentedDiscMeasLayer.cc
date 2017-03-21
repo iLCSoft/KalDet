@@ -3,7 +3,7 @@
 #include "ILDPlanarHit.h"
 
 #include <UTIL/BitField64.h>
-#include <UTIL/ILDConf.h>
+#include "UTIL/LCTrackerConf.h"
 
 #include "TVTrack.h"
 #include "TVector3.h"
@@ -192,10 +192,10 @@ TVector3 ILDSegmentedDiscMeasLayer::HitToXv(const TVTrackHit &vht) const
 //  
 //  double z = this->GetXc().Z() ;
 
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ;
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ;
   EVENT::TrackerHit* hit = mv.getLCIOTrackerHit();
   encoder.setValue(hit->getCellID0());
-  int segmentIndex = encoder[lcio::ILDCellID0::module] / 2 ;
+  int segmentIndex = encoder[lcio::LCTrackerCellID::module()] / 2 ;
   
   
   TVector3 XC = this->get_segment_centre(segmentIndex);
@@ -562,10 +562,10 @@ int ILDSegmentedDiscMeasLayer::getIntersectionAndCellID(const TVTrack  &hel,
     
     const std::vector<int>& cellIds = this->getCellIDs();
     
-    lcio::BitField64 bf(  UTIL::ILDCellID0::encoder_string ) ;
+    lcio::BitField64 bf(  UTIL::LCTrackerCellID::encoding_string() ) ;
     bf.setValue( this->getCellIDs()[0] ) ; // get the first cell_ID, this will have the correct sensor value
     
-    bf[lcio::ILDCellID0::module] = cellIds.at(segment);
+    bf[lcio::LCTrackerCellID::module()] = cellIds.at(segment);
     CellID = bf.lowWord();
     
   }

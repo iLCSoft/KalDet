@@ -18,7 +18,7 @@
 #include "ILDVMeasLayer.h"
 #include "iostream"
 #include "streamlog/streamlog.h"
-#include "UTIL/ILDConf.h"
+#include "UTIL/LCTrackerConf.h"
 
 class ILDConeMeasLayer : public ILDVMeasLayer, public TCutCone {
 public:

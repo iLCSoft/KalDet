@@ -9,6 +9,7 @@
 #include "TTUBE.h"
 
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 
 #include "MaterialDataBase.h"
@@ -264,18 +265,18 @@ TVKalDetector(10)
   double r_min_ecal_bar = ecalB.getExtent()[0];
   double z_max_ecal_bar = ecalB.getExtent()[3];
 
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   encoder.reset() ;  // reset to 0
   
-  encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::ECAL ;
-  encoder[lcio::ILDCellID0::side] = lcio::ILDDetID::barrel;
-  encoder[lcio::ILDCellID0::layer]  = 0 ;
+  encoder[lcio::LCTrackerCellID::subdet()] = lcio::ILDDetID::ECAL ;
+  encoder[lcio::LCTrackerCellID::side()] = lcio::ILDDetID::barrel;
+  encoder[lcio::LCTrackerCellID::layer()]  = 0 ;
   
   std::vector<int> module_ids;
   
   for (int i=0; i<8; ++i) {
 
-    encoder[lcio::ILDCellID0::module] = i;
+    encoder[lcio::LCTrackerCellID::module()] = i;
     module_ids.push_back(encoder.lowWord());
 
     double segment_dphi = 2.0*M_PI / 8; 
@@ -293,9 +294,9 @@ TVKalDetector(10)
   double r_max_ecal_ecap = ecalE.getExtent()[1];
   double z_min_ecal_ecap = ecalE.getExtent()[2];
 
-  encoder[lcio::ILDCellID0::module] = 0;
+  encoder[lcio::LCTrackerCellID::module()] = 0;
   
-  encoder[lcio::ILDCellID0::side] = lcio::ILDDetID::fwd;
+  encoder[lcio::LCTrackerCellID::side()] = lcio::ILDDetID::fwd;
   
   TVector3 front_face_centre_fwd( 0.0, 0.0, z_min_ecal_ecap); // for +z  
   TVector3 front_face_normal_fwd(front_face_centre_fwd);
@@ -305,7 +306,7 @@ TVKalDetector(10)
   
   streamlog_out( DEBUG0 )   << " *** adding ECalEndcapFace+Z Measurement layer at Zmin = " << front_face_centre_fwd.z() << " and Rmax = " << r_max_ecal_ecap/cos(M_PI/8.0) << std::endl ;
   
-  encoder[lcio::ILDCellID0::side] = lcio::ILDDetID::bwd;
+  encoder[lcio::LCTrackerCellID::side()] = lcio::ILDDetID::bwd;
   TVector3 front_face_centre_bwd( -front_face_centre_fwd ); // for -z  
   TVector3 front_face_normal_bwd(front_face_centre_bwd);
   front_face_normal_bwd.SetMag(1.0);
