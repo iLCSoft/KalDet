@@ -13,6 +13,7 @@
 #include "gearimpl/Util.h"
 
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 
 #include "streamlog/streamlog.h"
@@ -38,14 +39,14 @@ TVKalDetector(100)
   
   std::string name = "SIT";
 
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   
   for ( unsigned int ilayer = 0 ; ilayer<_nLayers ; ++ilayer) {
 
-    encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::SIT ;
-    encoder[lcio::ILDCellID0::layer]  = ilayer ;
-    encoder[lcio::ILDCellID0::module] = 0 ;
-    encoder[lcio::ILDCellID0::sensor] = 0 ;
+    encoder[lcio::LCTrackerCellID::subdet()] = lcio::ILDDetID::SIT ;
+    encoder[lcio::LCTrackerCellID::layer()]  = ilayer ;
+    encoder[lcio::LCTrackerCellID::module()] = 0 ;
+    encoder[lcio::LCTrackerCellID::sensor()] = 0 ;
     
     int CellID = encoder.lowWord() ;
     

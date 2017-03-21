@@ -17,6 +17,7 @@
 #include "gearimpl/Util.h"
 
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 
 #include "streamlog/streamlog.h"
@@ -86,14 +87,14 @@ TVKalDetector(250) // SJA:FIXME initial size, 250 looks reasonable for ILD, thou
   // create measurement layers
   Double_t r = rmin;
   
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   
   for (Int_t layer = 0; layer < nlayers; layer++) {
     
     encoder.reset() ;  // reset to 0
     
-    encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::TPC ;
-    encoder[lcio::ILDCellID0::layer] = layer ;
+    encoder[lcio::LCTrackerCellID::subdet()] = lcio::ILDDetID::TPC ;
+    encoder[lcio::LCTrackerCellID::layer()] = layer ;
     
     int CellID = encoder.lowWord() ;
     

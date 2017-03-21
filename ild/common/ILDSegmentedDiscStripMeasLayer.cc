@@ -4,7 +4,7 @@
 #include "ILDPlanarStripHit.h"
 
 #include <UTIL/BitField64.h>
-#include <UTIL/ILDConf.h>
+#include "UTIL/LCTrackerConf.h"
 
 #include "TVTrack.h"
 #include "TVector3.h"
@@ -114,10 +114,10 @@ TVector3 ILDSegmentedDiscStripMeasLayer::HitToXv(const TVTrackHit &vht) const
   
   const ILDPlanarStripHit &mv = dynamic_cast<const ILDPlanarStripHit &>(vht);
   
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ;
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ;
   EVENT::TrackerHit* hit = mv.getLCIOTrackerHit();
   encoder.setValue(hit->getCellID0());
-  int segmentIndex = encoder[lcio::ILDCellID0::module] / 2 ;
+  int segmentIndex = encoder[lcio::LCTrackerCellID::module()] / 2 ;
   
 
   TVector3 XC = this->get_segment_centre(segmentIndex);

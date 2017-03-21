@@ -16,6 +16,7 @@
 #include "ILDDiscMeasLayer.h"
 
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 
 #include "streamlog/streamlog.h"
@@ -48,7 +49,7 @@ void ILDFTDKalDetector::build_staggered_design() {
   
   std::string name = "FTD" ;
   
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   
   
   
@@ -166,12 +167,12 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
   //SJA:FIXME: due to the space frame design of the strip layers there is far too much support so just leave it out for now ...
   TMaterial & support   = isStripReadout == false ? carbon : stripsupport;
   
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ; 
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ; 
   encoder.reset() ;  // reset to 0
   
-  encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::FTD ;
-  encoder[lcio::ILDCellID0::side]   = zsign ;
-  encoder[lcio::ILDCellID0::layer]  = idisk ;
+  encoder[lcio::LCTrackerCellID::subdet()] = lcio::ILDDetID::FTD ;
+  encoder[lcio::LCTrackerCellID::side()]   = zsign ;
+  encoder[lcio::LCTrackerCellID::layer()]  = idisk ;
   
   int start_index = even_petals ? 0 : 1 ;
   std::vector<int> sensors_front;
@@ -194,18 +195,18 @@ void ILDFTDKalDetector::create_segmented_disk_layers( int idisk, int nsegments, 
 
   for (int i=0; i<nsegments; ++i) {
     
-    encoder[lcio::ILDCellID0::module] = start_index + i*2 ;
+    encoder[lcio::LCTrackerCellID::module()] = start_index + i*2 ;
     
     for( unsigned j=0; j<sensors_front.size(); j++ ){
       
-      encoder[lcio::ILDCellID0::sensor] = sensors_front[j];
+      encoder[lcio::LCTrackerCellID::sensor()] = sensors_front[j];
       module_ids_front.push_back( encoder.lowWord() );
       
     }
     
     for( unsigned j=0; j<sensors_back.size(); j++ ){
       
-      encoder[lcio::ILDCellID0::sensor] = sensors_back[j];
+      encoder[lcio::LCTrackerCellID::sensor()] = sensors_back[j];
       module_ids_back.push_back( encoder.lowWord() );
       
     }

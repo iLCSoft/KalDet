@@ -10,6 +10,7 @@
 #include <gearxml/GearXML.h>
 
 #include <UTIL/BitField64.h>
+#include "UTIL/LCTrackerConf.h"
 #include <UTIL/ILDConf.h>
 
 #include <streamlog/streamlog.h>
@@ -90,7 +91,7 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
   Int_t arrayIndex = 0;
 
   // ILD-type Encoder
-  UTIL::BitField64 encoder( lcio::ILDCellID0::encoder_string ) ;
+  UTIL::BitField64 encoder( lcio::LCTrackerCellID::encoding_string() ) ;
 
   // A map to store if a layer, which is a full cylinder, already exists. If it has the same 
   // offset and the same radius, this is the case. Then to not add a Kalman layer but add the module
@@ -161,7 +162,7 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
             // add the measurement layer to this object, and remember where we put it
             encoder.reset() ;  // reset to 0
 
-            encoder[lcio::ILDCellID0::subdet] = lcio::ILDDetID::TPC ;
+            encoder[lcio::LCTrackerCellID::subdet()] = lcio::ILDDetID::TPC ;
 
             int mod = module -> getModuleID() ;
             int row_global =
@@ -176,9 +177,9 @@ LCTPCKalDetector::LCTPCKalDetector(const gear::GearMgr& gearMgr)
   		 */
         	tpcParameters.getModule(0).getNRows() + tpcParameters.getModule(2).getNRows() + row );
 
-            encoder[lcio::ILDCellID0::layer] = row_global ;
+            encoder[lcio::LCTrackerCellID::layer()] = row_global ;
 
-	    //	    encoder[lcio::ILDCellID0::module] = mod ;
+	    //	    encoder[lcio::LCTrackerCellID::module()] = mod ;
 
             int CellID = encoder.lowWord() ;
 
