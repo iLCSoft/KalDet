@@ -1,5 +1,6 @@
 # KalDet
 [![Build Status](https://travis-ci.org/iLCSoft/KalDet.svg?branch=master)](https://travis-ci.org/iLCSoft/KalDet)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/12352/badge.svg)](https://scan.coverity.com/projects/ilcsoft-kaldet)
 
 KalDet is distributed under the [GPLv3 License](http://www.gnu.org/licenses/gpl-3.0.en.html)
 
