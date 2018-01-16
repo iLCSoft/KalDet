@@ -58,7 +58,7 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 # macros for generating root dict sources with rootcint
 SET( ROOT_DICT_CINT_DEFINITIONS "-DHANDLE_DICT_EXCEPTIONS=IGNORED_FOR_CINT" )
-INCLUDE( ${ROOT_DICT_MACROS_FILE} )
+INCLUDE( "${ILCUTIL_ROOT}/cmakemodules/MacroRootDict.cmake" )
 
 
 
