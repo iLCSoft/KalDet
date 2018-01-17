@@ -38,7 +38,7 @@ FIND_PACKAGE( streamlog REQUIRED )
 FOREACH( pkg Marlin ROOT KalTest LCIO GEAR streamlog)
 
   IF( ${pkg}_FOUND )
-    INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
+    INCLUDE_DIRECTORIES( SYSTEM ${${pkg}_INCLUDE_DIRS} )
     LINK_LIBRARIES( ${${pkg}_LIBRARIES} )
   ENDIF()
 
@@ -50,10 +50,8 @@ INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 ### LIBRARY AND TOOLS ######################################################
  
 
-# require proper c++
-#ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
-#----- need long long for int64 for now ------
-#ADD_DEFINITIONS( "-Wno-long-long -fno-strict-aliasing" )
+#fg: silence the following warnings
+ADD_DEFINITIONS( "-Wno-effc++ -Wno-unused-parameter" )
 
 
 # macros for generating root dict sources with rootcint
