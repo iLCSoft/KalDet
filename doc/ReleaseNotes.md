@@ -1,3 +1,11 @@
+# v01-14-01
+
+* 2018-01-31 Frank Gaede ([PR#2](https://github.com/iLCSoft/KalDet/pull/2))
+  - silence all compiler warnings by using:
+      - `"-Wno-effc++ -Wno-unused-parameter"`
+      - and SYSTEM includes
+  - future users/maintainers should consider to actually **fix these warnings**
+
 # v01-14
 
 # v01-13-03
