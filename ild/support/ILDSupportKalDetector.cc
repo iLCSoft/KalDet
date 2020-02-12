@@ -76,10 +76,10 @@ TVKalDetector(10)
     
     
     //SJA:FIXME: HERE WE NEED TO MAKE SURE THAT THE BEAM PIPE IS NEVER DECREASING IN RADII OTHERWISE THE SORTING GOES WRONG
-    if ( rInnerStart < rInnerStart_last ) rInnerStart = rInnerStart_last; rInnerStart_last = rInnerStart;
-    if ( rInnerEnd   < rInnerEnd_last   ) rInnerEnd   = rInnerEnd_last  ; rInnerEnd_last   = rInnerEnd;
-    if ( rOuterStart < rOuterStart_last ) rOuterStart = rOuterStart_last; rOuterStart_last = rOuterStart;
-    if ( rOuterEnd   < rOuterEnd_last   ) rOuterEnd   = rOuterEnd_last;   rOuterEnd_last   = rOuterEnd;
+    rInnerStart = std::max (rInnerStart, rInnerStart_last); rInnerStart_last = rInnerStart;
+    rInnerEnd   = std::max (rInnerEnd, rInnerEnd_last); rInnerEnd_last   = rInnerEnd;
+    rOuterStart = std::max (rOuterStart, rOuterStart_last); rOuterStart_last = rOuterStart;
+    rOuterEnd   = std::max (rOuterEnd, rOuterEnd_last);   rOuterEnd_last   = rOuterEnd;
     
     
     std::stringstream sname;

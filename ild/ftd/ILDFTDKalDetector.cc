@@ -390,7 +390,9 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
   //           which if traversed in the reverse direction to the next boundary then the track be propagated through carbon
   //           for a significant distance 
   
+#ifndef NDEBUG
   double eps = 1.0e-08;
+#endif
   
   for(int disk=0; disk< _nDisks; ++disk){
     
@@ -480,6 +482,7 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
     
     // there should be no gap between support and sensitive
     
+#ifndef NDEBUG
     for( int iPetal=0; iPetal< _FTDgeo[disk].nPetals; iPetal++){
       
       
@@ -491,6 +494,7 @@ void ILDFTDKalDetector::setupGearGeom( const gear::GearMgr& gearMgr ){
       assert( fabs( endSensitive- endSupport ) < eps ); 
       
     }
+#endif
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
