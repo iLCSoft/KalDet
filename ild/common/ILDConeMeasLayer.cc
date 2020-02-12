@@ -122,15 +122,15 @@ Bool_t ILDConeMeasLayer::IsOnSurface(const TVector3 &xx) const
     Double_t r   = xxc.Perp();
     Double_t z   = xxc.Z();
     Double_t s   = (r - GetTanA()*z) * (r + GetTanA()*z);
-    const Double_t kTol = 1.e-8;
+    const Double_t tol = 1.e-8;
 
 #if 0
     std::cout << this->TVMeasLayer::GetName() << ":" << this->GetIndex() << ":" << std::endl;
     std::cout << "s=" << s << " xx=(" << xx.X() << "," << xx.Y() << "," << xx.Z() << ")" << std::endl;
-    std::cout << "bool=" << (TMath::Abs(s) < kTol && ((xx.Z()-fZ1)*(xx.Z()-fZ2) <= 0.)) << std::endl;
+    std::cout << "bool=" << (TMath::Abs(s) < tol && ((xx.Z()-fZ1)*(xx.Z()-fZ2) <= 0.)) << std::endl;
     std::cout << "fZ1=" << fZ1 << " fZ2=" << fZ2 << std::endl;
 #endif
 
-    return (TMath::Abs(s) < kTol && ((xx.Z()-fZ1)*(xx.Z()-fZ2) <= 0.));
+    return (TMath::Abs(s) < tol && ((xx.Z()-fZ1)*(xx.Z()-fZ2) <= 0.));
 } 
 
