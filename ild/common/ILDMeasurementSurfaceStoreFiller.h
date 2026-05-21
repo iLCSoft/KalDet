@@ -18,11 +18,7 @@ class ILDMeasurementSurfaceStoreFiller : public MeasurementSurfaceStoreFiller{
   public:
 
    
-  ILDMeasurementSurfaceStoreFiller(const gear::GearMgr& gear_mgr) :
-    _nVTXLayers(0),
-    _nSITLayers(0),
-    _nFTDLayers(0),
-    _nSETLayers(0) {
+  ILDMeasurementSurfaceStoreFiller(const gear::GearMgr& gear_mgr) {
 
     this->get_gear_parameters(gear_mgr);
     
@@ -61,12 +57,6 @@ class ILDMeasurementSurfaceStoreFiller : public MeasurementSurfaceStoreFiller{
   
   /** the strip angles for every layer and sensor */
   std::vector< std::vector< double > > _FTDStripAngles;
-  
-  unsigned _nVTXLayers;
-  unsigned _nSITLayers;
-  unsigned _nFTDLayers;
-  unsigned _nSETLayers;
-  
   
   const gear::ZPlanarParameters* _paramVXD;
   const gear::ZPlanarParameters* _paramSIT;

@@ -31,7 +31,7 @@ ILDRotatedTrapMeaslayer::ILDRotatedTrapMeaslayer(TMaterial &min,
                                                  const Char_t    *name)
 : ILDVMeasLayer(min, mout, Bz, is_active, CellID, name),
 TPlane(center, normal),
-_sortingPolicy(SortingPolicy), _innerBaseLength(innerBaseLength), _outerBaseLength(outerBaseLength), _halfPetal(half_petal)
+_sortingPolicy(SortingPolicy), _outerBaseLength(outerBaseLength), _halfPetal(half_petal)
 {
   
   if( GetXc().Z() >= 0 ) {

@@ -85,9 +85,7 @@ public:
    
 private:
   Double_t fZ1;      // z of front face
-  Double_t fR1;      // r of front face
   Double_t fZ2;      // z of back end
-  Double_t fR2;      // r of back end
   Double_t fsortingPolicy; // used for sorting the layers in to out
 
   

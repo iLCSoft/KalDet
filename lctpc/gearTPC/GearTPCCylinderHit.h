@@ -48,6 +48,8 @@ public:
   /** Print some debug output to std err.
    */
   virtual void       DebugPrint(Option_t *opt = "")          const;
+
+  using TKalMatrix::DebugPrint;
 };
 
 }//namespace kaldet
