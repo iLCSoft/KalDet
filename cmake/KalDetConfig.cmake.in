@@ -54,15 +54,6 @@ INCLUDE( "@ILCSOFT_CMAKE_MODULES_ROOT@/MacroCheckPackageLibs.cmake" )
 CHECK_PACKAGE_LIBS( KalDet KalDet )
 
 
-
-
-# ---------- libraries dependencies -------------------------------------------
-# this sets KalDet_${COMPONENT}_LIB_DEPENDS variables
-INCLUDE( "${KalDet_ROOT}/lib/cmake/KalDetLibDeps.cmake" )
- 
-
-
-
 # ---------- final checking ---------------------------------------------------
 INCLUDE( FindPackageHandleStandardArgs )
 # set KALDET_FOUND to TRUE if all listed variables are TRUE and not empty
