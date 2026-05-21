@@ -83,7 +83,6 @@ private:
   Double_t _signZ ;
   Double_t _innerR ;
   Double_t _outerR ;
-  Double_t _innerBaseLength ;
   Double_t _outerBaseLength ;
   Double_t _cosPhi ;  //** cos of the azimuthal angle of the petal 
   Double_t _sinPhi ;  //** sin of the azimuthal angle of the petal 

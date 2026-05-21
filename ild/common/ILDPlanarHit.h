@@ -32,6 +32,8 @@ public:
   
   /** Print Debug information */
   virtual void       DebugPrint(Option_t *opt = "")           const;
+
+  using TKalMatrix::DebugPrint;
   
   
 private:

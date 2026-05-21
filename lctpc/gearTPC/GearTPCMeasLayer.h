@@ -77,6 +77,8 @@ namespace kaldet
      */
     virtual TKalMatrix XvToMv    (const TVector3   &xv)   const = 0;
 
+    using TVMeasLayer::XvToMv;
+
     /**
      * Get the z-depenent resolution in the readout plane 
      * (usually x or r\f$\phi\f$).

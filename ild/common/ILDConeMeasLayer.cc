@@ -31,9 +31,7 @@ ILDConeMeasLayer::ILDConeMeasLayer(TMaterial &min,
                                (r2-r1)/(z2-z1),
                             0.,0.,(r2*z1-r1*z2)/(r2-r1)),
                    fZ1(z1),
-                   fR1(r1),
                    fZ2(z2),
-                   fR2(r2),
                    fsortingPolicy(SortingPolicy)
 {
 }

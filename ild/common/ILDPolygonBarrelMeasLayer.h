@@ -120,10 +120,7 @@ private:
   double _sortingPolicy;
 
   double   _r0;       // min distance to the z-axis
-  double   _lhalf;    // half length
   int      _nsides;   
-  double   _zpos;     // z of the centre 
-  double   _phi0;     // phi of the first normal following the xaxis positive rotation
   
   double   _segment_dphi;
   double   _start_phi;
