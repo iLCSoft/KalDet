@@ -1,3 +1,20 @@
+# v01-15
+
+* 2026-05-21 Juan Miguel Carceller ([PR#7](https://github.com/iLCSoft/KalDet/pull/7))
+  - Do not generate a LibDeps.cmake file
+
+* 2026-05-21 Juan Miguel Carceller ([PR#6](https://github.com/iLCSoft/KalDet/pull/6))
+  - Add missing definitions in lctpc/gearTPC/LinkDef.h
+
+* 2026-05-21 Juan Miguel Carceller ([PR#5](https://github.com/iLCSoft/KalDet/pull/5))
+  - Add LANGUAGES CXX to project() to disable looking for a C compiler
+
+* 2026-05-21 scott snyder ([PR#3](https://github.com/iLCSoft/KalDet/pull/3))
+  - Fix warnings seen with current compilers.
+
+* 2026-04-23 jmcarcell ([PR#4](https://github.com/iLCSoft/KalDet/pull/4))
+  - Bump the minimum version of CMake to 3.10, to be able to compile with CMake 4.0
+
 # v01-14-01
 
 * 2018-01-31 Frank Gaede ([PR#2](https://github.com/iLCSoft/KalDet/pull/2))
