@@ -7,7 +7,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.10 FATAL_ERROR)
 
 
 # project name
-PROJECT( KalDet )
+PROJECT( KalDet LANGUAGES CXX )
 
 
 # project version
