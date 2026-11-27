@@ -32,6 +32,10 @@ FIND_PACKAGE( LCIO REQUIRED )
 FIND_PACKAGE( GEAR REQUIRED )
 FIND_PACKAGE( KalTest 1.5 REQUIRED )
 FIND_PACKAGE( ROOT REQUIRED )
+# Since ROOT 6.42, TMaterial is in the TGeometry library instead of Graf3d
+IF( TARGET ROOT::TGeometry )
+  LIST( APPEND ROOT_LIBRARIES ROOT::TGeometry )
+ENDIF()
 FIND_PACKAGE( streamlog REQUIRED )
 
 #NB: need ROOT before KalTest (needed on case sensitive systems and classes that differ only in capitalization)
