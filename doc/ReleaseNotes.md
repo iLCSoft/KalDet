@@ -1,3 +1,8 @@
+# v01-15-01
+
+* 2026-11-27 Juan Miguel Carceller ([PR#8](https://github.com/iLCSoft/KalDet/pull/8))
+  - Link to `ROOT::TGeometry` when available. Since ROOT 6.42, `TMaterial` is in the TGeometry library instead of Graf3d.
+
 # v01-15
 
 * 2026-05-21 Juan Miguel Carceller ([PR#7](https://github.com/iLCSoft/KalDet/pull/7))
