@@ -13,7 +13,7 @@ PROJECT( KalDet LANGUAGES CXX )
 # project version
 SET( KalDet_VERSION_MAJOR 1 )
 SET( KalDet_VERSION_MINOR 15 )
-SET( KalDet_VERSION_PATCH 0 )
+SET( KalDet_VERSION_PATCH 1 )
 
 cmake_policy(SET CMP0008 NEW)
 
